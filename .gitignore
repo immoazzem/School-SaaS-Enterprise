@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Laravel / PHP
+storage/*.key
+bootstrap/cache/*.php
+.phpunit.cache/
+coverage/
+
+# Nuxt / Node builds
+.nuxt/
+.output/
+dist/
+.vite/
+
+# Logs and OS files
+*.log
+.DS_Store
+Thumbs.db
+
+# Local reference clone; keep it on disk, do not commit it into the rebuild repo.
+legacy-reference/
+
