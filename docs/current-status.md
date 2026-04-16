@@ -44,15 +44,14 @@
   - typed API/auth composables
   - Academic Classes workspace
   - shared CSS foundation
+- Added Nuxt client route protection with stale-token cleanup.
+- Added dashboard school creation, tenant selection list, and first-school empty state.
 
 ## Not Started
 
 - MySQL database creation.
 - Herd site configuration.
-- Full frontend route protection.
-- Frontend school creation screen.
 - Live browser verification against a running Laravel API.
-- Frontend auth/dashboard implementation.
 - First-school bootstrap UX/API refinement.
 
 ## Verification
@@ -61,7 +60,7 @@
 - `vendor\bin\pint --test` from `apps/api`: passed.
 - `php artisan route:list` from `apps/api`: passed, 16 routes.
 - `php artisan migrate:fresh --seed` from `apps/api`: passed outside sandbox after sandbox SQLite disk I/O failure.
-- `npm run build` from `apps/web`: passed after Nuxt app UI slice.
+- `npm run build` from `apps/web`: passed after Nuxt app UI slice and again after route protection/school creation.
 - Initial sandbox runs hit Windows permission/process limits, then passed outside the sandbox with approval.
 
 ## Next Step
@@ -69,8 +68,8 @@
 Continue Phase 1 implementation:
 
 1. Configure Laravel API for local MySQL/Herd once DB credentials are confirmed.
-2. Add frontend route protection and school creation flow.
-3. Verify login/dashboard/classes against a running local API.
+2. Verify login/dashboard/classes against a running local API.
+3. Configure role-aware frontend navigation and module permissions.
 
 ## New Session Startup Prompt
 

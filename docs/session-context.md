@@ -118,7 +118,9 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Backend foundation tests pass: `php artisan test` reports 9 tests / 34 assertions.
 - Pint, route list, and `php artisan migrate:fresh --seed` pass for the backend foundation.
 - Nuxt has a first app UI slice: login page, dashboard shell, API/auth composables, and Academic Classes workspace.
-- Nuxt build passes after the app UI slice.
+- Nuxt has client route protection with stale-token cleanup.
+- Dashboard can create a school through `POST /api/schools`, select the new tenant, and show active tenants.
+- Nuxt build passes after the app UI slice and after route protection/school creation.
 - MySQL/Herd site config is still pending; tests currently use SQLite in memory.
 
 ## Required Project Structure

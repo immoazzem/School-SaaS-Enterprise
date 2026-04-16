@@ -14,6 +14,17 @@ interface SchoolsResponse {
   data: ApiSchool[]
 }
 
+interface SchoolResponse {
+  data: ApiSchool
+}
+
+interface CreateSchoolInput {
+  name: string
+  slug?: string
+  timezone?: string
+  locale?: string
+}
+
 export function useAuth() {
   const api = useApi()
   const token = useState<string | null>('auth.token', () => null)
@@ -73,6 +84,25 @@ export function useAuth() {
     return response.data
   }
 
+  async function createSchool(input: CreateSchoolInput) {
+    const response = await api.request<SchoolResponse>('/schools', {
+      method: 'POST',
+      body: input,
+    })
+
+    const existingIndex = schools.value.findIndex((school) => school.id === response.data.id)
+
+    if (existingIndex >= 0) {
+      schools.value[existingIndex] = response.data
+    } else {
+      schools.value = [...schools.value, response.data]
+    }
+
+    selectSchool(response.data.id)
+
+    return response.data
+  }
+
   function selectSchool(schoolId: number) {
     selectedSchoolId.value = schoolId
 
@@ -101,6 +131,7 @@ export function useAuth() {
     login,
     refreshProfile,
     refreshSchools,
+    createSchool,
     selectSchool,
     logout,
   }

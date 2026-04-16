@@ -3,7 +3,15 @@ const auth = useAuth()
 const router = useRouter()
 
 const loading = ref(false)
+const creatingSchool = ref(false)
 const error = ref('')
+const success = ref('')
+const schoolForm = reactive({
+  name: '',
+  slug: '',
+  timezone: 'Asia/Dhaka',
+  locale: 'en',
+})
 
 const selectedSchool = computed(() =>
   auth.schools.value.find((school) => school.id === auth.selectedSchoolId.value),
@@ -12,6 +20,7 @@ const selectedSchool = computed(() =>
 async function loadDashboard() {
   loading.value = true
   error.value = ''
+  success.value = ''
 
   try {
     await auth.refreshProfile()
@@ -26,6 +35,29 @@ async function loadDashboard() {
 function chooseSchool(event: Event) {
   const value = Number((event.target as HTMLSelectElement).value)
   auth.selectSchool(value)
+}
+
+async function createSchool() {
+  creatingSchool.value = true
+  error.value = ''
+  success.value = ''
+
+  try {
+    const school = await auth.createSchool({
+      name: schoolForm.name,
+      slug: schoolForm.slug || undefined,
+      timezone: schoolForm.timezone || undefined,
+      locale: schoolForm.locale || undefined,
+    })
+
+    success.value = `${school.name} is ready.`
+    schoolForm.name = ''
+    schoolForm.slug = ''
+  } catch (schoolError) {
+    error.value = schoolError instanceof Error ? schoolError.message : 'Unable to create school.'
+  } finally {
+    creatingSchool.value = false
+  }
 }
 
 async function openClasses() {
@@ -78,6 +110,7 @@ onMounted(loadDashboard)
       </header>
 
       <p v-if="error" class="error">{{ error }}</p>
+      <p v-if="success" class="success">{{ success }}</p>
       <p v-if="loading" class="muted">Loading workspace</p>
 
       <section class="metrics">
@@ -93,6 +126,79 @@ onMounted(loadDashboard)
           <span>Module</span>
           <strong>Academics</strong>
         </article>
+      </section>
+
+      <section class="workspace-grid">
+        <form class="surface create-school" @submit.prevent="createSchool">
+          <div>
+            <p class="muted">School setup</p>
+            <h2>Create a school</h2>
+            <p>Start a tenant, assign yourself as owner, and continue into Academic Classes.</p>
+          </div>
+
+          <div class="field">
+            <label for="school-name">School name</label>
+            <input
+              id="school-name"
+              v-model="schoolForm.name"
+              autocomplete="organization"
+              required
+              type="text"
+              placeholder="Example International School"
+            />
+          </div>
+
+          <div class="field">
+            <label for="school-slug">Slug</label>
+            <input
+              id="school-slug"
+              v-model="schoolForm.slug"
+              type="text"
+              placeholder="example-international-school"
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="school-timezone">Timezone</label>
+              <input id="school-timezone" v-model="schoolForm.timezone" type="text" />
+            </div>
+            <div class="field">
+              <label for="school-locale">Locale</label>
+              <input id="school-locale" v-model="schoolForm.locale" type="text" />
+            </div>
+          </div>
+
+          <button class="button" type="submit" :disabled="creatingSchool">
+            {{ creatingSchool ? 'Creating school' : 'Create school' }}
+          </button>
+        </form>
+
+        <section class="surface tenant-list">
+          <div>
+            <p class="muted">Active tenants</p>
+            <h2>Schools</h2>
+          </div>
+
+          <div v-if="auth.schools.value.length" class="school-list">
+            <button
+              v-for="school in auth.schools.value"
+              :key="school.id"
+              class="school-row"
+              :class="{ selected: school.id === auth.selectedSchoolId.value }"
+              type="button"
+              @click="auth.selectSchool(school.id)"
+            >
+              <span>
+                <strong>{{ school.name }}</strong>
+                <small>{{ school.slug }}</small>
+              </span>
+              <em>{{ school.status }}</em>
+            </button>
+          </div>
+
+          <p v-else class="empty-copy">No schools yet. Create the first tenant to unlock setup modules.</p>
+        </section>
       </section>
 
       <section class="surface action-strip">
@@ -231,6 +337,79 @@ nav {
   padding: 24px;
 }
 
+.workspace-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
+  gap: 16px;
+}
+
+.create-school,
+.tenant-list {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  padding: 24px;
+}
+
+.create-school h2,
+.tenant-list h2 {
+  margin: 0;
+  color: #16201c;
+}
+
+.create-school p,
+.empty-copy {
+  margin: 8px 0 0;
+  color: #607169;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.school-list {
+  display: grid;
+  gap: 10px;
+}
+
+.school-row {
+  display: flex;
+  min-height: 68px;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #d8e2de;
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: #fff;
+  color: #16201c;
+  cursor: pointer;
+  text-align: left;
+}
+
+.school-row:hover,
+.school-row.selected {
+  border-color: #0f5f4a;
+  background: #f1f7f4;
+}
+
+.school-row span {
+  display: grid;
+  gap: 4px;
+}
+
+.school-row small {
+  color: #607169;
+}
+
+.school-row em {
+  color: #0f5f4a;
+  font-style: normal;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
 .action-strip p {
   max-width: 620px;
   margin: 10px 0 0;
@@ -248,7 +427,9 @@ nav {
   }
 
   .metrics,
+  .workspace-grid,
   .topbar,
+  .form-row,
   .action-strip {
     grid-template-columns: 1fr;
   }
