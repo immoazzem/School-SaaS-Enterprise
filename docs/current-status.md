@@ -47,11 +47,14 @@
   - dashboard shell
   - typed API/auth composables
   - Academic Classes workspace
+  - Academic Sections workspace
   - shared CSS foundation
 - Added Nuxt client route protection with stale-token cleanup.
 - Added dashboard school creation, tenant selection list, and first-school empty state.
 - Added role and permission details to the `/api/me` user payload.
 - Added role-aware dashboard navigation states based on selected-school permissions.
+- Added Sections dashboard navigation gated by `sections.manage`.
+- Added Nuxt Academic Sections workspace with class filtering, create, edit, and archive flows.
 - Updated Laravel and Nuxt env examples for Herd/MySQL local development.
 - Updated local development docs for the current bearer-token Sanctum flow.
 - Linked the Laravel API folder in Herd as secured `https://school-api.test` on PHP 8.5.
@@ -82,6 +85,7 @@
 - `Invoke-WebRequest https://school-api.test/api/me`: passed, 401 Unauthorized JSON.
 - Live Herd API login/school/class smoke test: passed.
 - `npm run build` from `apps/web`: passed with local `.env` set to `https://school-api.test/api`.
+- `npm run build` from `apps/web`: passed after Academic Sections workspace, with existing Nuxt/Nitro warnings.
 - Nuxt dev server startup from this Codex shell did not become reachable on port 3000; production build remains valid.
 - Initial sandbox runs hit Windows permission/process limits, then passed outside the sandbox with approval.
 
@@ -91,8 +95,7 @@ Continue Phase 2 implementation:
 
 1. Configure Laravel API for local MySQL once DB credentials are confirmed.
 2. Verify the Nuxt UI in a browser against `https://school-api.test/api`.
-3. Add the Nuxt Academic Sections workspace.
-4. Continue academic setup modules: years, subjects, shifts, groups.
+3. Continue academic setup modules: years, subjects, shifts, groups.
 
 ## New Session Startup Prompt
 

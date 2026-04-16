@@ -25,6 +25,11 @@ const navItems = computed(() => [
     enabled: selectedSchool.value?.permissions?.includes('academic_classes.manage') ?? false,
   },
   {
+    label: 'Sections',
+    active: false,
+    enabled: selectedSchool.value?.permissions?.includes('sections.manage') ?? false,
+  },
+  {
     label: 'People',
     active: false,
     enabled: selectedSchool.value?.permissions?.includes('students.manage') ?? false,
@@ -88,6 +93,15 @@ async function openClasses() {
   await router.push(`/schools/${auth.selectedSchoolId.value}/academic-classes`)
 }
 
+async function openSections() {
+  if (!auth.selectedSchoolId.value) {
+    error.value = 'Create or select a school first.'
+    return
+  }
+
+  await router.push(`/schools/${auth.selectedSchoolId.value}/academic-sections`)
+}
+
 onMounted(loadDashboard)
 </script>
 
@@ -106,7 +120,7 @@ onMounted(loadDashboard)
           :class="{ active: item.active }"
           type="button"
           :disabled="!item.enabled"
-          @click="item.label === 'Academic Classes' ? openClasses() : undefined"
+          @click="item.label === 'Academic Classes' ? openClasses() : item.label === 'Sections' ? openSections() : undefined"
         >
           <span>{{ item.label }}</span>
           <small v-if="!item.enabled">Locked</small>

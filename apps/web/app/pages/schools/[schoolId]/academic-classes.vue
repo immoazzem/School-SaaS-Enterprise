@@ -90,6 +90,9 @@ onMounted(async () => {
         <h1>Academic Classes</h1>
         <p>Manage the class list for the active school.</p>
       </div>
+      <NuxtLink class="button secondary" :to="`/schools/${schoolId}/academic-sections`">
+        Manage sections
+      </NuxtLink>
     </header>
 
     <section class="classes-grid">
@@ -178,6 +181,10 @@ onMounted(async () => {
 }
 
 .classes-header {
+  display: flex;
+  gap: 20px;
+  align-items: end;
+  justify-content: space-between;
   margin-bottom: 24px;
 }
 
@@ -278,6 +285,11 @@ th {
 
   .classes-grid {
     grid-template-columns: 1fr;
+  }
+
+  .classes-header {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
 </style>

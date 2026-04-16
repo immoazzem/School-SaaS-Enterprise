@@ -118,11 +118,13 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - School creation assigns the seeded `school-owner` role to the creator.
 - Backend foundation tests pass after Academic Sections: `php artisan test` reports 12 tests / 60 assertions.
 - Pint, route list, and `php artisan migrate:fresh --seed` pass for the backend foundation.
-- Nuxt has a first app UI slice: login page, dashboard shell, API/auth composables, and Academic Classes workspace.
+- Nuxt has a first app UI slice: login page, dashboard shell, API/auth composables, Academic Classes workspace, and Academic Sections workspace.
 - Nuxt has client route protection with stale-token cleanup.
 - Dashboard can create a school through `POST /api/schools`, select the new tenant, and show active tenants.
 - `/api/me` includes per-school role and permission details.
 - Dashboard navigation uses the selected school's permissions for locked/enabled module states.
+- Sections navigation is gated by `sections.manage`.
+- Academic Sections workspace supports class filtering, create, edit, and archive flows.
 - Nuxt build passes after the app UI slice and after route protection/school creation.
 - Backend tests pass after the Academic Sections API: 12 tests / 60 assertions.
 - Env examples are Herd/MySQL-ready:
@@ -143,7 +145,7 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Nuxt production build passes with that env.
 - Nuxt dev server did not become reachable on port 3000 from the Codex shell; use browser/manual dev server verification next.
 - MySQL database config is still pending; tests currently use SQLite in memory.
-- Next app slice: add the Nuxt Academic Sections workspace.
+- Next app slice: continue academic setup modules: years, subjects, shifts, groups.
 
 ## Required Project Structure
 

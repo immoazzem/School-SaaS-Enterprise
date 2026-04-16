@@ -28,6 +28,19 @@ export interface AcademicClass {
   status: string
 }
 
+export interface AcademicSection {
+  id: number
+  school_id: number
+  academic_class_id: number
+  academic_class?: Pick<AcademicClass, 'id' | 'name' | 'code'>
+  name: string
+  code: string
+  capacity: number | null
+  room: string | null
+  sort_order: number
+  status: string
+}
+
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
   body?: Record<string, unknown>
