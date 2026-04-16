@@ -8,12 +8,15 @@ use App\Models\AuditLog;
 use App\Models\School;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class AcademicClassController extends Controller
 {
     public function index(Request $request, School $school): JsonResponse
     {
+        Gate::authorize('viewAny', [AcademicClass::class, $school]);
+
         $classes = $school->academicClasses()
             ->orderBy('sort_order')
             ->orderBy('name')
@@ -24,6 +27,8 @@ class AcademicClassController extends Controller
 
     public function store(Request $request, School $school): JsonResponse
     {
+        Gate::authorize('create', [AcademicClass::class, $school]);
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'code' => [
@@ -52,14 +57,14 @@ class AcademicClassController extends Controller
 
     public function show(Request $request, School $school, AcademicClass $academicClass): JsonResponse
     {
-        $this->ensureClassBelongsToSchool($school, $academicClass);
+        Gate::authorize('view', [$academicClass, $school]);
 
         return response()->json(['data' => $academicClass]);
     }
 
     public function update(Request $request, School $school, AcademicClass $academicClass): JsonResponse
     {
-        $this->ensureClassBelongsToSchool($school, $academicClass);
+        Gate::authorize('update', [$academicClass, $school]);
 
         $validated = $request->validate([
             'name' => ['sometimes', 'required', 'string', 'max:120'],
@@ -91,7 +96,7 @@ class AcademicClassController extends Controller
 
     public function destroy(Request $request, School $school, AcademicClass $academicClass): JsonResponse
     {
-        $this->ensureClassBelongsToSchool($school, $academicClass);
+        Gate::authorize('delete', [$academicClass, $school]);
 
         $oldValues = $academicClass->only(['name', 'code', 'description', 'sort_order', 'status']);
 
@@ -102,11 +107,6 @@ class AcademicClassController extends Controller
         ]);
 
         return response()->json(status: 204);
-    }
-
-    private function ensureClassBelongsToSchool(School $school, AcademicClass $academicClass): void
-    {
-        abort_unless($academicClass->school_id === $school->id, 404);
     }
 
     /**

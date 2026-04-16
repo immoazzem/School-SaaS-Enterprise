@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\AcademicClass;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\School;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -71,6 +73,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'status' => 'active',
             'joined_at' => now(),
         ]);
+        $this->grantAcademicClassManagement($user, $school);
 
         Sanctum::actingAs($user);
 
@@ -148,6 +151,24 @@ class EnterpriseFoundationApiTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_active_school_member_without_permission_cannot_manage_academic_classes(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Limited School', 'slug' => 'limited-school']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/academic-classes", [
+            'name' => 'Class One',
+            'code' => 'C1',
+        ])->assertForbidden();
+    }
+
     public function test_database_seeder_creates_enterprise_roles_and_permissions(): void
     {
         $this->seed();
@@ -157,5 +178,27 @@ class EnterpriseFoundationApiTest extends TestCase
         $this->assertDatabaseHas('roles', ['key' => 'super-admin', 'is_system' => true]);
         $this->assertDatabaseHas('roles', ['key' => 'read-only-auditor', 'is_system' => true]);
         $this->assertDatabaseCount('roles', 9);
+    }
+
+    private function grantAcademicClassManagement(User $user, School $school): void
+    {
+        $permission = Permission::query()->create([
+            'module' => 'academics',
+            'key' => 'academic_classes.manage',
+            'description' => 'Manage academic classes',
+        ]);
+
+        $role = Role::query()->create([
+            'school_id' => $school->id,
+            'name' => 'Academic Manager',
+            'key' => 'academic-manager',
+        ]);
+
+        $role->permissions()->attach($permission);
+
+        $user->roleAssignments()->create([
+            'school_id' => $school->id,
+            'role_id' => $role->id,
+        ]);
     }
 }

@@ -46,6 +46,16 @@ class User extends Authenticatable
         return $this->hasMany(UserRoleAssignment::class);
     }
 
+    public function hasSchoolPermission(School|int $school, string $permission): bool
+    {
+        $schoolId = $school instanceof School ? $school->id : $school;
+
+        return $this->roleAssignments()
+            ->where('school_id', $schoolId)
+            ->whereHas('role.permissions', fn ($query) => $query->where('key', $permission))
+            ->exists();
+    }
+
     /**
      * Get the attributes that should be cast.
      *

@@ -113,7 +113,8 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Token auth, school list/create, and tenant-scoped Academic Classes CRUD endpoints exist.
 - Enterprise role/permission seeders and Academic Classes audit-log writes exist.
 - Active school membership checks use reusable `school.member` route middleware.
-- Backend foundation tests pass: `php artisan test` reports 8 tests / 32 assertions.
+- Academic Class policy checks enforce `academic_classes.manage`.
+- Backend foundation tests pass: `php artisan test` reports 9 tests / 33 assertions.
 - Pint, route list, and `php artisan migrate:fresh --seed` pass for the backend foundation.
 - MySQL/Herd site config is still pending; tests currently use SQLite in memory.
 
