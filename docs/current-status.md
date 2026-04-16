@@ -33,21 +33,23 @@
 - Added tenant-scoped Academic Classes CRUD under:
   - `/api/schools/{school}/academic-classes`
 - Added feature tests for login, profile lookup, school creation, Academic Classes CRUD, and cross-school access denial.
+- Added enterprise role/permission seeders.
+- Added audit-log writes for Academic Classes create/update/delete.
 
 ## Not Started
 
 - MySQL database creation.
 - Herd site configuration.
 - Frontend auth/dashboard implementation.
-- Audit-log event writing for class mutations.
 - Policy/middleware extraction for active school context.
-- Seeders for enterprise roles and permissions.
+- First-school bootstrap UX/API refinement.
 
 ## Verification
 
-- `php artisan test` from `apps/api`: passed, 6 tests / 23 assertions.
+- `php artisan test` from `apps/api`: passed, 7 tests / 31 assertions.
 - `vendor\bin\pint --test` from `apps/api`: passed.
 - `php artisan route:list` from `apps/api`: passed, 16 routes.
+- `php artisan migrate:fresh --seed` from `apps/api`: passed outside sandbox after sandbox SQLite disk I/O failure.
 - `npm run build` from `apps/web`: passed.
 - Initial sandbox runs hit Windows permission/process limits, then passed outside the sandbox with approval.
 
@@ -55,11 +57,10 @@
 
 Continue Phase 1 implementation:
 
-1. Add role/permission seeders and a first-school bootstrap path.
-2. Extract active-school context middleware/policies from the controller-level guard.
-3. Add audit-log writes for Academic Classes mutations.
-4. Configure Laravel API for local MySQL/Herd once DB credentials are confirmed.
-5. Start Nuxt frontend auth/dashboard shell and Academic Classes screens.
+1. Extract active-school context middleware/policies from the controller-level guard.
+2. Add a first-school bootstrap UX/API refinement.
+3. Configure Laravel API for local MySQL/Herd once DB credentials are confirmed.
+4. Start Nuxt frontend auth/dashboard shell and Academic Classes screens.
 
 ## New Session Startup Prompt
 

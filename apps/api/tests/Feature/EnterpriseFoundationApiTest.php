@@ -87,6 +87,13 @@ class EnterpriseFoundationApiTest extends TestCase
 
         $classId = $created->json('data.id');
 
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'academic_class.created',
+            'auditable_id' => $classId,
+        ]);
+
         $this->getJson("/api/schools/{$school->id}/academic-classes")
             ->assertOk()
             ->assertJsonPath('data.0.id', $classId);
@@ -95,10 +102,23 @@ class EnterpriseFoundationApiTest extends TestCase
             'name' => 'Class 1',
         ])->assertOk()->assertJsonPath('data.name', 'Class 1');
 
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'academic_class.updated',
+            'auditable_id' => $classId,
+        ]);
+
         $this->deleteJson("/api/schools/{$school->id}/academic-classes/{$classId}")
             ->assertNoContent();
 
         $this->assertSoftDeleted(AcademicClass::class, ['id' => $classId]);
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'academic_class.deleted',
+            'auditable_id' => $classId,
+        ]);
     }
 
     public function test_user_cannot_access_another_schools_classes(): void
@@ -110,5 +130,16 @@ class EnterpriseFoundationApiTest extends TestCase
 
         $this->getJson("/api/schools/{$school->id}/academic-classes")
             ->assertForbidden();
+    }
+
+    public function test_database_seeder_creates_enterprise_roles_and_permissions(): void
+    {
+        $this->seed();
+
+        $this->assertDatabaseHas('permissions', ['key' => 'academic_classes.manage']);
+        $this->assertDatabaseHas('permissions', ['key' => 'audit.view']);
+        $this->assertDatabaseHas('roles', ['key' => 'super-admin', 'is_system' => true]);
+        $this->assertDatabaseHas('roles', ['key' => 'read-only-auditor', 'is_system' => true]);
+        $this->assertDatabaseCount('roles', 9);
     }
 }
