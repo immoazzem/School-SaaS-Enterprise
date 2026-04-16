@@ -124,6 +124,9 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Dashboard navigation uses the selected school's permissions for locked/enabled module states.
 - Nuxt build passes after the app UI slice and after route protection/school creation.
 - Backend tests pass after the RBAC payload update: 9 tests / 42 assertions.
+- Env examples are Herd/MySQL-ready:
+  - `apps/api/.env.example`
+  - `apps/web/.env.example`
 - MySQL/Herd site config is still pending; tests currently use SQLite in memory.
 
 ## Required Project Structure

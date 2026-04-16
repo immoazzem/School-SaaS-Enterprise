@@ -48,6 +48,8 @@
 - Added dashboard school creation, tenant selection list, and first-school empty state.
 - Added role and permission details to the `/api/me` user payload.
 - Added role-aware dashboard navigation states based on selected-school permissions.
+- Updated Laravel and Nuxt env examples for Herd/MySQL local development.
+- Updated local development docs for the current bearer-token Sanctum flow.
 
 ## Not Started
 
@@ -62,6 +64,7 @@
 - `php artisan route:list` from `apps/api`: passed, 16 routes.
 - `php artisan migrate:fresh --seed` from `apps/api`: passed outside sandbox after sandbox SQLite disk I/O failure.
 - `npm run build` from `apps/web`: passed after Nuxt app UI slice and again after route protection/school creation.
+- Env template/docs update does not require code execution.
 - Initial sandbox runs hit Windows permission/process limits, then passed outside the sandbox with approval.
 
 ## Next Step
