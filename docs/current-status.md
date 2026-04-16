@@ -38,12 +38,20 @@
 - Added reusable `school.member` middleware for active school membership checks.
 - Added Academic Class policy checks for `academic_classes.manage`.
 - School creation now assigns the seeded `school-owner` role to the creator when the RBAC seed exists.
+- Replaced the Nuxt welcome screen with the first app UI slice:
+  - login page
+  - dashboard shell
+  - typed API/auth composables
+  - Academic Classes workspace
+  - shared CSS foundation
 
 ## Not Started
 
 - MySQL database creation.
 - Herd site configuration.
-- Frontend auth/dashboard implementation.
+- Full frontend route protection.
+- Frontend school creation screen.
+- Live browser verification against a running Laravel API.
 - Frontend auth/dashboard implementation.
 - First-school bootstrap UX/API refinement.
 
@@ -53,7 +61,7 @@
 - `vendor\bin\pint --test` from `apps/api`: passed.
 - `php artisan route:list` from `apps/api`: passed, 16 routes.
 - `php artisan migrate:fresh --seed` from `apps/api`: passed outside sandbox after sandbox SQLite disk I/O failure.
-- `npm run build` from `apps/web`: passed.
+- `npm run build` from `apps/web`: passed after Nuxt app UI slice.
 - Initial sandbox runs hit Windows permission/process limits, then passed outside the sandbox with approval.
 
 ## Next Step
@@ -61,7 +69,8 @@
 Continue Phase 1 implementation:
 
 1. Configure Laravel API for local MySQL/Herd once DB credentials are confirmed.
-2. Start Nuxt frontend auth/dashboard shell and Academic Classes screens.
+2. Add frontend route protection and school creation flow.
+3. Verify login/dashboard/classes against a running local API.
 
 ## New Session Startup Prompt
 

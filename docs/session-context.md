@@ -117,6 +117,8 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - School creation assigns the seeded `school-owner` role to the creator.
 - Backend foundation tests pass: `php artisan test` reports 9 tests / 34 assertions.
 - Pint, route list, and `php artisan migrate:fresh --seed` pass for the backend foundation.
+- Nuxt has a first app UI slice: login page, dashboard shell, API/auth composables, and Academic Classes workspace.
+- Nuxt build passes after the app UI slice.
 - MySQL/Herd site config is still pending; tests currently use SQLite in memory.
 
 ## Required Project Structure
