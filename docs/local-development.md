@@ -52,7 +52,21 @@ The API app exists at:
 D:\Development\School-SaaS-Enterprise\apps\api
 ```
 
-In Herd:
+In Herd, the API has been linked as:
+
+```text
+https://school-api.test
+D:\Development\School-SaaS-Enterprise\apps\api
+PHP 8.5
+```
+
+Command used:
+
+```bash
+herd link school-api --secure --isolate=8.5
+```
+
+For a fresh machine:
 
 1. Add or link the API app folder.
 2. Set the local site domain to `school-api.test`.
@@ -65,6 +79,13 @@ After the site is available:
 composer install
 php artisan key:generate
 php artisan migrate:fresh --seed
+```
+
+Expected unauthenticated API check:
+
+```bash
+GET https://school-api.test/api/me
+401 {"message":"Unauthenticated."}
 ```
 
 ## Nuxt Setup

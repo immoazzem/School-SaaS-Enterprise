@@ -127,7 +127,14 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Env examples are Herd/MySQL-ready:
   - `apps/api/.env.example`
   - `apps/web/.env.example`
-- MySQL/Herd site config is still pending; tests currently use SQLite in memory.
+- Herd API site is linked and secured:
+  - `https://school-api.test`
+  - path: `D:\Development\School-SaaS-Enterprise\apps\api`
+  - PHP: 8.5
+- Herd verification passed outside sandbox:
+  - root API URL returns 200.
+  - `/api/me` returns expected 401 JSON without a token.
+- MySQL database config is still pending; tests currently use SQLite in memory.
 
 ## Required Project Structure
 

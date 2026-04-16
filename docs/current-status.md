@@ -50,11 +50,14 @@
 - Added role-aware dashboard navigation states based on selected-school permissions.
 - Updated Laravel and Nuxt env examples for Herd/MySQL local development.
 - Updated local development docs for the current bearer-token Sanctum flow.
+- Linked the Laravel API folder in Herd as secured `https://school-api.test` on PHP 8.5.
+- Verified Herd serves the API app:
+  - `https://school-api.test` returns 200.
+  - `https://school-api.test/api/me` returns the expected unauthenticated 401 JSON response without a bearer token.
 
 ## Not Started
 
 - MySQL database creation.
-- Herd site configuration.
 - Live browser verification against a running Laravel API.
 
 ## Verification
@@ -65,13 +68,16 @@
 - `php artisan migrate:fresh --seed` from `apps/api`: passed outside sandbox after sandbox SQLite disk I/O failure.
 - `npm run build` from `apps/web`: passed after Nuxt app UI slice and again after route protection/school creation.
 - Env template/docs update does not require code execution.
+- `herd link school-api --secure --isolate=8.5` from `apps/api`: passed.
+- `Invoke-WebRequest https://school-api.test`: passed, 200 OK.
+- `Invoke-WebRequest https://school-api.test/api/me`: passed, 401 Unauthorized JSON.
 - Initial sandbox runs hit Windows permission/process limits, then passed outside the sandbox with approval.
 
 ## Next Step
 
 Continue Phase 1 implementation:
 
-1. Configure Laravel API for local MySQL/Herd once DB credentials are confirmed.
+1. Configure Laravel API for local MySQL once DB credentials are confirmed.
 2. Run login/dashboard/school creation/classes against the local API.
 3. Start Phase 2 academic setup modules after the vertical slice is verified live.
 
