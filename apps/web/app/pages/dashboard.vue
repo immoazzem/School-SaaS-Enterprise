@@ -17,14 +17,33 @@ const selectedSchool = computed(() =>
   auth.schools.value.find((school) => school.id === auth.selectedSchoolId.value),
 )
 
+const navItems = computed(() => [
+  { label: 'Overview', active: true, enabled: true },
+  {
+    label: 'Academic Classes',
+    active: false,
+    enabled: selectedSchool.value?.permissions?.includes('academic_classes.manage') ?? false,
+  },
+  {
+    label: 'People',
+    active: false,
+    enabled: selectedSchool.value?.permissions?.includes('students.manage') ?? false,
+  },
+  {
+    label: 'Finance',
+    active: false,
+    enabled: selectedSchool.value?.permissions?.includes('finance.manage') ?? false,
+  },
+])
+
 async function loadDashboard() {
   loading.value = true
   error.value = ''
   success.value = ''
 
   try {
-    await auth.refreshProfile()
     await auth.refreshSchools()
+    await auth.refreshProfile()
   } catch (dashboardError) {
     error.value = dashboardError instanceof Error ? dashboardError.message : 'Unable to load dashboard.'
   } finally {
@@ -80,10 +99,18 @@ onMounted(loadDashboard)
         <strong>School SaaS</strong>
       </NuxtLink>
       <nav aria-label="Main navigation">
-        <button class="nav-item active" type="button">Overview</button>
-        <button class="nav-item" type="button" @click="openClasses">Academic Classes</button>
-        <button class="nav-item" type="button">People</button>
-        <button class="nav-item" type="button">Finance</button>
+        <button
+          v-for="item in navItems"
+          :key="item.label"
+          class="nav-item"
+          :class="{ active: item.active }"
+          type="button"
+          :disabled="!item.enabled"
+          @click="item.label === 'Academic Classes' ? openClasses() : undefined"
+        >
+          <span>{{ item.label }}</span>
+          <small v-if="!item.enabled">Locked</small>
+        </button>
       </nav>
     </aside>
 
@@ -120,7 +147,7 @@ onMounted(loadDashboard)
         </article>
         <article class="metric surface">
           <span>Access</span>
-          <strong>{{ auth.token.value ? 'Token' : 'Guest' }}</strong>
+          <strong>{{ selectedSchool?.roles?.[0]?.name || (auth.token.value ? 'Token' : 'Guest') }}</strong>
         </article>
         <article class="metric surface">
           <span>Module</span>
@@ -191,7 +218,7 @@ onMounted(loadDashboard)
             >
               <span>
                 <strong>{{ school.name }}</strong>
-                <small>{{ school.slug }}</small>
+                <small>{{ school.slug }} · {{ school.roles?.[0]?.name || 'Member' }}</small>
               </span>
               <em>{{ school.status }}</em>
             </button>
@@ -257,7 +284,10 @@ nav {
 }
 
 .nav-item {
+  display: flex;
   min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
   border: 0;
   border-radius: 8px;
   padding: 0 12px;
@@ -271,6 +301,16 @@ nav {
 .nav-item.active {
   background: #eef5f1;
   color: #0f5f4a;
+}
+
+.nav-item:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.nav-item small {
+  font-size: 0.72rem;
+  font-weight: 800;
 }
 
 .workspace {

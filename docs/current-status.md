@@ -46,17 +46,18 @@
   - shared CSS foundation
 - Added Nuxt client route protection with stale-token cleanup.
 - Added dashboard school creation, tenant selection list, and first-school empty state.
+- Added role and permission details to the `/api/me` user payload.
+- Added role-aware dashboard navigation states based on selected-school permissions.
 
 ## Not Started
 
 - MySQL database creation.
 - Herd site configuration.
 - Live browser verification against a running Laravel API.
-- First-school bootstrap UX/API refinement.
 
 ## Verification
 
-- `php artisan test` from `apps/api`: passed, 9 tests / 34 assertions.
+- `php artisan test` from `apps/api`: passed after RBAC payload update, 9 tests / 42 assertions.
 - `vendor\bin\pint --test` from `apps/api`: passed.
 - `php artisan route:list` from `apps/api`: passed, 16 routes.
 - `php artisan migrate:fresh --seed` from `apps/api`: passed outside sandbox after sandbox SQLite disk I/O failure.
@@ -68,8 +69,8 @@
 Continue Phase 1 implementation:
 
 1. Configure Laravel API for local MySQL/Herd once DB credentials are confirmed.
-2. Verify login/dashboard/classes against a running local API.
-3. Configure role-aware frontend navigation and module permissions.
+2. Run login/dashboard/school creation/classes against the local API.
+3. Start Phase 2 academic setup modules after the vertical slice is verified live.
 
 ## New Session Startup Prompt
 

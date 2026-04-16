@@ -120,7 +120,10 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Nuxt has a first app UI slice: login page, dashboard shell, API/auth composables, and Academic Classes workspace.
 - Nuxt has client route protection with stale-token cleanup.
 - Dashboard can create a school through `POST /api/schools`, select the new tenant, and show active tenants.
+- `/api/me` includes per-school role and permission details.
+- Dashboard navigation uses the selected school's permissions for locked/enabled module states.
 - Nuxt build passes after the app UI slice and after route protection/school creation.
+- Backend tests pass after the RBAC payload update: 9 tests / 42 assertions.
 - MySQL/Herd site config is still pending; tests currently use SQLite in memory.
 
 ## Required Project Structure

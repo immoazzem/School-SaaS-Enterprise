@@ -8,6 +8,7 @@ use App\Models\Role;
 use App\Models\School;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -73,6 +74,15 @@ class EnterpriseFoundationApiTest extends TestCase
             'role_id' => $ownerRole->id,
             'assigned_by' => $user->id,
         ]);
+
+        $this->getJson('/api/me')
+            ->assertOk()
+            ->assertJson(fn (AssertableJson $json) => $json
+                ->where('user.schools.0.id', $schoolId)
+                ->where('user.schools.0.roles.0.key', 'school-owner')
+                ->where('user.schools.0.permissions', fn ($permissions): bool => $permissions->contains('academic_classes.manage'))
+                ->etc()
+            );
     }
 
     public function test_school_member_can_manage_academic_classes(): void

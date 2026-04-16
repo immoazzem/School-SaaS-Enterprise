@@ -78,7 +78,15 @@ export function useAuth() {
 
   async function refreshSchools() {
     const response = await api.request<SchoolsResponse>('/schools')
-    schools.value = response.data
+    schools.value = response.data.map((school) => {
+      const current = schools.value.find((existingSchool) => existingSchool.id === school.id)
+
+      return {
+        ...school,
+        roles: current?.roles,
+        permissions: current?.permissions,
+      }
+    })
     selectedSchoolId.value ??= response.data[0]?.id ?? null
 
     return response.data
@@ -99,6 +107,7 @@ export function useAuth() {
     }
 
     selectSchool(response.data.id)
+    await refreshProfile()
 
     return response.data
   }

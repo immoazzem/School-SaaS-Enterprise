@@ -11,6 +11,11 @@ export interface ApiSchool {
   name: string
   slug: string
   status: string
+  roles?: {
+    key: string
+    name: string
+  }[]
+  permissions?: string[]
 }
 
 export interface AcademicClass {

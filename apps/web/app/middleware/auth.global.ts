@@ -16,8 +16,8 @@ export default defineNuxtRouteMiddleware(async (to) => {
 
   if (!auth.user.value) {
     try {
-      await auth.refreshProfile()
       await auth.refreshSchools()
+      await auth.refreshProfile()
     } catch {
       auth.logout()
 

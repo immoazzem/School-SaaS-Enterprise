@@ -57,18 +57,41 @@ class AuthController extends Controller
      */
     private function userPayload(User $user): array
     {
-        $user->loadMissing('schoolMemberships.school');
+        $user->loadMissing([
+            'roleAssignments.role.permissions',
+            'schoolMemberships.school',
+        ]);
+
+        $assignmentsBySchool = $user->roleAssignments->groupBy('school_id');
 
         return [
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
-            'schools' => $user->schoolMemberships->map(fn ($membership): array => [
-                'id' => $membership->school->id,
-                'name' => $membership->school->name,
-                'slug' => $membership->school->slug,
-                'status' => $membership->status,
-            ])->values(),
+            'schools' => $user->schoolMemberships->map(function ($membership) use ($assignmentsBySchool): array {
+                $roleAssignments = $assignmentsBySchool->get($membership->school->id, collect());
+                $roles = $roleAssignments
+                    ->pluck('role')
+                    ->filter();
+
+                return [
+                    'id' => $membership->school->id,
+                    'name' => $membership->school->name,
+                    'slug' => $membership->school->slug,
+                    'status' => $membership->status,
+                    'roles' => $roles
+                        ->map(fn ($role): array => [
+                            'key' => $role->key,
+                            'name' => $role->name,
+                        ])
+                        ->values(),
+                    'permissions' => $roles
+                        ->flatMap(fn ($role) => $role->permissions->pluck('key'))
+                        ->unique()
+                        ->sort()
+                        ->values(),
+                ];
+            })->values(),
         ];
     }
 }
