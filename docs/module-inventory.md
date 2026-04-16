@@ -37,7 +37,7 @@ The new app must replace this with normalized enterprise RBAC: roles, permission
 | Student classes | `StudentClassController`, `student_classes` | `academic_classes` scoped by `school_id` |
 | Academic years | `StudentYearController`, `student_years` | `academic_years` scoped by school |
 | Groups | `StudentGroupController`, `student_groups` | `student_groups` or `academic_groups` scoped by school |
-| Sections | `StudentSectionController`, `student_sections` | `sections` scoped by school |
+| Sections | `StudentSectionController`, `student_sections` | `academic_sections` scoped by school and academic class |
 | Shifts | `StudentShiftController`, `student_shifts` | `shifts` scoped by school |
 | Fee categories | `FeeCategoryController`, `fee_categories` | `fee_categories` scoped by school |
 | Fee amounts | `FeeCategoryAmountController`, `fee_category_amounts` | `fee_structures` or `fee_amounts` scoped by school/class |
@@ -85,3 +85,11 @@ The first implementation slice is Academic Classes because it is small, foundati
 - Nuxt list/create/edit/delete UI
 - backend tests and frontend build
 
+Academic Sections now extend the backend academic setup slice with:
+
+- tenant-scoped migration/model
+- class ownership validation
+- `sections.manage` policy authorization
+- REST API nested below schools
+- audit logging
+- backend tests for CRUD, missing permission, and cross-school class rejection

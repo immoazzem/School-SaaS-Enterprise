@@ -5,18 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class AcademicClass extends Model
+class AcademicSection extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'school_id',
+        'academic_class_id',
         'name',
         'code',
-        'description',
+        'capacity',
+        'room',
         'sort_order',
         'status',
     ];
@@ -24,6 +25,7 @@ class AcademicClass extends Model
     protected function casts(): array
     {
         return [
+            'capacity' => 'integer',
             'sort_order' => 'integer',
         ];
     }
@@ -37,10 +39,10 @@ class AcademicClass extends Model
     }
 
     /**
-     * @return HasMany<AcademicSection, $this>
+     * @return BelongsTo<AcademicClass, $this>
      */
-    public function sections(): HasMany
+    public function academicClass(): BelongsTo
     {
-        return $this->hasMany(AcademicSection::class);
+        return $this->belongsTo(AcademicClass::class);
     }
 }

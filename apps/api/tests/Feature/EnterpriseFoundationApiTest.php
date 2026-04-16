@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\AcademicClass;
+use App\Models\AcademicSection;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\School;
@@ -145,6 +146,104 @@ class EnterpriseFoundationApiTest extends TestCase
         ]);
     }
 
+    public function test_school_member_can_manage_academic_sections(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Section School', 'slug' => 'section-school']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'sections.manage', 'academics');
+
+        $academicClass = $school->academicClasses()->create([
+            'name' => 'Class One',
+            'code' => 'C1',
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $created = $this->postJson("/api/schools/{$school->id}/academic-sections", [
+            'academic_class_id' => $academicClass->id,
+            'name' => 'Section A',
+            'code' => 'A',
+            'capacity' => 35,
+            'room' => '101',
+            'sort_order' => 10,
+        ]);
+
+        $created
+            ->assertCreated()
+            ->assertJsonPath('data.name', 'Section A')
+            ->assertJsonPath('data.academic_class.id', $academicClass->id);
+
+        $sectionId = $created->json('data.id');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'academic_section.created',
+            'auditable_id' => $sectionId,
+        ]);
+
+        $this->getJson("/api/schools/{$school->id}/academic-sections?academic_class_id={$academicClass->id}")
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $sectionId);
+
+        $this->patchJson("/api/schools/{$school->id}/academic-sections/{$sectionId}", [
+            'name' => 'Section Alpha',
+            'capacity' => 40,
+        ])->assertOk()
+            ->assertJsonPath('data.name', 'Section Alpha')
+            ->assertJsonPath('data.capacity', 40);
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'academic_section.updated',
+            'auditable_id' => $sectionId,
+        ]);
+
+        $this->deleteJson("/api/schools/{$school->id}/academic-sections/{$sectionId}")
+            ->assertNoContent();
+
+        $this->assertSoftDeleted(AcademicSection::class, ['id' => $sectionId]);
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'academic_section.deleted',
+            'auditable_id' => $sectionId,
+        ]);
+    }
+
+    public function test_section_creation_rejects_classes_from_another_school(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Tenant School', 'slug' => 'tenant-school']);
+        $otherSchool = School::query()->create(['name' => 'Other Tenant', 'slug' => 'other-tenant']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'sections.manage', 'academics');
+
+        $foreignClass = $otherSchool->academicClasses()->create([
+            'name' => 'Foreign Class',
+            'code' => 'FC',
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/academic-sections", [
+            'academic_class_id' => $foreignClass->id,
+            'name' => 'Section A',
+            'code' => 'A',
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors('academic_class_id');
+    }
+
     public function test_user_cannot_access_another_schools_classes(): void
     {
         $user = User::factory()->create();
@@ -190,6 +289,29 @@ class EnterpriseFoundationApiTest extends TestCase
         ])->assertForbidden();
     }
 
+    public function test_active_school_member_without_permission_cannot_manage_academic_sections(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Section Limited', 'slug' => 'section-limited']);
+        $academicClass = $school->academicClasses()->create([
+            'name' => 'Class One',
+            'code' => 'C1',
+        ]);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/academic-sections", [
+            'academic_class_id' => $academicClass->id,
+            'name' => 'Section A',
+            'code' => 'A',
+        ])->assertForbidden();
+    }
+
     public function test_database_seeder_creates_enterprise_roles_and_permissions(): void
     {
         $this->seed();
@@ -203,16 +325,21 @@ class EnterpriseFoundationApiTest extends TestCase
 
     private function grantAcademicClassManagement(User $user, School $school): void
     {
+        $this->grantSchoolPermission($user, $school, 'academic_classes.manage', 'academics');
+    }
+
+    private function grantSchoolPermission(User $user, School $school, string $permissionKey, string $module): void
+    {
         $permission = Permission::query()->create([
-            'module' => 'academics',
-            'key' => 'academic_classes.manage',
-            'description' => 'Manage academic classes',
+            'module' => $module,
+            'key' => $permissionKey,
+            'description' => str($permissionKey)->replace('.', ' ')->headline()->toString(),
         ]);
 
         $role = Role::query()->create([
             'school_id' => $school->id,
-            'name' => 'Academic Manager',
-            'key' => 'academic-manager',
+            'name' => str($permissionKey)->before('.')->headline()->append(' Manager')->toString(),
+            'key' => str($permissionKey)->before('.')->slug()->append('-manager')->toString(),
         ]);
 
         $role->permissions()->attach($permission);

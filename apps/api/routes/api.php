@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AcademicClassController;
+use App\Http\Controllers\Api\AcademicSectionController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\SchoolController;
 use Illuminate\Http\Request;
@@ -13,6 +14,8 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::get('/me', [AuthController::class, 'me']);
     Route::apiResource('schools', SchoolController::class)->only(['index', 'store']);
     Route::apiResource('schools.academic-classes', AcademicClassController::class)
+        ->middleware('school.member');
+    Route::apiResource('schools.academic-sections', AcademicSectionController::class)
         ->middleware('school.member');
 });
 

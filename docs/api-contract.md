@@ -76,18 +76,27 @@ Foundation:
 
 First vertical slice:
 
-- `GET /api/academic/classes`
-- `POST /api/academic/classes`
-- `GET /api/academic/classes/{class}`
-- `PUT /api/academic/classes/{class}`
-- `DELETE /api/academic/classes/{class}`
+- `GET /api/schools/{school}/academic-classes`
+- `POST /api/schools/{school}/academic-classes`
+- `GET /api/schools/{school}/academic-classes/{academic_class}`
+- `PUT /api/schools/{school}/academic-classes/{academic_class}`
+- `DELETE /api/schools/{school}/academic-classes/{academic_class}`
 
 Academic Classes must support pagination, search, and active/inactive filtering.
+
+Academic Sections:
+
+- `GET /api/schools/{school}/academic-sections`
+- `POST /api/schools/{school}/academic-sections`
+- `GET /api/schools/{school}/academic-sections/{academic_section}`
+- `PUT /api/schools/{school}/academic-sections/{academic_section}`
+- `DELETE /api/schools/{school}/academic-sections/{academic_section}`
+
+Academic Sections require `sections.manage`, include `school_id`, and must reference an Academic Class owned by the same school. Lists accept optional `academic_class_id` filtering.
 
 ## Future API Groups
 
 - `/api/academic/years`
-- `/api/academic/sections`
 - `/api/academic/subjects`
 - `/api/students`
 - `/api/guardians`
@@ -108,4 +117,3 @@ Academic Classes must support pagination, search, and active/inactive filtering.
 - Never trust client-provided `school_id` for tenant ownership.
 - Server must set `school_id` from active school context.
 - All mutations that affect business records must write audit logs.
-
