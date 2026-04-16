@@ -100,6 +100,21 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - First implementation target: foundation plus one complete vertical slice.
 - First vertical slice: Academic Classes CRUD.
 
+## Current Implementation Checkpoints
+
+- Phase 0 legacy audit docs are complete and committed.
+- Laravel API scaffold exists in `D:\Development\School-SaaS-Enterprise\apps\api`.
+- Nuxt web scaffold exists in `D:\Development\School-SaaS-Enterprise\apps\web`.
+- Laravel framework resolved to `v13.5.0`.
+- Nuxt app targets `nuxt:^4.4.2`.
+- Laravel Sanctum `v4.3.1` is installed.
+- API routing and Sanctum config/migration are published.
+- Backend foundation schema exists for schools, memberships, RBAC, audit logs, and academic classes.
+- Token auth, school list/create, and tenant-scoped Academic Classes CRUD endpoints exist.
+- Backend foundation tests pass: `php artisan test` reports 6 tests / 23 assertions.
+- Pint and route list pass for the backend foundation.
+- MySQL/Herd site config is still pending; tests currently use SQLite in memory.
+
 ## Required Project Structure
 
 ```text
@@ -274,4 +289,3 @@ Then continue the School SaaS Enterprise rebuild from the current workspace stat
 Use D:\Development\School-SaaS-Enterprise-PLAN.md only when you need full detail.
 Minimize token usage by summarizing large files instead of pasting them.
 ```
-

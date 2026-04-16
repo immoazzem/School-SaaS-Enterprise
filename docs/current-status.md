@@ -19,19 +19,35 @@
 - Scaffolded Nuxt web app in `apps/web`.
 - Nuxt scaffold targets `nuxt:^4.4.2`, Vue 3, and Vue Router 5.
 - Installed Nuxt dependencies and generated `package-lock.json`.
+- Installed Laravel Sanctum `v4.3.1`.
+- Published Laravel 13 API routing and Sanctum config/migration.
+- Added enterprise foundation schema for schools, memberships, roles, permissions, role assignments, audit logs, and academic classes.
+- Added foundation models and relationships.
+- Added token auth endpoints:
+  - `POST /api/auth/login`
+  - `POST /api/auth/logout`
+  - `GET /api/me`
+- Added school endpoints:
+  - `GET /api/schools`
+  - `POST /api/schools`
+- Added tenant-scoped Academic Classes CRUD under:
+  - `/api/schools/{school}/academic-classes`
+- Added feature tests for login, profile lookup, school creation, Academic Classes CRUD, and cross-school access denial.
 
 ## Not Started
 
 - MySQL database creation.
 - Herd site configuration.
-- Sanctum SPA auth.
-- Multi-school tenancy, RBAC, audit logs, and Academic Classes CRUD.
+- Frontend auth/dashboard implementation.
+- Audit-log event writing for class mutations.
+- Policy/middleware extraction for active school context.
+- Seeders for enterprise roles and permissions.
 
 ## Verification
 
-- `php artisan test` from `apps/api`: passed, 2 tests.
+- `php artisan test` from `apps/api`: passed, 6 tests / 23 assertions.
 - `vendor\bin\pint --test` from `apps/api`: passed.
-- `php artisan route:list` from `apps/api`: passed, 4 scaffold routes.
+- `php artisan route:list` from `apps/api`: passed, 16 routes.
 - `npm run build` from `apps/web`: passed.
 - Initial sandbox runs hit Windows permission/process limits, then passed outside the sandbox with approval.
 
@@ -39,11 +55,11 @@
 
 Continue Phase 1 implementation:
 
-1. Configure Laravel API for local MySQL/Herd.
-2. Add Sanctum SPA auth.
-3. Add multi-school tenancy, RBAC, and audit log schema.
-4. Implement Academic Classes CRUD as the first vertical slice.
-5. Run backend and frontend quality gates.
+1. Add role/permission seeders and a first-school bootstrap path.
+2. Extract active-school context middleware/policies from the controller-level guard.
+3. Add audit-log writes for Academic Classes mutations.
+4. Configure Laravel API for local MySQL/Herd once DB credentials are confirmed.
+5. Start Nuxt frontend auth/dashboard shell and Academic Classes screens.
 
 ## New Session Startup Prompt
 
