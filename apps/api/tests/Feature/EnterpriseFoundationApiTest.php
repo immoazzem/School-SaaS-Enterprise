@@ -44,6 +44,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
     public function test_authenticated_user_can_create_a_school_membership(): void
     {
+        $this->seed();
         $user = User::factory()->create();
 
         Sanctum::actingAs($user);
@@ -61,6 +62,16 @@ class EnterpriseFoundationApiTest extends TestCase
         $this->assertDatabaseHas('school_memberships', [
             'user_id' => $user->id,
             'status' => 'active',
+        ]);
+
+        $schoolId = $response->json('data.id');
+        $ownerRole = Role::query()->where('key', 'school-owner')->firstOrFail();
+
+        $this->assertDatabaseHas('user_role_assignments', [
+            'school_id' => $schoolId,
+            'user_id' => $user->id,
+            'role_id' => $ownerRole->id,
+            'assigned_by' => $user->id,
         ]);
     }
 

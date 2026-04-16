@@ -37,18 +37,19 @@
 - Added audit-log writes for Academic Classes create/update/delete.
 - Added reusable `school.member` middleware for active school membership checks.
 - Added Academic Class policy checks for `academic_classes.manage`.
+- School creation now assigns the seeded `school-owner` role to the creator when the RBAC seed exists.
 
 ## Not Started
 
 - MySQL database creation.
 - Herd site configuration.
 - Frontend auth/dashboard implementation.
-- First-school bootstrap UX/API refinement.
+- Frontend auth/dashboard implementation.
 - First-school bootstrap UX/API refinement.
 
 ## Verification
 
-- `php artisan test` from `apps/api`: passed, 9 tests / 33 assertions.
+- `php artisan test` from `apps/api`: passed, 9 tests / 34 assertions.
 - `vendor\bin\pint --test` from `apps/api`: passed.
 - `php artisan route:list` from `apps/api`: passed, 16 routes.
 - `php artisan migrate:fresh --seed` from `apps/api`: passed outside sandbox after sandbox SQLite disk I/O failure.
@@ -59,9 +60,8 @@
 
 Continue Phase 1 implementation:
 
-1. Add a first-school bootstrap UX/API refinement.
-2. Configure Laravel API for local MySQL/Herd once DB credentials are confirmed.
-3. Start Nuxt frontend auth/dashboard shell and Academic Classes screens.
+1. Configure Laravel API for local MySQL/Herd once DB credentials are confirmed.
+2. Start Nuxt frontend auth/dashboard shell and Academic Classes screens.
 
 ## New Session Startup Prompt
 
