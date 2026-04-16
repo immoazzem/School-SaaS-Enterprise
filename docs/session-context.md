@@ -134,6 +134,13 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Herd verification passed outside sandbox:
   - root API URL returns 200.
   - `/api/me` returns expected 401 JSON without a token.
+- Live Herd API vertical-slice smoke test passed using the current local SQLite `.env`:
+  - seeded login works.
+  - school creation works.
+  - Academic Class creation/listing works.
+- Ignored local Nuxt `.env` points to `https://school-api.test/api`.
+- Nuxt production build passes with that env.
+- Nuxt dev server did not become reachable on port 3000 from the Codex shell; use browser/manual dev server verification next.
 - MySQL database config is still pending; tests currently use SQLite in memory.
 
 ## Required Project Structure

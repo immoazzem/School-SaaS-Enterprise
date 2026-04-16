@@ -54,11 +54,16 @@
 - Verified Herd serves the API app:
   - `https://school-api.test` returns 200.
   - `https://school-api.test/api/me` returns the expected unauthenticated 401 JSON response without a bearer token.
+- Verified the live Herd API vertical slice against the current local SQLite `.env`:
+  - login with seeded `test@example.com` user returns 200.
+  - school creation returns a tenant id.
+  - Academic Class creation/listing works through `https://school-api.test/api`.
+- Created ignored local Nuxt `.env` pointing to `https://school-api.test/api`.
 
 ## Not Started
 
 - MySQL database creation.
-- Live browser verification against a running Laravel API.
+- Live Nuxt browser verification against the running Laravel API.
 
 ## Verification
 
@@ -71,6 +76,9 @@
 - `herd link school-api --secure --isolate=8.5` from `apps/api`: passed.
 - `Invoke-WebRequest https://school-api.test`: passed, 200 OK.
 - `Invoke-WebRequest https://school-api.test/api/me`: passed, 401 Unauthorized JSON.
+- Live Herd API login/school/class smoke test: passed.
+- `npm run build` from `apps/web`: passed with local `.env` set to `https://school-api.test/api`.
+- Nuxt dev server startup from this Codex shell did not become reachable on port 3000; production build remains valid.
 - Initial sandbox runs hit Windows permission/process limits, then passed outside the sandbox with approval.
 
 ## Next Step
@@ -78,8 +86,8 @@
 Continue Phase 1 implementation:
 
 1. Configure Laravel API for local MySQL once DB credentials are confirmed.
-2. Run login/dashboard/school creation/classes against the local API.
-3. Start Phase 2 academic setup modules after the vertical slice is verified live.
+2. Verify the Nuxt UI in a browser against `https://school-api.test/api`.
+3. Start Phase 2 academic setup modules after the MySQL/live browser pass.
 
 ## New Session Startup Prompt
 
