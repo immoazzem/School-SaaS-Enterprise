@@ -132,6 +132,22 @@ class EnterpriseFoundationApiTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_inactive_school_member_cannot_access_school_classes(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Paused School', 'slug' => 'paused-school']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'inactive',
+            'joined_at' => now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/schools/{$school->id}/academic-classes")
+            ->assertForbidden();
+    }
+
     public function test_database_seeder_creates_enterprise_roles_and_permissions(): void
     {
         $this->seed();

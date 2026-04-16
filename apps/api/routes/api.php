@@ -12,7 +12,8 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
     Route::apiResource('schools', SchoolController::class)->only(['index', 'store']);
-    Route::apiResource('schools.academic-classes', AcademicClassController::class);
+    Route::apiResource('schools.academic-classes', AcademicClassController::class)
+        ->middleware('school.member');
 });
 
 Route::get('/user', function (Request $request) {

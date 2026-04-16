@@ -14,8 +14,6 @@ class AcademicClassController extends Controller
 {
     public function index(Request $request, School $school): JsonResponse
     {
-        $this->authorizeSchoolAccess($request, $school);
-
         $classes = $school->academicClasses()
             ->orderBy('sort_order')
             ->orderBy('name')
@@ -26,8 +24,6 @@ class AcademicClassController extends Controller
 
     public function store(Request $request, School $school): JsonResponse
     {
-        $this->authorizeSchoolAccess($request, $school);
-
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'code' => [
@@ -56,7 +52,6 @@ class AcademicClassController extends Controller
 
     public function show(Request $request, School $school, AcademicClass $academicClass): JsonResponse
     {
-        $this->authorizeSchoolAccess($request, $school);
         $this->ensureClassBelongsToSchool($school, $academicClass);
 
         return response()->json(['data' => $academicClass]);
@@ -64,7 +59,6 @@ class AcademicClassController extends Controller
 
     public function update(Request $request, School $school, AcademicClass $academicClass): JsonResponse
     {
-        $this->authorizeSchoolAccess($request, $school);
         $this->ensureClassBelongsToSchool($school, $academicClass);
 
         $validated = $request->validate([
@@ -97,7 +91,6 @@ class AcademicClassController extends Controller
 
     public function destroy(Request $request, School $school, AcademicClass $academicClass): JsonResponse
     {
-        $this->authorizeSchoolAccess($request, $school);
         $this->ensureClassBelongsToSchool($school, $academicClass);
 
         $oldValues = $academicClass->only(['name', 'code', 'description', 'sort_order', 'status']);
@@ -109,17 +102,6 @@ class AcademicClassController extends Controller
         ]);
 
         return response()->json(status: 204);
-    }
-
-    private function authorizeSchoolAccess(Request $request, School $school): void
-    {
-        abort_unless(
-            $request->user()->schoolMemberships()
-                ->where('school_id', $school->id)
-                ->where('status', 'active')
-                ->exists(),
-            403
-        );
     }
 
     private function ensureClassBelongsToSchool(School $school, AcademicClass $academicClass): void
