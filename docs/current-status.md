@@ -49,6 +49,10 @@
   - `/api/schools/{school}/designations`
 - Added tenant-scoped Employees CRUD under:
   - `/api/schools/{school}/employees`
+- Added tenant-scoped Guardians CRUD under:
+  - `/api/schools/{school}/guardians`
+- Added tenant-scoped Students CRUD under:
+  - `/api/schools/{school}/students`
 - Academic Sections validate their Academic Class belongs to the same school.
 - Academic Years enforce one current academic year per school.
 - Added feature tests for login, profile lookup, school creation, Academic Classes CRUD, Academic Sections CRUD, Academic Years CRUD, Subjects CRUD, Class Subjects CRUD, Student Groups CRUD, Shifts CRUD, permission denial, and cross-school access denial.
@@ -100,6 +104,9 @@
 - Added Nuxt Employees workspace with status/type/designation/search filters, create, edit, and archive flows.
 - Added dashboard navigation/action button for Employees.
 - Added typed Nuxt `Employee` API shape.
+- Added Nuxt Students and Guardians workspace with guardian/student create, edit, and archive flows.
+- Added dashboard navigation/action button for Students.
+- Added typed Nuxt `Guardian` and `Student` API shapes.
 - Added explicit Laravel CORS config for local Nuxt origins.
 - Added project `agent-browser.json` so future browser checks can run visibly and tolerate Herd local HTTPS certificates.
 - Updated Laravel and Nuxt env examples for Herd/MySQL local development.
@@ -131,6 +138,7 @@
 - `php artisan test --filter=Designation` from `apps/api`: passed, 2 tests / 14 assertions.
 - `php artisan test` from `apps/api`: passed after Employees workspace, 29 tests / 180 assertions.
 - `php artisan test --filter=Employee` from `apps/api`: passed, 3 tests / 19 assertions.
+- `php artisan test` from `apps/api`: passed after Students and Guardians workspace, 34 tests / 214 assertions.
 - `vendor\bin\pint --test` from `apps/api`: passed after Academic Years API.
 - `vendor\bin\pint --test` from `apps/api`: passed after Academic Years frontend/CORS phase.
 - `vendor\bin\pint --test` from `apps/api`: passed after Subjects workspace.
@@ -138,6 +146,7 @@
 - `vendor\bin\pint --test` from `apps/api`: passed after Class Subject Assignments workspace.
 - `vendor\bin\pint --test` from `apps/api`: passed after Designations workspace.
 - `vendor\bin\pint --test` from `apps/api`: passed after Employees workspace.
+- `vendor\bin\pint --test` from `apps/api`: passed after Students and Guardians workspace.
 - `php artisan route:list` from `apps/api`: passed, 41 routes.
 - `agent-browser --version`: passed, `agent-browser 0.26.0`.
 - `agent-browser` local web smoke check passed:
@@ -159,6 +168,7 @@
 - `npm run build` from `apps/web`: passed after Class Subject Assignments workspace, with existing Nuxt/Nitro warnings.
 - `npm run build` from `apps/web`: passed after Designations workspace, with existing Nuxt/Nitro warnings.
 - `npm run build` from `apps/web`: passed after Employees workspace, with existing Nuxt/Nitro warnings.
+- `npm run build` from `apps/web`: passed after Students and Guardians workspace, with existing Nuxt/Nitro warnings.
 - Agent-browser opened `http://127.0.0.1:3000/` and confirmed the login page rendered. Authenticated browser login was blocked inside the automation browser by local Herd HTTPS fetch handling before the project browser config was added; continue visual checks with the new `agent-browser.json`.
 - Agent-browser authenticated against the live app, reached `http://127.0.0.1:3000/dashboard`, opened `http://127.0.0.1:3000/schools/1/subjects`, and verified creating `Mathematics / MATH-101` through the live Herd API.
 - Agent-browser opened `http://127.0.0.1:3000/schools/1/student-groups` and verified creating `Science Group / SCI-01` through the live Herd API.
@@ -166,6 +176,8 @@
 - Agent-browser opened `http://127.0.0.1:3000/schools/1/class-subjects` and verified assigning `Mathematics / MATH-101` to `Class One` with `40 / 100` marks through the live Herd API.
 - Agent-browser opened `http://127.0.0.1:3000/schools/1/designations` and verified creating `Senior Teacher / SNR-TCHR` through the live Herd API.
 - Agent-browser opened `http://127.0.0.1:3000/schools/1/employees` and verified creating `Amina Rahman / EMP-2026-0001` through the live Herd API.
+- Agent-browser opened `http://127.0.0.1:3000/schools/1/students` and verified creating `Karim Rahman` plus `Nadia Rahman / ADM-2026-0001` through the live Herd API.
+- Saved browser screenshot at `docs/browser-checks/students-workspace.png`.
 - Nuxt dev server startup from this Codex shell did not become reachable on port 3000; production build remains valid.
 - Initial sandbox runs hit Windows permission/process limits, then passed outside the sandbox with approval.
 
@@ -175,10 +187,10 @@ Continue Phase 2 implementation:
 
 1. Configure Laravel API for local MySQL once DB credentials are confirmed.
 2. Continue browser walkthroughs with visible `agent-browser` as each page/module lands.
-3. Continue Phase 2 people records: students, guardians, teacher profiles, enrollments, promotions, and profiles.
+3. Continue Phase 2 people records: enrollments, teacher profiles, promotions, and profiles.
 
-Current page/module complete: Employees API/Nuxt workspace.
-Next page/module: Students and Guardians API/Nuxt workspace.
+Current page/module complete: Students and Guardians API/Nuxt workspace.
+Next page/module: Enrollments API/Nuxt workspace.
 
 ## New Session Startup Prompt
 

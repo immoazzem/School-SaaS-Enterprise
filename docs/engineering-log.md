@@ -220,3 +220,13 @@ Scope: added `employees` migration/model/relationship, `employees.manage` permis
 Verification: `php artisan test` passed with 29 tests / 180 assertions; `php artisan test --filter=Employee` passed with 3 tests / 19 assertions; `vendor\bin\pint --test` passed; `php artisan route:list --path=employees` showed the employee routes; `npm run build` passed with existing Nuxt/Nitro warnings; local migration and RBAC seeding passed; agent-browser verified creating `Amina Rahman / EMP-2026-0001` through the live Herd API.
 
 Next: commit and push this checkpoint, then continue Phase 2 with Students and Guardians.
+
+### Students And Guardians Workspace
+
+Current page/module complete: Students and Guardians API/Nuxt workspace, route `/schools/{schoolId}/students`.
+
+Scope: added `guardians` and `students` migrations/models/relationships, `guardians.manage` and `students.manage` policy checks, tenant-scoped controllers/routes, tests, audit logs, dashboard navigation, typed Nuxt `Guardian` and `Student` API shapes, and a combined Nuxt workspace for guardian and student create/edit/archive flows.
+
+Verification: `php artisan test` passed with 34 tests / 214 assertions; `vendor\bin\pint --test` passed; `php artisan migrate` and RBAC seeding passed locally; `php artisan route:list --path=students` and `php artisan route:list --path=guardians` showed the new routes; `npm run build` passed with existing Nuxt/Nitro warnings; agent-browser verified creating `Karim Rahman` and `Nadia Rahman / ADM-2026-0001` through the live Herd API. Browser screenshot saved at `docs/browser-checks/students-workspace.png`.
+
+Next: commit and push this checkpoint, then continue Phase 2 with Enrollments.

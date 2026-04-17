@@ -195,6 +195,15 @@ async function openEmployees() {
   await router.push(`/schools/${auth.selectedSchoolId.value}/employees`)
 }
 
+async function openStudents() {
+  if (!auth.selectedSchoolId.value) {
+    error.value = 'Create or select a school first.'
+    return
+  }
+
+  await router.push(`/schools/${auth.selectedSchoolId.value}/students`)
+}
+
 onMounted(loadDashboard)
 </script>
 
@@ -231,7 +240,7 @@ onMounted(loadDashboard)
                           : item.label === 'Designations'
                             ? openDesignations()
                             : item.label === 'People'
-                              ? openEmployees()
+                              ? openStudents()
                               : undefined
           "
         >
@@ -370,6 +379,7 @@ onMounted(loadDashboard)
           <button class="button secondary" type="button" @click="openShifts">Open shifts</button>
           <button class="button secondary" type="button" @click="openDesignations">Open designations</button>
           <button class="button secondary" type="button" @click="openEmployees">Open employees</button>
+          <button class="button secondary" type="button" @click="openStudents">Open students</button>
         </div>
       </section>
     </section>

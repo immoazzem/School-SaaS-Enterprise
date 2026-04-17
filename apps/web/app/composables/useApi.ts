@@ -132,6 +132,39 @@ export interface Employee {
   designation?: Pick<Designation, 'id' | 'name' | 'code'> | null
 }
 
+export interface Guardian {
+  id: number
+  school_id: number
+  full_name: string
+  relationship: string
+  phone: string | null
+  email: string | null
+  occupation: string | null
+  address: string | null
+  status: string
+  students_count?: number
+}
+
+export interface Student {
+  id: number
+  school_id: number
+  guardian_id: number | null
+  admission_no: string
+  full_name: string
+  father_name: string | null
+  mother_name: string | null
+  email: string | null
+  phone: string | null
+  gender: string | null
+  religion: string | null
+  date_of_birth: string | null
+  admitted_on: string
+  address: string | null
+  medical_notes: string | null
+  status: string
+  guardian?: Pick<Guardian, 'id' | 'full_name' | 'relationship' | 'phone'> | null
+}
+
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
   body?: Record<string, unknown>

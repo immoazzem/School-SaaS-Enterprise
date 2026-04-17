@@ -8,10 +8,12 @@ use App\Models\AcademicYear;
 use App\Models\ClassSubject;
 use App\Models\Designation;
 use App\Models\Employee;
+use App\Models\Guardian;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\School;
 use App\Models\Shift;
+use App\Models\Student;
 use App\Models\StudentGroup;
 use App\Models\Subject;
 use App\Models\User;
@@ -783,6 +785,176 @@ class EnterpriseFoundationApiTest extends TestCase
             ->assertJsonValidationErrors('designation_id');
     }
 
+    public function test_school_member_can_manage_guardians(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Guardian School', 'slug' => 'guardian-school']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'guardians.manage', 'people');
+
+        Sanctum::actingAs($user);
+
+        $created = $this->postJson("/api/schools/{$school->id}/guardians", [
+            'full_name' => 'Karim Rahman',
+            'relationship' => 'Father',
+            'phone' => '+8801700001000',
+            'email' => 'karim.rahman@example.test',
+            'occupation' => 'Engineer',
+            'address' => 'Dhaka',
+        ]);
+
+        $created
+            ->assertCreated()
+            ->assertJsonPath('data.full_name', 'Karim Rahman')
+            ->assertJsonPath('data.relationship', 'Father');
+
+        $guardianId = $created->json('data.id');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'guardian.created',
+            'auditable_id' => $guardianId,
+        ]);
+
+        $this->getJson("/api/schools/{$school->id}/guardians?search=karim")
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $guardianId);
+
+        $this->patchJson("/api/schools/{$school->id}/guardians/{$guardianId}", [
+            'occupation' => 'Architect',
+        ])->assertOk()
+            ->assertJsonPath('data.occupation', 'Architect');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'guardian.updated',
+            'auditable_id' => $guardianId,
+        ]);
+
+        $this->deleteJson("/api/schools/{$school->id}/guardians/{$guardianId}")
+            ->assertNoContent();
+
+        $this->assertSoftDeleted(Guardian::class, ['id' => $guardianId]);
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'guardian.deleted',
+            'auditable_id' => $guardianId,
+        ]);
+    }
+
+    public function test_school_member_can_manage_students(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Student School', 'slug' => 'student-school']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'students.manage', 'people');
+
+        $guardian = $school->guardians()->create([
+            'full_name' => 'Karim Rahman',
+            'relationship' => 'Father',
+            'phone' => '+8801700001000',
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $created = $this->postJson("/api/schools/{$school->id}/students", [
+            'guardian_id' => $guardian->id,
+            'admission_no' => 'ADM-2026-0001',
+            'full_name' => 'Nadia Rahman',
+            'father_name' => 'Karim Rahman',
+            'mother_name' => 'Amina Rahman',
+            'email' => 'nadia.rahman@example.test',
+            'phone' => '+8801700002000',
+            'gender' => 'Female',
+            'religion' => 'Islam',
+            'date_of_birth' => '2018-08-20',
+            'admitted_on' => '2026-01-10',
+            'address' => 'Dhaka',
+            'medical_notes' => 'No known allergies.',
+        ]);
+
+        $created
+            ->assertCreated()
+            ->assertJsonPath('data.full_name', 'Nadia Rahman')
+            ->assertJsonPath('data.admission_no', 'ADM-2026-0001')
+            ->assertJsonPath('data.guardian.id', $guardian->id);
+
+        $studentId = $created->json('data.id');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'student.created',
+            'auditable_id' => $studentId,
+        ]);
+
+        $this->getJson("/api/schools/{$school->id}/students?search=nadia")
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $studentId);
+
+        $this->patchJson("/api/schools/{$school->id}/students/{$studentId}", [
+            'full_name' => 'Nadia Karim Rahman',
+        ])->assertOk()
+            ->assertJsonPath('data.full_name', 'Nadia Karim Rahman');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'student.updated',
+            'auditable_id' => $studentId,
+        ]);
+
+        $this->deleteJson("/api/schools/{$school->id}/students/{$studentId}")
+            ->assertNoContent();
+
+        $this->assertSoftDeleted(Student::class, ['id' => $studentId]);
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'student.deleted',
+            'auditable_id' => $studentId,
+        ]);
+    }
+
+    public function test_student_creation_rejects_guardians_from_another_school(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Student Tenant', 'slug' => 'student-tenant']);
+        $otherSchool = School::query()->create(['name' => 'Foreign Student Tenant', 'slug' => 'foreign-student-tenant']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'students.manage', 'people');
+
+        $foreignGuardian = $otherSchool->guardians()->create([
+            'full_name' => 'Foreign Guardian',
+            'relationship' => 'Father',
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/students", [
+            'guardian_id' => $foreignGuardian->id,
+            'admission_no' => 'ADM-2026-0002',
+            'full_name' => 'Foreign Guardian Student',
+            'admitted_on' => '2026-01-10',
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors('guardian_id');
+    }
+
     public function test_section_creation_rejects_classes_from_another_school(): void
     {
         $user = User::factory()->create();
@@ -1009,6 +1181,42 @@ class EnterpriseFoundationApiTest extends TestCase
         ])->assertForbidden();
     }
 
+    public function test_active_school_member_without_permission_cannot_manage_guardians(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Guardian Limited', 'slug' => 'guardian-limited']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/guardians", [
+            'full_name' => 'Limited Guardian',
+        ])->assertForbidden();
+    }
+
+    public function test_active_school_member_without_permission_cannot_manage_students(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Student Limited', 'slug' => 'student-limited']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/students", [
+            'admission_no' => 'ADM-2026-0003',
+            'full_name' => 'Limited Student',
+            'admitted_on' => '2026-01-10',
+        ])->assertForbidden();
+    }
+
     public function test_database_seeder_creates_enterprise_roles_and_permissions(): void
     {
         $this->seed();
@@ -1021,6 +1229,8 @@ class EnterpriseFoundationApiTest extends TestCase
         $this->assertDatabaseHas('permissions', ['key' => 'shifts.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'designations.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'employees.manage']);
+        $this->assertDatabaseHas('permissions', ['key' => 'guardians.manage']);
+        $this->assertDatabaseHas('permissions', ['key' => 'students.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'audit.view']);
         $this->assertDatabaseHas('roles', ['key' => 'super-admin', 'is_system' => true]);
         $this->assertDatabaseHas('roles', ['key' => 'read-only-auditor', 'is_system' => true]);
