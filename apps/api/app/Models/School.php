@@ -150,4 +150,12 @@ class School extends Model
     {
         return $this->hasMany(StudentEnrollment::class);
     }
+
+    /**
+     * @return HasMany<TeacherProfile, $this>
+     */
+    public function teacherProfiles(): HasMany
+    {
+        return $this->hasMany(TeacherProfile::class);
+    }
 }

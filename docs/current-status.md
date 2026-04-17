@@ -55,6 +55,8 @@
   - `/api/schools/{school}/students`
 - Added tenant-scoped Student Enrollments CRUD under:
   - `/api/schools/{school}/student-enrollments`
+- Added tenant-scoped Teacher Profiles CRUD under:
+  - `/api/schools/{school}/teacher-profiles`
 - Academic Sections validate their Academic Class belongs to the same school.
 - Academic Years enforce one current academic year per school.
 - Added feature tests for login, profile lookup, school creation, Academic Classes CRUD, Academic Sections CRUD, Academic Years CRUD, Subjects CRUD, Class Subjects CRUD, Student Groups CRUD, Shifts CRUD, permission denial, and cross-school access denial.
@@ -112,6 +114,9 @@
 - Added Nuxt Enrollments workspace with student/year/class/section/group/shift placement, create, edit, and archive flows.
 - Added dashboard navigation/action button for Enrollments.
 - Added typed Nuxt `StudentEnrollment` API shape.
+- Added Nuxt Teacher Profiles workspace with employee-based teacher profile create, edit, and archive flows.
+- Added dashboard navigation/action button for Teachers.
+- Added typed Nuxt `TeacherProfile` API shape.
 - Added explicit Laravel CORS config for local Nuxt origins.
 - Added project `agent-browser.json` so future browser checks can run visibly and tolerate Herd local HTTPS certificates.
 - Updated Laravel and Nuxt env examples for Herd/MySQL local development.
@@ -145,6 +150,7 @@
 - `php artisan test --filter=Employee` from `apps/api`: passed, 3 tests / 19 assertions.
 - `php artisan test` from `apps/api`: passed after Students and Guardians workspace, 34 tests / 214 assertions.
 - `php artisan test` from `apps/api`: passed after Enrollments workspace, 37 tests / 233 assertions.
+- `php artisan test` from `apps/api`: passed after Teacher Profiles workspace, 40 tests / 251 assertions.
 - `vendor\bin\pint --test` from `apps/api`: passed after Academic Years API.
 - `vendor\bin\pint --test` from `apps/api`: passed after Academic Years frontend/CORS phase.
 - `vendor\bin\pint --test` from `apps/api`: passed after Subjects workspace.
@@ -154,6 +160,7 @@
 - `vendor\bin\pint --test` from `apps/api`: passed after Employees workspace.
 - `vendor\bin\pint --test` from `apps/api`: passed after Students and Guardians workspace.
 - `vendor\bin\pint --test` from `apps/api`: passed after Enrollments workspace.
+- `vendor\bin\pint --test` from `apps/api`: passed after Teacher Profiles workspace.
 - `php artisan route:list` from `apps/api`: passed, 41 routes.
 - `agent-browser --version`: passed, `agent-browser 0.26.0`.
 - `agent-browser` local web smoke check passed:
@@ -177,6 +184,7 @@
 - `npm run build` from `apps/web`: passed after Employees workspace, with existing Nuxt/Nitro warnings.
 - `npm run build` from `apps/web`: passed after Students and Guardians workspace, with existing Nuxt/Nitro warnings.
 - `npm run build` from `apps/web`: passed after Enrollments workspace, with existing Nuxt/Nitro warnings.
+- `npm run build` from `apps/web`: passed after Teacher Profiles workspace, with existing Nuxt/Nitro warnings.
 - Agent-browser opened `http://127.0.0.1:3000/` and confirmed the login page rendered. Authenticated browser login was blocked inside the automation browser by local Herd HTTPS fetch handling before the project browser config was added; continue visual checks with the new `agent-browser.json`.
 - Agent-browser authenticated against the live app, reached `http://127.0.0.1:3000/dashboard`, opened `http://127.0.0.1:3000/schools/1/subjects`, and verified creating `Mathematics / MATH-101` through the live Herd API.
 - Agent-browser opened `http://127.0.0.1:3000/schools/1/student-groups` and verified creating `Science Group / SCI-01` through the live Herd API.
@@ -188,19 +196,22 @@
 - Saved browser screenshot at `docs/browser-checks/students-workspace.png`.
 - Agent-browser opened `http://127.0.0.1:3000/schools/1/enrollments` and verified enrolling `Nadia Rahman / ADM-2026-0001` into `Class One` with roll `12` through the live Herd API.
 - Saved browser screenshot at `docs/browser-checks/enrollments-workspace.png`.
+- Agent-browser opened `http://127.0.0.1:3000/schools/1/teacher-profiles` and verified creating `Amina Rahman / TCHR-2026-0001` through the live Herd API.
+- Saved browser screenshot at `docs/browser-checks/teacher-profiles-workspace.png`.
 - Nuxt dev server startup from this Codex shell did not become reachable on port 3000; production build remains valid.
 - Initial sandbox runs hit Windows permission/process limits, then passed outside the sandbox with approval.
 
 ## Next Step
 
-Continue Phase 2 implementation:
+Continue Phase 3 implementation:
 
 1. Configure Laravel API for local MySQL once DB credentials are confirmed.
 2. Continue browser walkthroughs with visible `agent-browser` as each page/module lands.
-3. Continue Phase 2 people records: teacher profile foundations, promotions, and profiles.
+3. Start Phase 3 attendance records.
 
-Current page/module complete: Enrollments API/Nuxt workspace.
-Next page/module: Teacher Profiles foundation, then Phase 3 Attendance.
+Current page/module complete: Teacher Profiles API/Nuxt workspace.
+Phase 2 status: complete for the current academic setup and people foundation.
+Next page/module: Phase 3 Attendance.
 
 ## New Session Startup Prompt
 

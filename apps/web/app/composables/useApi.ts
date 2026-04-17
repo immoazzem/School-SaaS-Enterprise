@@ -186,6 +186,20 @@ export interface StudentEnrollment {
   shift?: Pick<Shift, 'id' | 'name' | 'code'> | null
 }
 
+export interface TeacherProfile {
+  id: number
+  school_id: number
+  employee_id: number
+  teacher_no: string
+  specialization: string | null
+  qualification: string | null
+  experience_years: number | null
+  joined_teaching_on: string | null
+  bio: string | null
+  status: string
+  employee?: Pick<Employee, 'id' | 'employee_no' | 'full_name' | 'email' | 'phone'>
+}
+
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
   body?: Record<string, unknown>

@@ -17,6 +17,7 @@ use App\Models\Student;
 use App\Models\StudentEnrollment;
 use App\Models\StudentGroup;
 use App\Models\Subject;
+use App\Models\TeacherProfile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -1081,6 +1082,104 @@ class EnterpriseFoundationApiTest extends TestCase
             ->assertJsonValidationErrors('student_id');
     }
 
+    public function test_school_member_can_manage_teacher_profiles(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Teacher School', 'slug' => 'teacher-school']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'teachers.manage', 'people');
+
+        $employee = $school->employees()->create([
+            'employee_no' => 'EMP-2026-0100',
+            'full_name' => 'Amina Rahman',
+            'joined_on' => '2026-01-15',
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $created = $this->postJson("/api/schools/{$school->id}/teacher-profiles", [
+            'employee_id' => $employee->id,
+            'teacher_no' => 'TCHR-2026-0001',
+            'specialization' => 'Mathematics',
+            'qualification' => 'M.Ed',
+            'experience_years' => 8,
+            'joined_teaching_on' => '2026-02-01',
+            'bio' => 'Senior mathematics teacher.',
+        ]);
+
+        $created
+            ->assertCreated()
+            ->assertJsonPath('data.teacher_no', 'TCHR-2026-0001')
+            ->assertJsonPath('data.employee.id', $employee->id);
+
+        $profileId = $created->json('data.id');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'teacher_profile.created',
+            'auditable_id' => $profileId,
+        ]);
+
+        $this->getJson("/api/schools/{$school->id}/teacher-profiles?search=amina")
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $profileId);
+
+        $this->patchJson("/api/schools/{$school->id}/teacher-profiles/{$profileId}", [
+            'specialization' => 'Advanced Mathematics',
+        ])->assertOk()
+            ->assertJsonPath('data.specialization', 'Advanced Mathematics');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'teacher_profile.updated',
+            'auditable_id' => $profileId,
+        ]);
+
+        $this->deleteJson("/api/schools/{$school->id}/teacher-profiles/{$profileId}")
+            ->assertNoContent();
+
+        $this->assertSoftDeleted(TeacherProfile::class, ['id' => $profileId]);
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'teacher_profile.deleted',
+            'auditable_id' => $profileId,
+        ]);
+    }
+
+    public function test_teacher_profile_rejects_employees_from_another_school(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Teacher Tenant', 'slug' => 'teacher-tenant']);
+        $otherSchool = School::query()->create(['name' => 'Foreign Teacher Tenant', 'slug' => 'foreign-teacher-tenant']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'teachers.manage', 'people');
+
+        $foreignEmployee = $otherSchool->employees()->create([
+            'employee_no' => 'EMP-FOREIGN',
+            'full_name' => 'Foreign Teacher',
+            'joined_on' => '2026-01-15',
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/teacher-profiles", [
+            'employee_id' => $foreignEmployee->id,
+            'teacher_no' => 'TCHR-FOREIGN',
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors('employee_id');
+    }
+
     public function test_section_creation_rejects_classes_from_another_school(): void
     {
         $user = User::factory()->create();
@@ -1375,6 +1474,29 @@ class EnterpriseFoundationApiTest extends TestCase
         ])->assertForbidden();
     }
 
+    public function test_active_school_member_without_permission_cannot_manage_teacher_profiles(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Teacher Limited', 'slug' => 'teacher-limited']);
+        $employee = $school->employees()->create([
+            'employee_no' => 'EMP-2026-0101',
+            'full_name' => 'Limited Teacher',
+            'joined_on' => '2026-01-15',
+        ]);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/teacher-profiles", [
+            'employee_id' => $employee->id,
+            'teacher_no' => 'TCHR-2026-0101',
+        ])->assertForbidden();
+    }
+
     public function test_database_seeder_creates_enterprise_roles_and_permissions(): void
     {
         $this->seed();
@@ -1390,6 +1512,7 @@ class EnterpriseFoundationApiTest extends TestCase
         $this->assertDatabaseHas('permissions', ['key' => 'guardians.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'students.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'enrollments.manage']);
+        $this->assertDatabaseHas('permissions', ['key' => 'teachers.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'audit.view']);
         $this->assertDatabaseHas('roles', ['key' => 'super-admin', 'is_system' => true]);
         $this->assertDatabaseHas('roles', ['key' => 'read-only-auditor', 'is_system' => true]);

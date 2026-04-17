@@ -240,3 +240,15 @@ Scope: added `student_enrollments` migration/model/relationships, `enrollments.m
 Verification: `php artisan test` passed with 37 tests / 233 assertions; `vendor\bin\pint --test` passed; `php artisan migrate`, RBAC seeding, and `php artisan route:list --path=student-enrollments` passed; `npm run build` passed with existing Nuxt/Nitro warnings; agent-browser verified enrolling `Nadia Rahman / ADM-2026-0001` into `Class One` with roll `12` through the live Herd API. Browser screenshot saved at `docs/browser-checks/enrollments-workspace.png`.
 
 Next: commit and push this checkpoint, then continue Phase 2 with Teacher Profiles foundation.
+
+### Teacher Profiles Workspace
+
+Current page/module complete: Teacher Profiles API/Nuxt workspace, route `/schools/{schoolId}/teacher-profiles`.
+
+Scope: added `teacher_profiles` migration/model/relationship, `teachers.manage` policy, tenant-scoped controller/routes, tests, audit logs, dashboard navigation, typed Nuxt `TeacherProfile` API shape, and a Nuxt workspace for connecting employee records to teaching profiles.
+
+Verification: `php artisan test` passed with 40 tests / 251 assertions; `vendor\bin\pint --test` passed; `php artisan migrate`, RBAC seeding, and `php artisan route:list --path=teacher-profiles` passed; `npm run build` passed with existing Nuxt/Nitro warnings; agent-browser verified creating `Amina Rahman / TCHR-2026-0001` through the live Herd API. Browser screenshot saved at `docs/browser-checks/teacher-profiles-workspace.png`.
+
+Phase 2 status: complete for the current academic setup and people foundation.
+
+Next: commit and push this checkpoint, then start Phase 3 Attendance.

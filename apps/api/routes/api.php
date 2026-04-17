@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\StudentEnrollmentController;
 use App\Http\Controllers\Api\StudentGroupController;
 use App\Http\Controllers\Api\SubjectController;
+use App\Http\Controllers\Api\TeacherProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -49,6 +50,9 @@ Route::middleware('auth:sanctum')->group(function (): void {
         ->parameters(['student-groups' => 'studentGroup'])
         ->middleware('school.member');
     Route::apiResource('schools.subjects', SubjectController::class)
+        ->middleware('school.member');
+    Route::apiResource('schools.teacher-profiles', TeacherProfileController::class)
+        ->parameters(['teacher-profiles' => 'teacherProfile'])
         ->middleware('school.member');
 });
 

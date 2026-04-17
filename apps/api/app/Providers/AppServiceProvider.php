@@ -14,6 +14,7 @@ use App\Models\Student;
 use App\Models\StudentEnrollment;
 use App\Models\StudentGroup;
 use App\Models\Subject;
+use App\Models\TeacherProfile;
 use App\Policies\AcademicClassPolicy;
 use App\Policies\AcademicSectionPolicy;
 use App\Policies\AcademicYearPolicy;
@@ -26,6 +27,7 @@ use App\Policies\StudentEnrollmentPolicy;
 use App\Policies\StudentGroupPolicy;
 use App\Policies\StudentPolicy;
 use App\Policies\SubjectPolicy;
+use App\Policies\TeacherProfilePolicy;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
@@ -56,5 +58,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(StudentEnrollment::class, StudentEnrollmentPolicy::class);
         Gate::policy(StudentGroup::class, StudentGroupPolicy::class);
         Gate::policy(Subject::class, SubjectPolicy::class);
+        Gate::policy(TeacherProfile::class, TeacherProfilePolicy::class);
     }
 }
