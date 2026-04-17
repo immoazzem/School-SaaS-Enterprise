@@ -200,3 +200,13 @@ Scope: added `class_subjects` migration/model/relationship, permission, policy, 
 Verification: `php artisan test` passed with 24 tests / 145 assertions; `vendor\bin\pint --test` passed; `php artisan route:list --path=class-subjects` showed the assignment routes; `npm run build` passed with existing Nuxt/Nitro warnings; local migration and RBAC seeding passed; agent-browser verified assigning `Mathematics / MATH-101` to `Class One` with `40 / 100` marks through the live Herd API.
 
 Next: commit and push this checkpoint, then continue Phase 2 with Designations.
+
+### Designations Workspace
+
+Current page/module complete: Designations API/Nuxt workspace, route `/schools/{schoolId}/designations`.
+
+Scope: added `designations` migration/model/relationship, `designations.manage` permission, policy, controller, tenant-scoped routes, tests, audit logs, dashboard navigation, typed Nuxt `Designation` API shape, and a Nuxt workspace with status/search filters plus create/edit/archive flows.
+
+Verification: `php artisan test` passed with 26 tests / 160 assertions; `php artisan test --filter=Designation` passed with 2 tests / 14 assertions; `vendor\bin\pint --test` passed; `php artisan route:list --path=designations` showed the designation routes; `npm run build` passed with existing Nuxt/Nitro warnings; local migration and RBAC seeding passed; agent-browser verified creating `Senior Teacher / SNR-TCHR` through the live Herd API.
+
+Next: commit and push this checkpoint, then continue Phase 2 with Employees.

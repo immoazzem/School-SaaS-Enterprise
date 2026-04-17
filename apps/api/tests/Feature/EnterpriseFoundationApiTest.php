@@ -6,6 +6,7 @@ use App\Models\AcademicClass;
 use App\Models\AcademicSection;
 use App\Models\AcademicYear;
 use App\Models\ClassSubject;
+use App\Models\Designation;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\School;
@@ -610,6 +611,68 @@ class EnterpriseFoundationApiTest extends TestCase
         ]);
     }
 
+    public function test_school_member_can_manage_designations(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'People School', 'slug' => 'people-school']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'designations.manage', 'people');
+
+        Sanctum::actingAs($user);
+
+        $created = $this->postJson("/api/schools/{$school->id}/designations", [
+            'name' => 'Senior Teacher',
+            'code' => 'SNR-TCHR',
+            'description' => 'Lead classroom teacher designation.',
+            'sort_order' => 10,
+        ]);
+
+        $created
+            ->assertCreated()
+            ->assertJsonPath('data.name', 'Senior Teacher')
+            ->assertJsonPath('data.code', 'SNR-TCHR');
+
+        $designationId = $created->json('data.id');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'designation.created',
+            'auditable_id' => $designationId,
+        ]);
+
+        $this->getJson("/api/schools/{$school->id}/designations?search=senior")
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $designationId);
+
+        $this->patchJson("/api/schools/{$school->id}/designations/{$designationId}", [
+            'name' => 'Senior Faculty',
+        ])->assertOk()
+            ->assertJsonPath('data.name', 'Senior Faculty');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'designation.updated',
+            'auditable_id' => $designationId,
+        ]);
+
+        $this->deleteJson("/api/schools/{$school->id}/designations/{$designationId}")
+            ->assertNoContent();
+
+        $this->assertSoftDeleted(Designation::class, ['id' => $designationId]);
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'designation.deleted',
+            'auditable_id' => $designationId,
+        ]);
+    }
+
     public function test_section_creation_rejects_classes_from_another_school(): void
     {
         $user = User::factory()->create();
@@ -799,6 +862,24 @@ class EnterpriseFoundationApiTest extends TestCase
         ])->assertForbidden();
     }
 
+    public function test_active_school_member_without_permission_cannot_manage_designations(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'People Limited', 'slug' => 'people-limited']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/designations", [
+            'name' => 'Assistant Teacher',
+            'code' => 'AST-TCHR',
+        ])->assertForbidden();
+    }
+
     public function test_database_seeder_creates_enterprise_roles_and_permissions(): void
     {
         $this->seed();
@@ -809,6 +890,7 @@ class EnterpriseFoundationApiTest extends TestCase
         $this->assertDatabaseHas('permissions', ['key' => 'class_subjects.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'student_groups.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'shifts.manage']);
+        $this->assertDatabaseHas('permissions', ['key' => 'designations.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'audit.view']);
         $this->assertDatabaseHas('roles', ['key' => 'super-admin', 'is_system' => true]);
         $this->assertDatabaseHas('roles', ['key' => 'read-only-auditor', 'is_system' => true]);

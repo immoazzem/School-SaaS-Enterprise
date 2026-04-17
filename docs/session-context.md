@@ -109,9 +109,9 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Nuxt app targets `nuxt:^4.4.2`.
 - Laravel Sanctum `v4.3.1` is installed.
 - API routing and Sanctum config/migration are published.
-- Backend foundation schema exists for schools, memberships, RBAC, audit logs, academic classes, academic sections, academic years, subjects, class subjects, student groups, and shifts.
-- Token auth, school list/create, tenant-scoped Academic Classes CRUD, tenant-scoped Academic Sections CRUD, tenant-scoped Academic Years CRUD, tenant-scoped Subjects CRUD, tenant-scoped Class Subjects CRUD, tenant-scoped Student Groups CRUD, and tenant-scoped Shifts CRUD endpoints exist.
-- Enterprise role/permission seeders and Academic Classes/Sections/Years/Subjects/Class Subjects/Student Groups/Shifts audit-log writes exist.
+- Backend foundation schema exists for schools, memberships, RBAC, audit logs, academic classes, academic sections, academic years, subjects, class subjects, student groups, shifts, and designations.
+- Token auth, school list/create, tenant-scoped Academic Classes CRUD, tenant-scoped Academic Sections CRUD, tenant-scoped Academic Years CRUD, tenant-scoped Subjects CRUD, tenant-scoped Class Subjects CRUD, tenant-scoped Student Groups CRUD, tenant-scoped Shifts CRUD, and tenant-scoped Designations CRUD endpoints exist.
+- Enterprise role/permission seeders and Academic Classes/Sections/Years/Subjects/Class Subjects/Student Groups/Shifts/Designations audit-log writes exist.
 - Active school membership checks use reusable `school.member` route middleware.
 - Academic Class policy checks enforce `academic_classes.manage`.
 - Academic Section policy checks enforce `sections.manage`.
@@ -120,6 +120,7 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Class Subject policy checks enforce `class_subjects.manage`.
 - Student Group policy checks enforce `student_groups.manage`.
 - Shift policy checks enforce `shifts.manage`.
+- Designation policy checks enforce `designations.manage`.
 - School creation assigns the seeded `school-owner` role to the creator.
 - Backend foundation tests pass after Academic Years: `php artisan test` reports 15 tests / 78 assertions.
 - Pint, route list, and `php artisan migrate:fresh --seed` pass for the backend foundation.
@@ -135,11 +136,12 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Class Subjects workspace supports class/subject filters, mark rules, create, edit, and archive flows.
 - Student Groups workspace supports status/search filters, create, edit, and archive flows.
 - Shifts workspace supports status/search filters, time windows, create, edit, and archive flows.
+- Designations workspace supports status/search filters, create, edit, and archive flows.
 - Dashboard, Academic Classes, and Academic Sections screens link to Academic Years.
 - Explicit Laravel CORS config allows local Nuxt origins.
 - Project `agent-browser.json` is present so browser checks can run headed and ignore Herd local HTTPS certificate errors.
 - Nuxt build passes after the app UI slice and after route protection/school creation.
-- Backend tests pass after the Class Subject Assignments workspace: 24 tests / 145 assertions.
+- Backend tests pass after the Designations workspace: 26 tests / 160 assertions.
 - Env examples are Herd/MySQL-ready:
   - `apps/api/.env.example`
   - `apps/web/.env.example`
@@ -156,14 +158,15 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
   - Academic Class creation/listing works.
 - Ignored local Nuxt `.env` points to `https://school-api.test/api`.
 - Nuxt production build passes with that env.
-- Nuxt dev server did not become reachable on port 3000 from the Codex shell; use browser/manual dev server verification next.
+- Nuxt dev server is reachable on `http://127.0.0.1:3000` when started from this workspace with `npm run dev -- --host 127.0.0.1 --port 3000`.
 - MySQL database config is still pending; tests currently use SQLite in memory.
-- Current page/module complete: Class Subject Assignments API/Nuxt workspace.
-- Next app slice: add Designations API/Nuxt workspace.
+- Current page/module complete: Designations API/Nuxt workspace.
+- Next app slice: add Employees API/Nuxt workspace.
 - Agent-browser authenticated against the live app, reached the dashboard, opened `http://127.0.0.1:3000/schools/1/subjects`, and verified creating `Mathematics / MATH-101` through the live Herd API.
 - Agent-browser opened `http://127.0.0.1:3000/schools/1/student-groups` and verified creating `Science Group / SCI-01` through the live Herd API.
 - Agent-browser opened `http://127.0.0.1:3000/schools/1/shifts` and verified creating `Morning Shift / MOR-01` with `08:00 to 12:30` through the live Herd API.
 - Agent-browser opened `http://127.0.0.1:3000/schools/1/class-subjects` and verified assigning `Mathematics / MATH-101` to `Class One` with `40 / 100` marks through the live Herd API.
+- Agent-browser opened `http://127.0.0.1:3000/schools/1/designations` and verified creating `Senior Teacher / SNR-TCHR` through the live Herd API.
 - `agent-browser@0.26.0` is installed globally with Chrome runtime `147.0.7727.57` and should be used after dev server starts.
 - Show/use the browser during UI phases at natural checkpoints: after a page is added, after login/navigation changes, and before committing a successful phase.
 - Maintain `docs/engineering-log.md` after each successful step, and update `docs/current-status.md` plus this file before ending long sessions.

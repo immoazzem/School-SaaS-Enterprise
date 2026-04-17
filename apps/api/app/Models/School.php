@@ -110,4 +110,12 @@ class School extends Model
     {
         return $this->hasMany(ClassSubject::class);
     }
+
+    /**
+     * @return HasMany<Designation, $this>
+     */
+    public function designations(): HasMany
+    {
+        return $this->hasMany(Designation::class);
+    }
 }
