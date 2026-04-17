@@ -102,4 +102,12 @@ class School extends Model
     {
         return $this->hasMany(Shift::class);
     }
+
+    /**
+     * @return HasMany<ClassSubject, $this>
+     */
+    public function classSubjects(): HasMany
+    {
+        return $this->hasMany(ClassSubject::class);
+    }
 }

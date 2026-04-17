@@ -40,6 +40,11 @@ const navItems = computed(() => [
     enabled: selectedSchool.value?.permissions?.includes('subjects.manage') ?? false,
   },
   {
+    label: 'Class Subjects',
+    active: false,
+    enabled: selectedSchool.value?.permissions?.includes('class_subjects.manage') ?? false,
+  },
+  {
     label: 'Groups',
     active: false,
     enabled: selectedSchool.value?.permissions?.includes('student_groups.manage') ?? false,
@@ -140,6 +145,15 @@ async function openSubjects() {
   await router.push(`/schools/${auth.selectedSchoolId.value}/subjects`)
 }
 
+async function openClassSubjects() {
+  if (!auth.selectedSchoolId.value) {
+    error.value = 'Create or select a school first.'
+    return
+  }
+
+  await router.push(`/schools/${auth.selectedSchoolId.value}/class-subjects`)
+}
+
 async function openStudentGroups() {
   if (!auth.selectedSchoolId.value) {
     error.value = 'Create or select a school first.'
@@ -185,11 +199,13 @@ onMounted(loadDashboard)
                   ? openAcademicYears()
                   : item.label === 'Subjects'
                     ? openSubjects()
-                    : item.label === 'Groups'
-                      ? openStudentGroups()
-                      : item.label === 'Shifts'
-                        ? openShifts()
-                        : undefined
+                    : item.label === 'Class Subjects'
+                      ? openClassSubjects()
+                      : item.label === 'Groups'
+                        ? openStudentGroups()
+                        : item.label === 'Shifts'
+                          ? openShifts()
+                          : undefined
           "
         >
           <span>{{ item.label }}</span>
@@ -322,6 +338,7 @@ onMounted(loadDashboard)
           <button class="button" type="button" @click="openClasses">Open classes</button>
           <button class="button secondary" type="button" @click="openAcademicYears">Open years</button>
           <button class="button secondary" type="button" @click="openSubjects">Open subjects</button>
+          <button class="button secondary" type="button" @click="openClassSubjects">Assign subjects</button>
           <button class="button secondary" type="button" @click="openStudentGroups">Open groups</button>
           <button class="button secondary" type="button" @click="openShifts">Open shifts</button>
         </div>

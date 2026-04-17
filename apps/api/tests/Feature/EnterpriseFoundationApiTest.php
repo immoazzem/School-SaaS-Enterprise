@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\AcademicClass;
 use App\Models\AcademicSection;
 use App\Models\AcademicYear;
+use App\Models\ClassSubject;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\School;
@@ -387,6 +388,100 @@ class EnterpriseFoundationApiTest extends TestCase
         ]);
     }
 
+    public function test_school_member_can_manage_class_subject_assignments(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Assignment School', 'slug' => 'assignment-school']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'class_subjects.manage', 'academics');
+
+        $academicClass = $school->academicClasses()->create(['name' => 'Class Nine', 'code' => 'C9']);
+        $subject = $school->subjects()->create(['name' => 'Physics', 'code' => 'PHY', 'type' => 'core']);
+
+        Sanctum::actingAs($user);
+
+        $created = $this->postJson("/api/schools/{$school->id}/class-subjects", [
+            'academic_class_id' => $academicClass->id,
+            'subject_id' => $subject->id,
+            'full_marks' => 100,
+            'pass_marks' => 40,
+            'subjective_marks' => 60,
+            'sort_order' => 10,
+        ]);
+
+        $created
+            ->assertCreated()
+            ->assertJsonPath('data.academic_class.id', $academicClass->id)
+            ->assertJsonPath('data.subject.id', $subject->id)
+            ->assertJsonPath('data.pass_marks', 40);
+
+        $assignmentId = $created->json('data.id');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'class_subject.created',
+            'auditable_id' => $assignmentId,
+        ]);
+
+        $this->getJson("/api/schools/{$school->id}/class-subjects?academic_class_id={$academicClass->id}&search=physics")
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $assignmentId);
+
+        $this->patchJson("/api/schools/{$school->id}/class-subjects/{$assignmentId}", [
+            'full_marks' => 100,
+            'pass_marks' => 45,
+            'status' => 'active',
+        ])->assertOk()
+            ->assertJsonPath('data.pass_marks', 45);
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'class_subject.updated',
+            'auditable_id' => $assignmentId,
+        ]);
+
+        $this->deleteJson("/api/schools/{$school->id}/class-subjects/{$assignmentId}")
+            ->assertNoContent();
+
+        $this->assertSoftDeleted(ClassSubject::class, ['id' => $assignmentId]);
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'class_subject.deleted',
+            'auditable_id' => $assignmentId,
+        ]);
+    }
+
+    public function test_class_subject_assignment_rejects_records_from_another_school(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Assignment Tenant', 'slug' => 'assignment-tenant']);
+        $otherSchool = School::query()->create(['name' => 'Foreign Assignment Tenant', 'slug' => 'foreign-assignment-tenant']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'class_subjects.manage', 'academics');
+
+        $academicClass = $school->academicClasses()->create(['name' => 'Class Nine', 'code' => 'C9']);
+        $foreignSubject = $otherSchool->subjects()->create(['name' => 'Foreign Physics', 'code' => 'FPHY', 'type' => 'core']);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/class-subjects", [
+            'academic_class_id' => $academicClass->id,
+            'subject_id' => $foreignSubject->id,
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors('subject_id');
+    }
+
     public function test_school_member_can_manage_student_groups(): void
     {
         $user = User::factory()->create();
@@ -648,6 +743,26 @@ class EnterpriseFoundationApiTest extends TestCase
         ])->assertForbidden();
     }
 
+    public function test_active_school_member_without_permission_cannot_manage_class_subjects(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Assignment Limited', 'slug' => 'assignment-limited']);
+        $academicClass = $school->academicClasses()->create(['name' => 'Class Ten', 'code' => 'C10']);
+        $subject = $school->subjects()->create(['name' => 'Chemistry', 'code' => 'CHEM', 'type' => 'core']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/class-subjects", [
+            'academic_class_id' => $academicClass->id,
+            'subject_id' => $subject->id,
+        ])->assertForbidden();
+    }
+
     public function test_active_school_member_without_permission_cannot_manage_student_groups(): void
     {
         $user = User::factory()->create();
@@ -691,6 +806,7 @@ class EnterpriseFoundationApiTest extends TestCase
         $this->assertDatabaseHas('permissions', ['key' => 'academic_years.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'academic_classes.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'subjects.manage']);
+        $this->assertDatabaseHas('permissions', ['key' => 'class_subjects.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'student_groups.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'shifts.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'audit.view']);

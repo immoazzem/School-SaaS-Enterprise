@@ -190,3 +190,13 @@ Scope: added `student_groups` and `shifts` migrations/models/relationships, perm
 Verification: `php artisan test` passed with 21 tests / 126 assertions; `vendor\bin\pint --test` passed; `php artisan route:list` showed 41 routes; `npm run build` passed with existing Nuxt/Nitro warnings; local migrations and RBAC seeding passed; agent-browser verified creating `Science Group / SCI-01` and `Morning Shift / MOR-01` through the live Herd API.
 
 Next: commit and push this checkpoint, then continue Phase 2 with Class Subject Assignments.
+
+### Class Subject Assignments Workspace
+
+Current page/module complete: Class Subject Assignments API/Nuxt workspace, route `/schools/{schoolId}/class-subjects`.
+
+Scope: added `class_subjects` migration/model/relationship, permission, policy, controller, tenant-scoped routes, tests, audit logs, dashboard navigation, typed Nuxt `ClassSubject` API shape, and a Nuxt workspace with class/subject filters, mark rules, and create/edit/archive flows.
+
+Verification: `php artisan test` passed with 24 tests / 145 assertions; `vendor\bin\pint --test` passed; `php artisan route:list --path=class-subjects` showed the assignment routes; `npm run build` passed with existing Nuxt/Nitro warnings; local migration and RBAC seeding passed; agent-browser verified assigning `Mathematics / MATH-101` to `Class One` with `40 / 100` marks through the live Herd API.
+
+Next: commit and push this checkpoint, then continue Phase 2 with Designations.

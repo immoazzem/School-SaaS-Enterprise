@@ -86,6 +86,20 @@ export interface Shift {
   status: string
 }
 
+export interface ClassSubject {
+  id: number
+  school_id: number
+  academic_class_id: number
+  subject_id: number
+  academic_class?: Pick<AcademicClass, 'id' | 'name' | 'code'>
+  subject?: Pick<Subject, 'id' | 'name' | 'code' | 'type'>
+  full_marks: number
+  pass_marks: number
+  subjective_marks: number | null
+  sort_order: number
+  status: string
+}
+
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
   body?: Record<string, unknown>

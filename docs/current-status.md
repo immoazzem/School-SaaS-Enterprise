@@ -22,7 +22,7 @@
 - Installed Nuxt dependencies and generated `package-lock.json`.
 - Installed Laravel Sanctum `v4.3.1`.
 - Published Laravel 13 API routing and Sanctum config/migration.
-- Added enterprise foundation schema for schools, memberships, roles, permissions, role assignments, audit logs, academic classes, academic sections, academic years, subjects, student groups, and shifts.
+- Added enterprise foundation schema for schools, memberships, roles, permissions, role assignments, audit logs, academic classes, academic sections, academic years, subjects, class subjects, student groups, and shifts.
 - Added foundation models and relationships.
 - Added token auth endpoints:
   - `POST /api/auth/login`
@@ -39,22 +39,26 @@
   - `/api/schools/{school}/academic-years`
 - Added tenant-scoped Subjects CRUD under:
   - `/api/schools/{school}/subjects`
+- Added tenant-scoped Class Subjects CRUD under:
+  - `/api/schools/{school}/class-subjects`
 - Added tenant-scoped Student Groups CRUD under:
   - `/api/schools/{school}/student-groups`
 - Added tenant-scoped Shifts CRUD under:
   - `/api/schools/{school}/shifts`
 - Academic Sections validate their Academic Class belongs to the same school.
 - Academic Years enforce one current academic year per school.
-- Added feature tests for login, profile lookup, school creation, Academic Classes CRUD, Academic Sections CRUD, Academic Years CRUD, Subjects CRUD, Student Groups CRUD, Shifts CRUD, permission denial, and cross-school access denial.
+- Added feature tests for login, profile lookup, school creation, Academic Classes CRUD, Academic Sections CRUD, Academic Years CRUD, Subjects CRUD, Class Subjects CRUD, Student Groups CRUD, Shifts CRUD, permission denial, and cross-school access denial.
 - Added enterprise role/permission seeders.
 - Added audit-log writes for Academic Classes, Academic Sections, and Academic Years create/update/delete.
 - Added audit-log writes for Subjects create/update/delete.
+- Added audit-log writes for Class Subjects create/update/delete.
 - Added audit-log writes for Student Groups and Shifts create/update/delete.
 - Added reusable `school.member` middleware for active school membership checks.
 - Added Academic Class policy checks for `academic_classes.manage`.
 - Added Academic Section policy checks for `sections.manage`.
 - Added Academic Year policy checks for `academic_years.manage`.
 - Added Subject policy checks for `subjects.manage`.
+- Added Class Subject policy checks for `class_subjects.manage`.
 - Added Student Group policy checks for `student_groups.manage`.
 - Added Shift policy checks for `shifts.manage`.
 - School creation now assigns the seeded `school-owner` role to the creator when the RBAC seed exists.
@@ -77,6 +81,9 @@
 - Added Nuxt Subjects workspace with status/type/search filters, create, edit, and archive flows.
 - Added dashboard and Academic Years navigation links for Subjects.
 - Added typed Nuxt `Subject` API shape.
+- Added Nuxt Class Subjects workspace with class/subject filters, mark rules, create, edit, and archive flows.
+- Added dashboard navigation/action button for Class Subjects.
+- Added typed Nuxt `ClassSubject` API shape.
 - Added Nuxt Student Groups workspace with status/search filters, create, edit, and archive flows.
 - Added Nuxt Shifts workspace with status/search filters, time windows, create, edit, and archive flows.
 - Added dashboard navigation/action buttons for Student Groups and Shifts.
@@ -107,10 +114,12 @@
 - `php artisan test` from `apps/api`: passed after Academic Years frontend/CORS phase, 15 tests / 78 assertions.
 - `php artisan test` from `apps/api`: passed after Subjects workspace, 17 tests / 95 assertions.
 - `php artisan test` from `apps/api`: passed after Student Groups and Shifts workspace, 21 tests / 126 assertions.
+- `php artisan test` from `apps/api`: passed after Class Subject Assignments workspace, 24 tests / 145 assertions.
 - `vendor\bin\pint --test` from `apps/api`: passed after Academic Years API.
 - `vendor\bin\pint --test` from `apps/api`: passed after Academic Years frontend/CORS phase.
 - `vendor\bin\pint --test` from `apps/api`: passed after Subjects workspace.
 - `vendor\bin\pint --test` from `apps/api`: passed after Student Groups and Shifts workspace.
+- `vendor\bin\pint --test` from `apps/api`: passed after Class Subject Assignments workspace.
 - `php artisan route:list` from `apps/api`: passed, 41 routes.
 - `agent-browser --version`: passed, `agent-browser 0.26.0`.
 - `agent-browser` local web smoke check passed:
@@ -129,10 +138,12 @@
 - `npm run build` from `apps/web`: passed after Academic Years workspace, with existing Nuxt/Nitro warnings.
 - `npm run build` from `apps/web`: passed after Subjects workspace, with existing Nuxt/Nitro warnings.
 - `npm run build` from `apps/web`: passed after Student Groups and Shifts workspace, with existing Nuxt/Nitro warnings.
+- `npm run build` from `apps/web`: passed after Class Subject Assignments workspace, with existing Nuxt/Nitro warnings.
 - Agent-browser opened `http://127.0.0.1:3000/` and confirmed the login page rendered. Authenticated browser login was blocked inside the automation browser by local Herd HTTPS fetch handling before the project browser config was added; continue visual checks with the new `agent-browser.json`.
 - Agent-browser authenticated against the live app, reached `http://127.0.0.1:3000/dashboard`, opened `http://127.0.0.1:3000/schools/1/subjects`, and verified creating `Mathematics / MATH-101` through the live Herd API.
 - Agent-browser opened `http://127.0.0.1:3000/schools/1/student-groups` and verified creating `Science Group / SCI-01` through the live Herd API.
 - Agent-browser opened `http://127.0.0.1:3000/schools/1/shifts` and verified creating `Morning Shift / MOR-01` with `08:00 to 12:30` through the live Herd API.
+- Agent-browser opened `http://127.0.0.1:3000/schools/1/class-subjects` and verified assigning `Mathematics / MATH-101` to `Class One` with `40 / 100` marks through the live Herd API.
 - Nuxt dev server startup from this Codex shell did not become reachable on port 3000; production build remains valid.
 - Initial sandbox runs hit Windows permission/process limits, then passed outside the sandbox with approval.
 
@@ -142,10 +153,10 @@ Continue Phase 2 implementation:
 
 1. Configure Laravel API for local MySQL once DB credentials are confirmed.
 2. Continue browser walkthroughs with visible `agent-browser` as each page/module lands.
-3. Continue academic setup modules: subject assignments, then people records.
+3. Continue Phase 2 people records: designations, students, guardians, teachers, employees, enrollments, promotions, and profiles.
 
-Current page/module complete: Student Groups and Shifts API/Nuxt workspaces.
-Next page/module: Class Subject Assignments API/Nuxt workspace.
+Current page/module complete: Class Subject Assignments API/Nuxt workspace.
+Next page/module: Designations API/Nuxt workspace.
 
 ## New Session Startup Prompt
 

@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AcademicClassController;
 use App\Http\Controllers\Api\AcademicSectionController;
 use App\Http\Controllers\Api\AcademicYearController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ClassSubjectController;
 use App\Http\Controllers\Api\SchoolController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\StudentGroupController;
@@ -22,6 +23,9 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::apiResource('schools.academic-years', AcademicYearController::class)
         ->middleware('school.member');
     Route::apiResource('schools.academic-sections', AcademicSectionController::class)
+        ->middleware('school.member');
+    Route::apiResource('schools.class-subjects', ClassSubjectController::class)
+        ->parameters(['class-subjects' => 'classSubject'])
         ->middleware('school.member');
     Route::apiResource('schools.shifts', ShiftController::class)
         ->middleware('school.member');
