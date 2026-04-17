@@ -147,6 +147,8 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Nuxt dev server did not become reachable on port 3000 from the Codex shell; use browser/manual dev server verification next.
 - MySQL database config is still pending; tests currently use SQLite in memory.
 - Next app slice: add the Nuxt Academic Years workspace.
+- `agent-browser@0.26.0` is installed globally with Chrome runtime `147.0.7727.57` and should be used after dev server starts.
+- Maintain `docs/engineering-log.md` after each successful step, and update `docs/current-status.md` plus this file before ending long sessions.
 
 ## Required Project Structure
 
@@ -164,6 +166,7 @@ School-SaaS-Enterprise/
     security-model.md
     audit-log-model.md
     local-development.md
+    engineering-log.md
   database/
     exports/
     import-scripts/
@@ -307,6 +310,8 @@ npm run lint
 - Keep `legacy-reference` read-only.
 - Work phase by phase.
 - Commit after each meaningful phase.
+- Update `docs/engineering-log.md` after each meaningful phase or successful commit.
+- Before a session gets long, checkpoint by updating `docs/current-status.md`, `docs/session-context.md`, and `docs/engineering-log.md`.
 - Pause after each phase with:
   - files changed
   - commands run

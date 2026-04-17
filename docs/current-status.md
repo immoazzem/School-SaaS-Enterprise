@@ -14,6 +14,7 @@
   - `docs/security-model.md`
   - `docs/audit-log-model.md`
   - `docs/local-development.md`
+- Created `docs/engineering-log.md` for durable phase-by-phase code change logs.
 - Scaffolded Laravel API app in `apps/api`.
 - Composer resolved Laravel framework to `v13.5.0` with PHP 8.5.5.
 - Scaffolded Nuxt web app in `apps/web`.
@@ -70,6 +71,8 @@
   - school creation returns a tenant id.
   - Academic Class creation/listing works through `https://school-api.test/api`.
 - Created ignored local Nuxt `.env` pointing to `https://school-api.test/api`.
+- Installed `agent-browser@0.26.0` globally for browser automation checks.
+- Installed agent-browser Chrome runtime `147.0.7727.57`.
 
 ## Not Started
 
@@ -81,6 +84,11 @@
 - `php artisan test` from `apps/api`: passed after Academic Years API, 15 tests / 78 assertions.
 - `vendor\bin\pint --test` from `apps/api`: passed after Academic Years API.
 - `php artisan route:list` from `apps/api`: passed, 26 routes.
+- `agent-browser --version`: passed, `agent-browser 0.26.0`.
+- `agent-browser` local web smoke check passed:
+  - opened `http://127.0.0.1:3000/`
+  - confirmed nonblank login page content
+  - no page errors reported
 - `php artisan migrate:fresh --seed` from `apps/api`: passed outside sandbox after sandbox SQLite disk I/O failure.
 - `npm run build` from `apps/web`: passed after Nuxt app UI slice and again after route protection/school creation.
 - Env template/docs update does not require code execution.
