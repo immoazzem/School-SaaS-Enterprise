@@ -110,6 +110,28 @@ export interface Designation {
   status: string
 }
 
+export interface Employee {
+  id: number
+  school_id: number
+  designation_id: number | null
+  employee_no: string
+  full_name: string
+  father_name: string | null
+  mother_name: string | null
+  email: string | null
+  phone: string | null
+  gender: string | null
+  religion: string | null
+  date_of_birth: string | null
+  joined_on: string
+  salary: string
+  employee_type: string
+  address: string | null
+  notes: string | null
+  status: string
+  designation?: Pick<Designation, 'id' | 'name' | 'code'> | null
+}
+
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
   body?: Record<string, unknown>

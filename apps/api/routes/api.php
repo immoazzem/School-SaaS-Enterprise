@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AcademicYearController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClassSubjectController;
 use App\Http\Controllers\Api\DesignationController;
+use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\SchoolController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\StudentGroupController;
@@ -29,6 +30,8 @@ Route::middleware('auth:sanctum')->group(function (): void {
         ->parameters(['class-subjects' => 'classSubject'])
         ->middleware('school.member');
     Route::apiResource('schools.designations', DesignationController::class)
+        ->middleware('school.member');
+    Route::apiResource('schools.employees', EmployeeController::class)
         ->middleware('school.member');
     Route::apiResource('schools.shifts', ShiftController::class)
         ->middleware('school.member');

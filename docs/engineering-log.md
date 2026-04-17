@@ -210,3 +210,13 @@ Scope: added `designations` migration/model/relationship, `designations.manage` 
 Verification: `php artisan test` passed with 26 tests / 160 assertions; `php artisan test --filter=Designation` passed with 2 tests / 14 assertions; `vendor\bin\pint --test` passed; `php artisan route:list --path=designations` showed the designation routes; `npm run build` passed with existing Nuxt/Nitro warnings; local migration and RBAC seeding passed; agent-browser verified creating `Senior Teacher / SNR-TCHR` through the live Herd API.
 
 Next: commit and push this checkpoint, then continue Phase 2 with Employees.
+
+### Employees Workspace
+
+Current page/module complete: Employees API/Nuxt workspace, route `/schools/{schoolId}/employees`.
+
+Scope: added `employees` migration/model/relationship, `employees.manage` permission, policy, controller, tenant-scoped routes, tests, audit logs, dashboard navigation, typed Nuxt `Employee` API shape, and a Nuxt workspace with status/type/designation/search filters plus create/edit/archive flows.
+
+Verification: `php artisan test` passed with 29 tests / 180 assertions; `php artisan test --filter=Employee` passed with 3 tests / 19 assertions; `vendor\bin\pint --test` passed; `php artisan route:list --path=employees` showed the employee routes; `npm run build` passed with existing Nuxt/Nitro warnings; local migration and RBAC seeding passed; agent-browser verified creating `Amina Rahman / EMP-2026-0001` through the live Herd API.
+
+Next: commit and push this checkpoint, then continue Phase 2 with Students and Guardians.
