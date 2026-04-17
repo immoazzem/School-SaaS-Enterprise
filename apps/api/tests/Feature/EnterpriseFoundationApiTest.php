@@ -8,6 +8,8 @@ use App\Models\AcademicYear;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\School;
+use App\Models\Shift;
+use App\Models\StudentGroup;
 use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -385,6 +387,134 @@ class EnterpriseFoundationApiTest extends TestCase
         ]);
     }
 
+    public function test_school_member_can_manage_student_groups(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Group School', 'slug' => 'group-school']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'student_groups.manage', 'academics');
+
+        Sanctum::actingAs($user);
+
+        $created = $this->postJson("/api/schools/{$school->id}/student-groups", [
+            'name' => 'Science Group',
+            'code' => 'SCI',
+            'description' => 'Science-focused student cohort.',
+            'sort_order' => 10,
+        ]);
+
+        $created
+            ->assertCreated()
+            ->assertJsonPath('data.name', 'Science Group')
+            ->assertJsonPath('data.code', 'SCI');
+
+        $groupId = $created->json('data.id');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'student_group.created',
+            'auditable_id' => $groupId,
+        ]);
+
+        $this->getJson("/api/schools/{$school->id}/student-groups?search=science")
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $groupId);
+
+        $this->patchJson("/api/schools/{$school->id}/student-groups/{$groupId}", [
+            'name' => 'Science Cohort',
+        ])->assertOk()
+            ->assertJsonPath('data.name', 'Science Cohort');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'student_group.updated',
+            'auditable_id' => $groupId,
+        ]);
+
+        $this->deleteJson("/api/schools/{$school->id}/student-groups/{$groupId}")
+            ->assertNoContent();
+
+        $this->assertSoftDeleted(StudentGroup::class, ['id' => $groupId]);
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'student_group.deleted',
+            'auditable_id' => $groupId,
+        ]);
+    }
+
+    public function test_school_member_can_manage_shifts(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Shift School', 'slug' => 'shift-school']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'shifts.manage', 'academics');
+
+        Sanctum::actingAs($user);
+
+        $created = $this->postJson("/api/schools/{$school->id}/shifts", [
+            'name' => 'Morning Shift',
+            'code' => 'MOR',
+            'starts_at' => '08:00',
+            'ends_at' => '12:30',
+            'description' => 'Morning academic schedule.',
+            'sort_order' => 10,
+        ]);
+
+        $created
+            ->assertCreated()
+            ->assertJsonPath('data.name', 'Morning Shift')
+            ->assertJsonPath('data.code', 'MOR');
+
+        $shiftId = $created->json('data.id');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'shift.created',
+            'auditable_id' => $shiftId,
+        ]);
+
+        $this->getJson("/api/schools/{$school->id}/shifts?search=morning")
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $shiftId);
+
+        $this->patchJson("/api/schools/{$school->id}/shifts/{$shiftId}", [
+            'name' => 'Morning Session',
+            'ends_at' => '13:00',
+        ])->assertOk()
+            ->assertJsonPath('data.name', 'Morning Session')
+            ->assertJsonPath('data.ends_at', '13:00');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'shift.updated',
+            'auditable_id' => $shiftId,
+        ]);
+
+        $this->deleteJson("/api/schools/{$school->id}/shifts/{$shiftId}")
+            ->assertNoContent();
+
+        $this->assertSoftDeleted(Shift::class, ['id' => $shiftId]);
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'shift.deleted',
+            'auditable_id' => $shiftId,
+        ]);
+    }
+
     public function test_section_creation_rejects_classes_from_another_school(): void
     {
         $user = User::factory()->create();
@@ -518,6 +648,42 @@ class EnterpriseFoundationApiTest extends TestCase
         ])->assertForbidden();
     }
 
+    public function test_active_school_member_without_permission_cannot_manage_student_groups(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Group Limited', 'slug' => 'group-limited']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/student-groups", [
+            'name' => 'Commerce Group',
+            'code' => 'COM',
+        ])->assertForbidden();
+    }
+
+    public function test_active_school_member_without_permission_cannot_manage_shifts(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Shift Limited', 'slug' => 'shift-limited']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/shifts", [
+            'name' => 'Day Shift',
+            'code' => 'DAY',
+        ])->assertForbidden();
+    }
+
     public function test_database_seeder_creates_enterprise_roles_and_permissions(): void
     {
         $this->seed();
@@ -525,6 +691,8 @@ class EnterpriseFoundationApiTest extends TestCase
         $this->assertDatabaseHas('permissions', ['key' => 'academic_years.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'academic_classes.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'subjects.manage']);
+        $this->assertDatabaseHas('permissions', ['key' => 'student_groups.manage']);
+        $this->assertDatabaseHas('permissions', ['key' => 'shifts.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'audit.view']);
         $this->assertDatabaseHas('roles', ['key' => 'super-admin', 'is_system' => true]);
         $this->assertDatabaseHas('roles', ['key' => 'read-only-auditor', 'is_system' => true]);

@@ -64,6 +64,28 @@ export interface Subject {
   status: string
 }
 
+export interface StudentGroup {
+  id: number
+  school_id: number
+  name: string
+  code: string
+  description: string | null
+  sort_order: number
+  status: string
+}
+
+export interface Shift {
+  id: number
+  school_id: number
+  name: string
+  code: string
+  starts_at: string | null
+  ends_at: string | null
+  description: string | null
+  sort_order: number
+  status: string
+}
+
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
   body?: Record<string, unknown>
