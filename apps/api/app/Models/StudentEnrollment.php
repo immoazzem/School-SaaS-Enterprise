@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StudentEnrollment extends Model
@@ -86,5 +87,13 @@ class StudentEnrollment extends Model
     public function shift(): BelongsTo
     {
         return $this->belongsTo(Shift::class);
+    }
+
+    /**
+     * @return HasMany<StudentAttendanceRecord, $this>
+     */
+    public function studentAttendanceRecords(): HasMany
+    {
+        return $this->hasMany(StudentAttendanceRecord::class);
     }
 }

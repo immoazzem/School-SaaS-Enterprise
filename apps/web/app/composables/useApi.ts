@@ -186,6 +186,19 @@ export interface StudentEnrollment {
   shift?: Pick<Shift, 'id' | 'name' | 'code'> | null
 }
 
+export interface StudentAttendanceRecord {
+  id: number
+  school_id: number
+  student_enrollment_id: number
+  attendance_date: string
+  status: 'present' | 'absent' | 'late' | 'excused'
+  remarks: string | null
+  student_enrollment?: Pick<StudentEnrollment, 'id' | 'student_id' | 'academic_class_id' | 'roll_no'> & {
+    student?: Pick<Student, 'id' | 'admission_no' | 'full_name'>
+    academic_class?: Pick<AcademicClass, 'id' | 'name' | 'code'>
+  }
+}
+
 export interface TeacherProfile {
   id: number
   school_id: number

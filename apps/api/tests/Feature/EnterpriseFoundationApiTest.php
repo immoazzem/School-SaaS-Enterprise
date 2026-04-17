@@ -14,6 +14,7 @@ use App\Models\Role;
 use App\Models\School;
 use App\Models\Shift;
 use App\Models\Student;
+use App\Models\StudentAttendanceRecord;
 use App\Models\StudentEnrollment;
 use App\Models\StudentGroup;
 use App\Models\Subject;
@@ -1082,6 +1083,139 @@ class EnterpriseFoundationApiTest extends TestCase
             ->assertJsonValidationErrors('student_id');
     }
 
+    public function test_school_member_can_manage_student_attendance_records(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Attendance School', 'slug' => 'attendance-school']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'attendance.manage', 'attendance');
+
+        $student = $school->students()->create([
+            'admission_no' => 'ADM-2026-0200',
+            'full_name' => 'Attendance Student',
+            'admitted_on' => '2026-01-10',
+        ]);
+        $academicYear = $school->academicYears()->create([
+            'name' => 'Academic Year 2026',
+            'code' => 'AY-2026',
+            'starts_on' => '2026-01-01',
+            'ends_on' => '2026-12-31',
+        ]);
+        $academicClass = $school->academicClasses()->create(['name' => 'Class One', 'code' => 'C1']);
+        $enrollment = $school->studentEnrollments()->create([
+            'student_id' => $student->id,
+            'academic_year_id' => $academicYear->id,
+            'academic_class_id' => $academicClass->id,
+            'roll_no' => '12',
+            'enrolled_on' => '2026-01-15',
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $created = $this->postJson("/api/schools/{$school->id}/student-attendance-records", [
+            'student_enrollment_id' => $enrollment->id,
+            'attendance_date' => '2026-04-18',
+            'status' => 'present',
+            'remarks' => 'Morning homeroom.',
+        ]);
+
+        $created
+            ->assertCreated()
+            ->assertJsonPath('data.student_enrollment.id', $enrollment->id)
+            ->assertJsonPath('data.student_enrollment.student.full_name', 'Attendance Student')
+            ->assertJsonPath('data.status', 'present');
+
+        $recordId = $created->json('data.id');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'student_attendance.created',
+            'auditable_id' => $recordId,
+        ]);
+
+        $this->getJson("/api/schools/{$school->id}/student-attendance-records?attendance_date=2026-04-18&search=attendance")
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $recordId);
+
+        $this->postJson("/api/schools/{$school->id}/student-attendance-records", [
+            'student_enrollment_id' => $enrollment->id,
+            'attendance_date' => '2026-04-18',
+            'status' => 'late',
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors('attendance_date');
+
+        $this->patchJson("/api/schools/{$school->id}/student-attendance-records/{$recordId}", [
+            'status' => 'late',
+            'remarks' => 'Arrived after assembly.',
+        ])->assertOk()
+            ->assertJsonPath('data.status', 'late')
+            ->assertJsonPath('data.remarks', 'Arrived after assembly.');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'student_attendance.updated',
+            'auditable_id' => $recordId,
+        ]);
+
+        $this->deleteJson("/api/schools/{$school->id}/student-attendance-records/{$recordId}")
+            ->assertNoContent();
+
+        $this->assertSoftDeleted(StudentAttendanceRecord::class, ['id' => $recordId]);
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'student_attendance.deleted',
+            'auditable_id' => $recordId,
+        ]);
+    }
+
+    public function test_student_attendance_rejects_enrollments_from_another_school(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Attendance Tenant', 'slug' => 'attendance-tenant']);
+        $otherSchool = School::query()->create(['name' => 'Foreign Attendance Tenant', 'slug' => 'foreign-attendance-tenant']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'attendance.manage', 'attendance');
+
+        $foreignStudent = $otherSchool->students()->create([
+            'admission_no' => 'ADM-ATT-FOREIGN',
+            'full_name' => 'Foreign Attendance Student',
+            'admitted_on' => '2026-01-10',
+        ]);
+        $foreignYear = $otherSchool->academicYears()->create([
+            'name' => 'Academic Year 2026',
+            'code' => 'AY-2026',
+            'starts_on' => '2026-01-01',
+            'ends_on' => '2026-12-31',
+        ]);
+        $foreignClass = $otherSchool->academicClasses()->create(['name' => 'Class One', 'code' => 'C1']);
+        $foreignEnrollment = $otherSchool->studentEnrollments()->create([
+            'student_id' => $foreignStudent->id,
+            'academic_year_id' => $foreignYear->id,
+            'academic_class_id' => $foreignClass->id,
+            'enrolled_on' => '2026-01-15',
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/student-attendance-records", [
+            'student_enrollment_id' => $foreignEnrollment->id,
+            'attendance_date' => '2026-04-18',
+            'status' => 'present',
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors('student_enrollment_id');
+    }
+
     public function test_school_member_can_manage_teacher_profiles(): void
     {
         $user = User::factory()->create();
@@ -1474,6 +1608,43 @@ class EnterpriseFoundationApiTest extends TestCase
         ])->assertForbidden();
     }
 
+    public function test_active_school_member_without_permission_cannot_manage_student_attendance(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Attendance Limited', 'slug' => 'attendance-limited']);
+        $student = $school->students()->create([
+            'admission_no' => 'ADM-2026-0301',
+            'full_name' => 'Limited Attendance Student',
+            'admitted_on' => '2026-01-10',
+        ]);
+        $academicYear = $school->academicYears()->create([
+            'name' => 'Academic Year 2026',
+            'code' => 'AY-2026',
+            'starts_on' => '2026-01-01',
+            'ends_on' => '2026-12-31',
+        ]);
+        $academicClass = $school->academicClasses()->create(['name' => 'Class One', 'code' => 'C1']);
+        $enrollment = $school->studentEnrollments()->create([
+            'student_id' => $student->id,
+            'academic_year_id' => $academicYear->id,
+            'academic_class_id' => $academicClass->id,
+            'enrolled_on' => '2026-01-15',
+        ]);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/student-attendance-records", [
+            'student_enrollment_id' => $enrollment->id,
+            'attendance_date' => '2026-04-18',
+            'status' => 'present',
+        ])->assertForbidden();
+    }
+
     public function test_active_school_member_without_permission_cannot_manage_teacher_profiles(): void
     {
         $user = User::factory()->create();
@@ -1513,6 +1684,7 @@ class EnterpriseFoundationApiTest extends TestCase
         $this->assertDatabaseHas('permissions', ['key' => 'students.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'enrollments.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'teachers.manage']);
+        $this->assertDatabaseHas('permissions', ['key' => 'attendance.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'audit.view']);
         $this->assertDatabaseHas('roles', ['key' => 'super-admin', 'is_system' => true]);
         $this->assertDatabaseHas('roles', ['key' => 'read-only-auditor', 'is_system' => true]);

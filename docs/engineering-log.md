@@ -252,3 +252,15 @@ Verification: `php artisan test` passed with 40 tests / 251 assertions; `vendor\
 Phase 2 status: complete for the current academic setup and people foundation.
 
 Next: commit and push this checkpoint, then start Phase 3 Attendance.
+
+### Attendance Workspace
+
+Current page/module complete: Attendance API/Nuxt workspace, route `/schools/{schoolId}/attendance`.
+
+Scope: added `student_attendance_records` migration/model/relationship, `attendance.manage` policy, tenant-scoped controller/routes, tests, audit logs, dashboard navigation, typed Nuxt `StudentAttendanceRecord` API shape, and a Nuxt daily attendance workspace for active enrollments with date/status/search filters, create/edit/delete flows, and status summaries.
+
+Verification: `php artisan test` passed with 43 tests / 274 assertions; `vendor\bin\pint --test` passed; `php artisan migrate`, RBAC seeding, and `php artisan route:list --path=student-attendance-records` passed; `npm run build` passed with existing Nuxt/Nitro warnings; agent-browser opened `http://127.0.0.1:3000/schools/1/attendance`, confirmed no error overlay and nonblank content, then verified creating `Nadia Rahman / ADM-2026-0001` as `Present` on `2026-04-18` through the live Herd API. Browser screenshot saved at `docs/browser-checks/attendance-workspace.png`.
+
+Phase 3 status: Attendance foundation complete.
+
+Next: commit and push this checkpoint, then continue Phase 3 with Exams.

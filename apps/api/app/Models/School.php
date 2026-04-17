@@ -152,6 +152,14 @@ class School extends Model
     }
 
     /**
+     * @return HasMany<StudentAttendanceRecord, $this>
+     */
+    public function studentAttendanceRecords(): HasMany
+    {
+        return $this->hasMany(StudentAttendanceRecord::class);
+    }
+
+    /**
      * @return HasMany<TeacherProfile, $this>
      */
     public function teacherProfiles(): HasMany

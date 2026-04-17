@@ -110,8 +110,8 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Laravel Sanctum `v4.3.1` is installed.
 - API routing and Sanctum config/migration are published.
 - Backend foundation schema exists for schools, memberships, RBAC, audit logs, academic classes, academic sections, academic years, subjects, class subjects, student groups, shifts, designations, employees, guardians, students, student enrollments, and teacher profiles.
-- Token auth, school list/create, tenant-scoped Academic Classes CRUD, tenant-scoped Academic Sections CRUD, tenant-scoped Academic Years CRUD, tenant-scoped Subjects CRUD, tenant-scoped Class Subjects CRUD, tenant-scoped Student Groups CRUD, tenant-scoped Shifts CRUD, tenant-scoped Designations CRUD, tenant-scoped Employees CRUD, tenant-scoped Guardians CRUD, tenant-scoped Students CRUD, tenant-scoped Student Enrollments CRUD, and tenant-scoped Teacher Profiles CRUD endpoints exist.
-- Enterprise role/permission seeders and Academic Classes/Sections/Years/Subjects/Class Subjects/Student Groups/Shifts/Designations/Employees/Guardians/Students/Student Enrollments/Teacher Profiles audit-log writes exist.
+- Token auth, school list/create, tenant-scoped Academic Classes CRUD, tenant-scoped Academic Sections CRUD, tenant-scoped Academic Years CRUD, tenant-scoped Subjects CRUD, tenant-scoped Class Subjects CRUD, tenant-scoped Student Groups CRUD, tenant-scoped Shifts CRUD, tenant-scoped Designations CRUD, tenant-scoped Employees CRUD, tenant-scoped Guardians CRUD, tenant-scoped Students CRUD, tenant-scoped Student Enrollments CRUD, tenant-scoped Teacher Profiles CRUD, and tenant-scoped Student Attendance Records CRUD endpoints exist.
+- Enterprise role/permission seeders and Academic Classes/Sections/Years/Subjects/Class Subjects/Student Groups/Shifts/Designations/Employees/Guardians/Students/Student Enrollments/Teacher Profiles/Student Attendance audit-log writes exist.
 - Active school membership checks use reusable `school.member` route middleware.
 - Academic Class policy checks enforce `academic_classes.manage`.
 - Academic Section policy checks enforce `sections.manage`.
@@ -126,6 +126,7 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Student policy checks enforce `students.manage`.
 - Student Enrollment policy checks enforce `enrollments.manage`.
 - Teacher Profile policy checks enforce `teachers.manage`.
+- Student Attendance Record policy checks enforce `attendance.manage`.
 - School creation assigns the seeded `school-owner` role to the creator.
 - Backend foundation tests pass after Academic Years: `php artisan test` reports 15 tests / 78 assertions.
 - Pint, route list, and `php artisan migrate:fresh --seed` pass for the backend foundation.
@@ -146,11 +147,12 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Students and Guardians workspace supports guardian/student create, edit, and archive flows.
 - Enrollments workspace supports student/year/class/section/group/shift placement plus create, edit, and archive flows.
 - Teacher Profiles workspace supports employee-based teacher profile create, edit, and archive flows.
+- Attendance workspace supports active enrollment selection, date/status/search filters, create/edit/delete flows, and status summaries.
 - Dashboard, Academic Classes, and Academic Sections screens link to Academic Years.
 - Explicit Laravel CORS config allows local Nuxt origins.
 - Project `agent-browser.json` is present so browser checks can run headed and ignore Herd local HTTPS certificate errors.
 - Nuxt build passes after the app UI slice and after route protection/school creation.
-- Backend tests pass after the Teacher Profiles workspace: 40 tests / 251 assertions.
+- Backend tests pass after the Attendance workspace: 43 tests / 274 assertions.
 - Env examples are Herd/MySQL-ready:
   - `apps/api/.env.example`
   - `apps/web/.env.example`
@@ -169,9 +171,10 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Nuxt production build passes with that env.
 - Nuxt dev server is reachable on `http://127.0.0.1:3000` when started from this workspace with `npm run dev -- --host 127.0.0.1 --port 3000`.
 - MySQL database config is still pending; tests currently use SQLite in memory.
-- Current page/module complete: Teacher Profiles API/Nuxt workspace.
+- Current page/module complete: Attendance API/Nuxt workspace.
 - Phase 2 status: complete for the current academic setup and people foundation.
-- Next app slice: start Phase 3 Attendance.
+- Phase 3 status: Attendance foundation complete.
+- Next app slice: Phase 3 Exams.
 - Agent-browser authenticated against the live app, reached the dashboard, opened `http://127.0.0.1:3000/schools/1/subjects`, and verified creating `Mathematics / MATH-101` through the live Herd API.
 - Agent-browser opened `http://127.0.0.1:3000/schools/1/student-groups` and verified creating `Science Group / SCI-01` through the live Herd API.
 - Agent-browser opened `http://127.0.0.1:3000/schools/1/shifts` and verified creating `Morning Shift / MOR-01` with `08:00 to 12:30` through the live Herd API.
@@ -184,6 +187,8 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Browser screenshot saved at `docs/browser-checks/enrollments-workspace.png`.
 - Agent-browser opened `http://127.0.0.1:3000/schools/1/teacher-profiles` and verified creating `Amina Rahman / TCHR-2026-0001` through the live Herd API.
 - Browser screenshot saved at `docs/browser-checks/teacher-profiles-workspace.png`.
+- Agent-browser opened `http://127.0.0.1:3000/schools/1/attendance`, confirmed no error overlay and nonblank content, and verified creating `Nadia Rahman / ADM-2026-0001` as `Present` on `2026-04-18` through the live Herd API.
+- Browser screenshot saved at `docs/browser-checks/attendance-workspace.png`.
 - `agent-browser@0.26.0` is installed globally with Chrome runtime `147.0.7727.57` and should be used after dev server starts.
 - Show/use the browser during UI phases at natural checkpoints: after a page is added, after login/navigation changes, and before committing a successful phase.
 - Maintain `docs/engineering-log.md` after each successful step, and update `docs/current-status.md` plus this file before ending long sessions.
@@ -218,7 +223,7 @@ School-SaaS-Enterprise/
 1. Phase 0: Audit the legacy app and write docs.
 2. Phase 1: Build enterprise foundation and Academic Classes vertical slice.
 3. Phase 2: Academic setup and people modules is complete for the current foundation: Academic Classes, Sections, Years, Subjects, Class Subjects, Student Groups, Shifts, Designations, Employees, Guardians, Students, Enrollments, and Teacher Profiles.
-4. Phase 3: Attendance, exams, and finance.
+4. Phase 3: Attendance foundation is complete; exams and finance remain.
 5. Phase 4: Reports, PDFs, calendar, and operations.
 6. Phase 5: SaaS administration and billing placeholders.
 
