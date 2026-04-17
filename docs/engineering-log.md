@@ -161,7 +161,7 @@ Browser smoke check:
 
 Next: use `agent-browser` after starting dev servers for visual verification.
 
-### `db66a8c` - Academic Years Frontend Workspace
+### `35be5b6` - Academic Years Frontend Workspace
 
 Current page/module: Academic Years frontend workspace, route `/schools/{schoolId}/academic-years`.
 
