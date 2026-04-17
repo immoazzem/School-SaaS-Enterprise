@@ -21,7 +21,7 @@
 - Installed Nuxt dependencies and generated `package-lock.json`.
 - Installed Laravel Sanctum `v4.3.1`.
 - Published Laravel 13 API routing and Sanctum config/migration.
-- Added enterprise foundation schema for schools, memberships, roles, permissions, role assignments, audit logs, academic classes, and academic sections.
+- Added enterprise foundation schema for schools, memberships, roles, permissions, role assignments, audit logs, academic classes, academic sections, and academic years.
 - Added foundation models and relationships.
 - Added token auth endpoints:
   - `POST /api/auth/login`
@@ -34,13 +34,17 @@
   - `/api/schools/{school}/academic-classes`
 - Added tenant-scoped Academic Sections CRUD under:
   - `/api/schools/{school}/academic-sections`
+- Added tenant-scoped Academic Years CRUD under:
+  - `/api/schools/{school}/academic-years`
 - Academic Sections validate their Academic Class belongs to the same school.
-- Added feature tests for login, profile lookup, school creation, Academic Classes CRUD, Academic Sections CRUD, and cross-school access denial.
+- Academic Years enforce one current academic year per school.
+- Added feature tests for login, profile lookup, school creation, Academic Classes CRUD, Academic Sections CRUD, Academic Years CRUD, and cross-school access denial.
 - Added enterprise role/permission seeders.
-- Added audit-log writes for Academic Classes and Academic Sections create/update/delete.
+- Added audit-log writes for Academic Classes, Academic Sections, and Academic Years create/update/delete.
 - Added reusable `school.member` middleware for active school membership checks.
 - Added Academic Class policy checks for `academic_classes.manage`.
 - Added Academic Section policy checks for `sections.manage`.
+- Added Academic Year policy checks for `academic_years.manage`.
 - School creation now assigns the seeded `school-owner` role to the creator when the RBAC seed exists.
 - Replaced the Nuxt welcome screen with the first app UI slice:
   - login page
@@ -74,9 +78,9 @@
 
 ## Verification
 
-- `php artisan test` from `apps/api`: passed after Academic Sections API, 12 tests / 60 assertions.
-- `vendor\bin\pint --test` from `apps/api`: passed after Academic Sections API.
-- `php artisan route:list` from `apps/api`: passed, 21 routes.
+- `php artisan test` from `apps/api`: passed after Academic Years API, 15 tests / 78 assertions.
+- `vendor\bin\pint --test` from `apps/api`: passed after Academic Years API.
+- `php artisan route:list` from `apps/api`: passed, 26 routes.
 - `php artisan migrate:fresh --seed` from `apps/api`: passed outside sandbox after sandbox SQLite disk I/O failure.
 - `npm run build` from `apps/web`: passed after Nuxt app UI slice and again after route protection/school creation.
 - Env template/docs update does not require code execution.
@@ -95,7 +99,8 @@ Continue Phase 2 implementation:
 
 1. Configure Laravel API for local MySQL once DB credentials are confirmed.
 2. Verify the Nuxt UI in a browser against `https://school-api.test/api`.
-3. Continue academic setup modules: years, subjects, shifts, groups.
+3. Add the Nuxt Academic Years workspace.
+4. Continue academic setup modules: subjects, shifts, groups.
 
 ## New Session Startup Prompt
 

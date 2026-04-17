@@ -64,6 +64,14 @@ class School extends Model
     }
 
     /**
+     * @return HasMany<AcademicYear, $this>
+     */
+    public function academicYears(): HasMany
+    {
+        return $this->hasMany(AcademicYear::class);
+    }
+
+    /**
      * @return HasMany<AcademicSection, $this>
      */
     public function academicSections(): HasMany

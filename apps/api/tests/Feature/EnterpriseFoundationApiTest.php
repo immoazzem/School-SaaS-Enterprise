@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\AcademicClass;
 use App\Models\AcademicSection;
+use App\Models\AcademicYear;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\School;
@@ -217,6 +218,105 @@ class EnterpriseFoundationApiTest extends TestCase
         ]);
     }
 
+    public function test_school_member_can_manage_academic_years(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Year School', 'slug' => 'year-school']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'academic_years.manage', 'academics');
+
+        Sanctum::actingAs($user);
+
+        $created = $this->postJson("/api/schools/{$school->id}/academic-years", [
+            'name' => 'Academic Year 2026',
+            'code' => 'AY-2026',
+            'starts_on' => '2026-01-01',
+            'ends_on' => '2026-12-31',
+            'is_current' => true,
+        ]);
+
+        $created
+            ->assertCreated()
+            ->assertJsonPath('data.name', 'Academic Year 2026')
+            ->assertJsonPath('data.is_current', true);
+
+        $yearId = $created->json('data.id');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'academic_year.created',
+            'auditable_id' => $yearId,
+        ]);
+
+        $this->getJson("/api/schools/{$school->id}/academic-years?is_current=1")
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $yearId);
+
+        $this->patchJson("/api/schools/{$school->id}/academic-years/{$yearId}", [
+            'name' => 'Academic Year 2026-27',
+            'ends_on' => '2027-03-31',
+        ])->assertOk()
+            ->assertJsonPath('data.name', 'Academic Year 2026-27');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'academic_year.updated',
+            'auditable_id' => $yearId,
+        ]);
+
+        $this->deleteJson("/api/schools/{$school->id}/academic-years/{$yearId}")
+            ->assertNoContent();
+
+        $this->assertSoftDeleted(AcademicYear::class, ['id' => $yearId]);
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'academic_year.deleted',
+            'auditable_id' => $yearId,
+        ]);
+    }
+
+    public function test_current_academic_year_is_unique_per_school(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Current Year School', 'slug' => 'current-year-school']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'academic_years.manage', 'academics');
+
+        $firstYear = $school->academicYears()->create([
+            'name' => 'Academic Year 2025',
+            'code' => 'AY-2025',
+            'starts_on' => '2025-01-01',
+            'ends_on' => '2025-12-31',
+            'is_current' => true,
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $created = $this->postJson("/api/schools/{$school->id}/academic-years", [
+            'name' => 'Academic Year 2026',
+            'code' => 'AY-2026',
+            'starts_on' => '2026-01-01',
+            'ends_on' => '2026-12-31',
+            'is_current' => true,
+        ]);
+
+        $created->assertCreated();
+
+        $this->assertFalse($firstYear->fresh()->is_current);
+        $this->assertTrue(AcademicYear::query()->findOrFail($created->json('data.id'))->is_current);
+    }
+
     public function test_section_creation_rejects_classes_from_another_school(): void
     {
         $user = User::factory()->create();
@@ -312,10 +412,31 @@ class EnterpriseFoundationApiTest extends TestCase
         ])->assertForbidden();
     }
 
+    public function test_active_school_member_without_permission_cannot_manage_academic_years(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Year Limited', 'slug' => 'year-limited']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/academic-years", [
+            'name' => 'Academic Year 2026',
+            'code' => 'AY-2026',
+            'starts_on' => '2026-01-01',
+            'ends_on' => '2026-12-31',
+        ])->assertForbidden();
+    }
+
     public function test_database_seeder_creates_enterprise_roles_and_permissions(): void
     {
         $this->seed();
 
+        $this->assertDatabaseHas('permissions', ['key' => 'academic_years.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'academic_classes.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'audit.view']);
         $this->assertDatabaseHas('roles', ['key' => 'super-admin', 'is_system' => true]);

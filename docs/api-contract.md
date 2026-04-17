@@ -94,9 +94,18 @@ Academic Sections:
 
 Academic Sections require `sections.manage`, include `school_id`, and must reference an Academic Class owned by the same school. Lists accept optional `academic_class_id` filtering.
 
+Academic Years:
+
+- `GET /api/schools/{school}/academic-years`
+- `POST /api/schools/{school}/academic-years`
+- `GET /api/schools/{school}/academic-years/{academic_year}`
+- `PUT /api/schools/{school}/academic-years/{academic_year}`
+- `DELETE /api/schools/{school}/academic-years/{academic_year}`
+
+Academic Years require `academic_years.manage`, include date bounds, and enforce one current year per school. Lists accept optional `status` and `is_current` filtering.
+
 ## Future API Groups
 
-- `/api/academic/years`
 - `/api/academic/subjects`
 - `/api/students`
 - `/api/guardians`

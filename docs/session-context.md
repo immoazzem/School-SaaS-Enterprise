@@ -109,14 +109,15 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Nuxt app targets `nuxt:^4.4.2`.
 - Laravel Sanctum `v4.3.1` is installed.
 - API routing and Sanctum config/migration are published.
-- Backend foundation schema exists for schools, memberships, RBAC, audit logs, academic classes, and academic sections.
-- Token auth, school list/create, tenant-scoped Academic Classes CRUD, and tenant-scoped Academic Sections CRUD endpoints exist.
-- Enterprise role/permission seeders and Academic Classes/Sections audit-log writes exist.
+- Backend foundation schema exists for schools, memberships, RBAC, audit logs, academic classes, academic sections, and academic years.
+- Token auth, school list/create, tenant-scoped Academic Classes CRUD, tenant-scoped Academic Sections CRUD, and tenant-scoped Academic Years CRUD endpoints exist.
+- Enterprise role/permission seeders and Academic Classes/Sections/Years audit-log writes exist.
 - Active school membership checks use reusable `school.member` route middleware.
 - Academic Class policy checks enforce `academic_classes.manage`.
 - Academic Section policy checks enforce `sections.manage`.
+- Academic Year policy checks enforce `academic_years.manage`.
 - School creation assigns the seeded `school-owner` role to the creator.
-- Backend foundation tests pass after Academic Sections: `php artisan test` reports 12 tests / 60 assertions.
+- Backend foundation tests pass after Academic Years: `php artisan test` reports 15 tests / 78 assertions.
 - Pint, route list, and `php artisan migrate:fresh --seed` pass for the backend foundation.
 - Nuxt has a first app UI slice: login page, dashboard shell, API/auth composables, Academic Classes workspace, and Academic Sections workspace.
 - Nuxt has client route protection with stale-token cleanup.
@@ -126,7 +127,7 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Sections navigation is gated by `sections.manage`.
 - Academic Sections workspace supports class filtering, create, edit, and archive flows.
 - Nuxt build passes after the app UI slice and after route protection/school creation.
-- Backend tests pass after the Academic Sections API: 12 tests / 60 assertions.
+- Backend tests pass after the Academic Years API: 15 tests / 78 assertions.
 - Env examples are Herd/MySQL-ready:
   - `apps/api/.env.example`
   - `apps/web/.env.example`
@@ -145,7 +146,7 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Nuxt production build passes with that env.
 - Nuxt dev server did not become reachable on port 3000 from the Codex shell; use browser/manual dev server verification next.
 - MySQL database config is still pending; tests currently use SQLite in memory.
-- Next app slice: continue academic setup modules: years, subjects, shifts, groups.
+- Next app slice: add the Nuxt Academic Years workspace.
 
 ## Required Project Structure
 

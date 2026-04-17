@@ -34,7 +34,7 @@ Map legacy setup tables to school-scoped tables:
 - `academic_years`
 - `academic_classes`
 - `student_groups`
-- `sections`
+- `academic_sections`
 - `shifts`
 - `subjects`
 - `class_subjects`
@@ -108,7 +108,7 @@ Lessons should reference school, class, subject, teacher, weekday, start time, a
 | `student_classes` | `academic_classes` |
 | `student_years` | `academic_years` |
 | `student_groups` | `student_groups` |
-| `student_sections` | `sections` |
+| `student_sections` | `academic_sections` |
 | `student_shifts` | `shifts` |
 | `school_subjects` | `subjects` |
 | `assign_subjects` | `class_subjects` |
@@ -134,4 +134,3 @@ Lessons should reference school, class, subject, teacher, weekday, start time, a
 - Prefer decimal columns for money instead of double.
 - Prefer date columns for dates instead of strings.
 - Use soft deletes for master data; avoid hard deletes for finance and audit data.
-

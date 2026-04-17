@@ -17,6 +17,7 @@ class EnterpriseRolePermissionSeeder extends Seeder
             ['module' => 'schools', 'key' => 'schools.manage', 'description' => 'Manage school profile and settings'],
             ['module' => 'users', 'key' => 'users.manage', 'description' => 'Manage users and memberships'],
             ['module' => 'roles', 'key' => 'roles.manage', 'description' => 'Manage roles and permissions'],
+            ['module' => 'academics', 'key' => 'academic_years.manage', 'description' => 'Manage academic years'],
             ['module' => 'academics', 'key' => 'academic_classes.manage', 'description' => 'Manage academic classes'],
             ['module' => 'academics', 'key' => 'sections.manage', 'description' => 'Manage class sections'],
             ['module' => 'people', 'key' => 'students.manage', 'description' => 'Manage student records'],
@@ -55,6 +56,7 @@ class EnterpriseRolePermissionSeeder extends Seeder
                     'schools.manage',
                     'users.manage',
                     'roles.manage',
+                    'academic_years.manage',
                     'academic_classes.manage',
                     'sections.manage',
                     'students.manage',
@@ -70,6 +72,7 @@ class EnterpriseRolePermissionSeeder extends Seeder
             'principal' => [
                 'name' => 'Principal',
                 'permissions' => [
+                    'academic_years.manage',
                     'academic_classes.manage',
                     'sections.manage',
                     'students.manage',
