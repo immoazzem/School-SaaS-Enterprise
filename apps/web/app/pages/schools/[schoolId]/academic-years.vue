@@ -184,6 +184,9 @@ onMounted(async () => {
         <NuxtLink class="button secondary" :to="`/schools/${schoolId}/academic-sections`">
           Sections
         </NuxtLink>
+        <NuxtLink class="button secondary" :to="`/schools/${schoolId}/subjects`">
+          Subjects
+        </NuxtLink>
       </div>
     </header>
 

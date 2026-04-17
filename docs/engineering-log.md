@@ -170,3 +170,13 @@ Scope: added Nuxt Academic Years workspace with list filters, create/edit form, 
 Verification: `php artisan test` passed with 15 tests / 78 assertions; `vendor\bin\pint --test` passed; `npm run build` passed with the existing Nuxt/Nitro warnings. Agent-browser confirmed the login page renders at `http://127.0.0.1:3000/`; authenticated automation needs the new browser config or a restarted browser session because the first run hit local Herd HTTPS fetch handling.
 
 Next: push this phase, then start the Subjects module.
+
+### Subjects API And Nuxt Workspace
+
+Current page/module complete: Subjects API and Nuxt workspace, route `/schools/{schoolId}/subjects`.
+
+Scope: added `subjects` migration/model/relationship, permission, policy, controller, tenant-scoped routes, tests, audit logs, dashboard navigation, typed Nuxt `Subject` API shape, and a Nuxt Subjects workspace with status/type/search filters plus create/edit/archive flows.
+
+Verification: `php artisan test` passed with 17 tests / 95 assertions; `vendor\bin\pint --test` passed; `php artisan route:list --path=subjects` showed the Subjects routes; `npm run build` passed with existing Nuxt/Nitro warnings; local migration and RBAC seeding passed; agent-browser reached the Subjects page and verified creating `Mathematics / MATH-101` through the live Herd API.
+
+Next: commit and push this checkpoint, then continue Phase 2 with Student Groups and Shifts.

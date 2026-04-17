@@ -35,6 +35,11 @@ const navItems = computed(() => [
     enabled: selectedSchool.value?.permissions?.includes('academic_years.manage') ?? false,
   },
   {
+    label: 'Subjects',
+    active: false,
+    enabled: selectedSchool.value?.permissions?.includes('subjects.manage') ?? false,
+  },
+  {
     label: 'People',
     active: false,
     enabled: selectedSchool.value?.permissions?.includes('students.manage') ?? false,
@@ -116,6 +121,15 @@ async function openAcademicYears() {
   await router.push(`/schools/${auth.selectedSchoolId.value}/academic-years`)
 }
 
+async function openSubjects() {
+  if (!auth.selectedSchoolId.value) {
+    error.value = 'Create or select a school first.'
+    return
+  }
+
+  await router.push(`/schools/${auth.selectedSchoolId.value}/subjects`)
+}
+
 onMounted(loadDashboard)
 </script>
 
@@ -141,7 +155,9 @@ onMounted(loadDashboard)
                 ? openSections()
                 : item.label === 'Academic Years'
                   ? openAcademicYears()
-                  : undefined
+                  : item.label === 'Subjects'
+                    ? openSubjects()
+                    : undefined
           "
         >
           <span>{{ item.label }}</span>
@@ -268,11 +284,12 @@ onMounted(loadDashboard)
         <div>
           <p class="muted">Next task</p>
           <h2>Set up Academic Classes</h2>
-          <p>Manage class names, sections, and academic years inside the active school.</p>
+          <p>Manage class names, sections, academic years, and subjects inside the active school.</p>
         </div>
         <div class="strip-actions">
           <button class="button" type="button" @click="openClasses">Open classes</button>
           <button class="button secondary" type="button" @click="openAcademicYears">Open years</button>
+          <button class="button secondary" type="button" @click="openSubjects">Open subjects</button>
         </div>
       </section>
     </section>

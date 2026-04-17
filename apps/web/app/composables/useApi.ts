@@ -52,6 +52,18 @@ export interface AcademicYear {
   status: string
 }
 
+export interface Subject {
+  id: number
+  school_id: number
+  name: string
+  code: string
+  type: 'core' | 'elective' | 'co_curricular'
+  description: string | null
+  credit_hours: number | null
+  sort_order: number
+  status: string
+}
+
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
   body?: Record<string, unknown>

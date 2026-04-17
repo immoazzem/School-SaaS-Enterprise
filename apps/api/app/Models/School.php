@@ -78,4 +78,12 @@ class School extends Model
     {
         return $this->hasMany(AcademicSection::class);
     }
+
+    /**
+     * @return HasMany<Subject, $this>
+     */
+    public function subjects(): HasMany
+    {
+        return $this->hasMany(Subject::class);
+    }
 }

@@ -8,6 +8,7 @@ use App\Models\AcademicYear;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\School;
+use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -317,6 +318,73 @@ class EnterpriseFoundationApiTest extends TestCase
         $this->assertTrue(AcademicYear::query()->findOrFail($created->json('data.id'))->is_current);
     }
 
+    public function test_school_member_can_manage_subjects(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Subject School', 'slug' => 'subject-school']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'subjects.manage', 'academics');
+
+        Sanctum::actingAs($user);
+
+        $created = $this->postJson("/api/schools/{$school->id}/subjects", [
+            'name' => 'Mathematics',
+            'code' => 'MATH',
+            'type' => 'core',
+            'description' => 'Primary mathematics curriculum.',
+            'credit_hours' => 4,
+            'sort_order' => 10,
+        ]);
+
+        $created
+            ->assertCreated()
+            ->assertJsonPath('data.name', 'Mathematics')
+            ->assertJsonPath('data.code', 'MATH')
+            ->assertJsonPath('data.type', 'core');
+
+        $subjectId = $created->json('data.id');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'subject.created',
+            'auditable_id' => $subjectId,
+        ]);
+
+        $this->getJson("/api/schools/{$school->id}/subjects?type=core&search=math")
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $subjectId);
+
+        $this->patchJson("/api/schools/{$school->id}/subjects/{$subjectId}", [
+            'name' => 'Advanced Mathematics',
+            'credit_hours' => 5,
+        ])->assertOk()
+            ->assertJsonPath('data.name', 'Advanced Mathematics')
+            ->assertJsonPath('data.credit_hours', 5);
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'subject.updated',
+            'auditable_id' => $subjectId,
+        ]);
+
+        $this->deleteJson("/api/schools/{$school->id}/subjects/{$subjectId}")
+            ->assertNoContent();
+
+        $this->assertSoftDeleted(Subject::class, ['id' => $subjectId]);
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'subject.deleted',
+            'auditable_id' => $subjectId,
+        ]);
+    }
+
     public function test_section_creation_rejects_classes_from_another_school(): void
     {
         $user = User::factory()->create();
@@ -432,12 +500,31 @@ class EnterpriseFoundationApiTest extends TestCase
         ])->assertForbidden();
     }
 
+    public function test_active_school_member_without_permission_cannot_manage_subjects(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Subject Limited', 'slug' => 'subject-limited']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/subjects", [
+            'name' => 'Science',
+            'code' => 'SCI',
+        ])->assertForbidden();
+    }
+
     public function test_database_seeder_creates_enterprise_roles_and_permissions(): void
     {
         $this->seed();
 
         $this->assertDatabaseHas('permissions', ['key' => 'academic_years.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'academic_classes.manage']);
+        $this->assertDatabaseHas('permissions', ['key' => 'subjects.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'audit.view']);
         $this->assertDatabaseHas('roles', ['key' => 'super-admin', 'is_system' => true]);
         $this->assertDatabaseHas('roles', ['key' => 'read-only-auditor', 'is_system' => true]);
