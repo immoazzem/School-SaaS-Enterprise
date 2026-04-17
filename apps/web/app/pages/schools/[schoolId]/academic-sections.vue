@@ -168,14 +168,20 @@ onMounted(async () => {
         <p>Organize class groups, rooms, capacity, and status for the selected school.</p>
       </div>
 
-      <div class="filter-panel">
-        <label for="class-filter">Class filter</label>
-        <select id="class-filter" :value="selectedClassId || ''" @change="chooseClass">
-          <option value="">All classes</option>
-          <option v-for="academicClass in classes" :key="academicClass.id" :value="academicClass.id">
-            {{ academicClass.name }} · {{ academicClass.code }}
-          </option>
-        </select>
+      <div class="header-tools">
+        <NuxtLink class="button secondary" :to="`/schools/${schoolId}/academic-years`">
+          Manage years
+        </NuxtLink>
+
+        <div class="filter-panel">
+          <label for="class-filter">Class filter</label>
+          <select id="class-filter" :value="selectedClassId || ''" @change="chooseClass">
+            <option value="">All classes</option>
+            <option v-for="academicClass in classes" :key="academicClass.id" :value="academicClass.id">
+              {{ academicClass.name }} · {{ academicClass.code }}
+            </option>
+          </select>
+        </div>
       </div>
     </header>
 
@@ -342,6 +348,12 @@ h1 {
   min-width: 250px;
 }
 
+.header-tools {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+}
+
 .filter-panel label {
   color: #40524a;
   font-size: 0.88rem;
@@ -468,6 +480,7 @@ td small {
   }
 
   .sections-header,
+  .header-tools,
   .form-actions {
     align-items: stretch;
     flex-direction: column;

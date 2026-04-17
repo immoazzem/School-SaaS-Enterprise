@@ -60,6 +60,11 @@
 - Added role-aware dashboard navigation states based on selected-school permissions.
 - Added Sections dashboard navigation gated by `sections.manage`.
 - Added Nuxt Academic Sections workspace with class filtering, create, edit, and archive flows.
+- Added Nuxt Academic Years workspace with status/current filters, create, edit, set-current, and archive flows.
+- Added dashboard, Academic Classes, and Academic Sections navigation links for Academic Years.
+- Added typed Nuxt `AcademicYear` API shape.
+- Added explicit Laravel CORS config for local Nuxt origins.
+- Added project `agent-browser.json` so future browser checks can run visibly and tolerate Herd local HTTPS certificates.
 - Updated Laravel and Nuxt env examples for Herd/MySQL local development.
 - Updated local development docs for the current bearer-token Sanctum flow.
 - Linked the Laravel API folder in Herd as secured `https://school-api.test` on PHP 8.5.
@@ -77,12 +82,14 @@
 ## Not Started
 
 - MySQL database creation.
-- Live Nuxt browser verification against the running Laravel API.
+- Full authenticated Nuxt browser walkthrough against the running Laravel API.
 
 ## Verification
 
 - `php artisan test` from `apps/api`: passed after Academic Years API, 15 tests / 78 assertions.
+- `php artisan test` from `apps/api`: passed after Academic Years frontend/CORS phase, 15 tests / 78 assertions.
 - `vendor\bin\pint --test` from `apps/api`: passed after Academic Years API.
+- `vendor\bin\pint --test` from `apps/api`: passed after Academic Years frontend/CORS phase.
 - `php artisan route:list` from `apps/api`: passed, 26 routes.
 - `agent-browser --version`: passed, `agent-browser 0.26.0`.
 - `agent-browser` local web smoke check passed:
@@ -98,6 +105,8 @@
 - Live Herd API login/school/class smoke test: passed.
 - `npm run build` from `apps/web`: passed with local `.env` set to `https://school-api.test/api`.
 - `npm run build` from `apps/web`: passed after Academic Sections workspace, with existing Nuxt/Nitro warnings.
+- `npm run build` from `apps/web`: passed after Academic Years workspace, with existing Nuxt/Nitro warnings.
+- Agent-browser opened `http://127.0.0.1:3000/` and confirmed the login page rendered. Authenticated browser login was blocked inside the automation browser by local Herd HTTPS fetch handling before the project browser config was added; continue visual checks with the new `agent-browser.json`.
 - Nuxt dev server startup from this Codex shell did not become reachable on port 3000; production build remains valid.
 - Initial sandbox runs hit Windows permission/process limits, then passed outside the sandbox with approval.
 
@@ -106,9 +115,10 @@
 Continue Phase 2 implementation:
 
 1. Configure Laravel API for local MySQL once DB credentials are confirmed.
-2. Verify the Nuxt UI in a browser against `https://school-api.test/api`.
-3. Add the Nuxt Academic Years workspace.
-4. Continue academic setup modules: subjects, shifts, groups.
+2. Continue browser walkthroughs with visible `agent-browser` as each page/module lands.
+3. Continue academic setup modules: subjects, shifts, groups.
+
+Current page/module: Academic Years frontend workspace is complete. Next page/module: Subjects API and Nuxt workspace.
 
 ## New Session Startup Prompt
 

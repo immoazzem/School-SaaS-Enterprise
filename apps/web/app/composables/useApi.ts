@@ -41,6 +41,17 @@ export interface AcademicSection {
   status: string
 }
 
+export interface AcademicYear {
+  id: number
+  school_id: number
+  name: string
+  code: string
+  starts_on: string
+  ends_on: string
+  is_current: boolean
+  status: string
+}
+
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
   body?: Record<string, unknown>

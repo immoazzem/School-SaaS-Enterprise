@@ -30,6 +30,11 @@ const navItems = computed(() => [
     enabled: selectedSchool.value?.permissions?.includes('sections.manage') ?? false,
   },
   {
+    label: 'Academic Years',
+    active: false,
+    enabled: selectedSchool.value?.permissions?.includes('academic_years.manage') ?? false,
+  },
+  {
     label: 'People',
     active: false,
     enabled: selectedSchool.value?.permissions?.includes('students.manage') ?? false,
@@ -102,6 +107,15 @@ async function openSections() {
   await router.push(`/schools/${auth.selectedSchoolId.value}/academic-sections`)
 }
 
+async function openAcademicYears() {
+  if (!auth.selectedSchoolId.value) {
+    error.value = 'Create or select a school first.'
+    return
+  }
+
+  await router.push(`/schools/${auth.selectedSchoolId.value}/academic-years`)
+}
+
 onMounted(loadDashboard)
 </script>
 
@@ -120,7 +134,15 @@ onMounted(loadDashboard)
           :class="{ active: item.active }"
           type="button"
           :disabled="!item.enabled"
-          @click="item.label === 'Academic Classes' ? openClasses() : item.label === 'Sections' ? openSections() : undefined"
+          @click="
+            item.label === 'Academic Classes'
+              ? openClasses()
+              : item.label === 'Sections'
+                ? openSections()
+                : item.label === 'Academic Years'
+                  ? openAcademicYears()
+                  : undefined
+          "
         >
           <span>{{ item.label }}</span>
           <small v-if="!item.enabled">Locked</small>
@@ -246,9 +268,12 @@ onMounted(loadDashboard)
         <div>
           <p class="muted">Next task</p>
           <h2>Set up Academic Classes</h2>
-          <p>Manage class names, codes, ordering, and status inside the active school.</p>
+          <p>Manage class names, sections, and academic years inside the active school.</p>
         </div>
-        <button class="button" type="button" @click="openClasses">Open classes</button>
+        <div class="strip-actions">
+          <button class="button" type="button" @click="openClasses">Open classes</button>
+          <button class="button secondary" type="button" @click="openAcademicYears">Open years</button>
+        </div>
       </section>
     </section>
   </main>
@@ -470,6 +495,12 @@ nav {
   color: #607169;
 }
 
+.strip-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
 @media (max-width: 860px) {
   .shell {
     grid-template-columns: 1fr;
@@ -490,7 +521,8 @@ nav {
 
   .topbar,
   .topbar-actions,
-  .action-strip {
+  .action-strip,
+  .strip-actions {
     align-items: stretch;
     flex-direction: column;
   }

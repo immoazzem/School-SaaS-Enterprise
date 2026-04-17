@@ -1,0 +1,5 @@
+{
+  "headed": true,
+  "ignoreHttpsErrors": true,
+  "screenshotDir": "docs/browser-checks"
+}

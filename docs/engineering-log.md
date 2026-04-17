@@ -9,6 +9,8 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 - Add one entry here after each meaningful commit or phase slice.
 - Include scope, verification, commit SHA, local environment notes, and next step.
 - Before a context-heavy session ends, update this file plus the two checkpoint files above.
+- Mention the current page/module in progress and phase completion notes.
+- Use visible agent-browser checks during UI phases when the dev server is available.
 
 ## 2026-04-17
 
@@ -158,3 +160,13 @@ Browser smoke check:
 - `agent-browser errors` returned no page errors.
 
 Next: use `agent-browser` after starting dev servers for visual verification.
+
+### `db66a8c` - Academic Years Frontend Workspace
+
+Current page/module: Academic Years frontend workspace, route `/schools/{schoolId}/academic-years`.
+
+Scope: added Nuxt Academic Years workspace with list filters, create/edit form, set-current action, archive action, typed `AcademicYear` API interface, and navigation from dashboard/classes/sections. Added explicit Laravel CORS config for local Nuxt origins and project `agent-browser.json` for headed browser checks with local Herd HTTPS certificates.
+
+Verification: `php artisan test` passed with 15 tests / 78 assertions; `vendor\bin\pint --test` passed; `npm run build` passed with the existing Nuxt/Nitro warnings. Agent-browser confirmed the login page renders at `http://127.0.0.1:3000/`; authenticated automation needs the new browser config or a restarted browser session because the first run hit local Herd HTTPS fetch handling.
+
+Next: push this phase, then start the Subjects module.

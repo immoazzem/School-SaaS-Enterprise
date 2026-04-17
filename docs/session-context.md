@@ -126,6 +126,10 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Dashboard navigation uses the selected school's permissions for locked/enabled module states.
 - Sections navigation is gated by `sections.manage`.
 - Academic Sections workspace supports class filtering, create, edit, and archive flows.
+- Academic Years workspace supports status/current filters, create, edit, set-current, and archive flows.
+- Dashboard, Academic Classes, and Academic Sections screens link to Academic Years.
+- Explicit Laravel CORS config allows local Nuxt origins.
+- Project `agent-browser.json` is present so browser checks can run headed and ignore Herd local HTTPS certificate errors.
 - Nuxt build passes after the app UI slice and after route protection/school creation.
 - Backend tests pass after the Academic Years API: 15 tests / 78 assertions.
 - Env examples are Herd/MySQL-ready:
@@ -146,8 +150,10 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Nuxt production build passes with that env.
 - Nuxt dev server did not become reachable on port 3000 from the Codex shell; use browser/manual dev server verification next.
 - MySQL database config is still pending; tests currently use SQLite in memory.
-- Next app slice: add the Nuxt Academic Years workspace.
+- Current page/module: Academic Years frontend workspace is complete.
+- Next app slice: add Subjects API and Nuxt workspace.
 - `agent-browser@0.26.0` is installed globally with Chrome runtime `147.0.7727.57` and should be used after dev server starts.
+- Show/use the browser during UI phases at natural checkpoints: after a page is added, after login/navigation changes, and before committing a successful phase.
 - Maintain `docs/engineering-log.md` after each successful step, and update `docs/current-status.md` plus this file before ending long sessions.
 
 ## Required Project Structure
@@ -312,6 +318,8 @@ npm run lint
 - Commit after each meaningful phase.
 - Update `docs/engineering-log.md` after each meaningful phase or successful commit.
 - Before a session gets long, checkpoint by updating `docs/current-status.md`, `docs/session-context.md`, and `docs/engineering-log.md`.
+- Mention the current page/module at the start of work and in each phase finish note.
+- Use visible `agent-browser` checks during UI phases when a dev server is available.
 - Pause after each phase with:
   - files changed
   - commands run
