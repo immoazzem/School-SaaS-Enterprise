@@ -14,6 +14,7 @@ use App\Models\Role;
 use App\Models\School;
 use App\Models\Shift;
 use App\Models\Student;
+use App\Models\StudentEnrollment;
 use App\Models\StudentGroup;
 use App\Models\Subject;
 use App\Models\User;
@@ -955,6 +956,131 @@ class EnterpriseFoundationApiTest extends TestCase
             ->assertJsonValidationErrors('guardian_id');
     }
 
+    public function test_school_member_can_manage_student_enrollments(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Enrollment School', 'slug' => 'enrollment-school']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'enrollments.manage', 'people');
+
+        $student = $school->students()->create([
+            'admission_no' => 'ADM-2026-0100',
+            'full_name' => 'Nadia Rahman',
+            'admitted_on' => '2026-01-10',
+        ]);
+        $academicYear = $school->academicYears()->create([
+            'name' => 'Academic Year 2026',
+            'code' => 'AY-2026',
+            'starts_on' => '2026-01-01',
+            'ends_on' => '2026-12-31',
+        ]);
+        $academicClass = $school->academicClasses()->create(['name' => 'Class One', 'code' => 'C1']);
+        $section = $school->academicSections()->create([
+            'academic_class_id' => $academicClass->id,
+            'name' => 'Section A',
+            'code' => 'A',
+        ]);
+        $group = $school->studentGroups()->create(['name' => 'Science', 'code' => 'SCI']);
+        $shift = $school->shifts()->create(['name' => 'Morning', 'code' => 'MOR']);
+
+        Sanctum::actingAs($user);
+
+        $created = $this->postJson("/api/schools/{$school->id}/student-enrollments", [
+            'student_id' => $student->id,
+            'academic_year_id' => $academicYear->id,
+            'academic_class_id' => $academicClass->id,
+            'academic_section_id' => $section->id,
+            'student_group_id' => $group->id,
+            'shift_id' => $shift->id,
+            'roll_no' => '12',
+            'enrolled_on' => '2026-01-15',
+            'notes' => 'Initial admission.',
+        ]);
+
+        $created
+            ->assertCreated()
+            ->assertJsonPath('data.student.id', $student->id)
+            ->assertJsonPath('data.academic_class.id', $academicClass->id)
+            ->assertJsonPath('data.roll_no', '12');
+
+        $enrollmentId = $created->json('data.id');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'student_enrollment.created',
+            'auditable_id' => $enrollmentId,
+        ]);
+
+        $this->getJson("/api/schools/{$school->id}/student-enrollments?search=nadia")
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $enrollmentId);
+
+        $this->patchJson("/api/schools/{$school->id}/student-enrollments/{$enrollmentId}", [
+            'roll_no' => '15',
+            'status' => 'active',
+        ])->assertOk()
+            ->assertJsonPath('data.roll_no', '15');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'student_enrollment.updated',
+            'auditable_id' => $enrollmentId,
+        ]);
+
+        $this->deleteJson("/api/schools/{$school->id}/student-enrollments/{$enrollmentId}")
+            ->assertNoContent();
+
+        $this->assertSoftDeleted(StudentEnrollment::class, ['id' => $enrollmentId]);
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'student_enrollment.deleted',
+            'auditable_id' => $enrollmentId,
+        ]);
+    }
+
+    public function test_student_enrollment_rejects_records_from_another_school(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Enrollment Tenant', 'slug' => 'enrollment-tenant']);
+        $otherSchool = School::query()->create(['name' => 'Foreign Enrollment Tenant', 'slug' => 'foreign-enrollment-tenant']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'enrollments.manage', 'people');
+
+        $foreignStudent = $otherSchool->students()->create([
+            'admission_no' => 'ADM-FOREIGN',
+            'full_name' => 'Foreign Student',
+            'admitted_on' => '2026-01-10',
+        ]);
+        $academicYear = $school->academicYears()->create([
+            'name' => 'Academic Year 2026',
+            'code' => 'AY-2026',
+            'starts_on' => '2026-01-01',
+            'ends_on' => '2026-12-31',
+        ]);
+        $academicClass = $school->academicClasses()->create(['name' => 'Class One', 'code' => 'C1']);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/student-enrollments", [
+            'student_id' => $foreignStudent->id,
+            'academic_year_id' => $academicYear->id,
+            'academic_class_id' => $academicClass->id,
+            'enrolled_on' => '2026-01-15',
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors('student_id');
+    }
+
     public function test_section_creation_rejects_classes_from_another_school(): void
     {
         $user = User::factory()->create();
@@ -1217,6 +1343,38 @@ class EnterpriseFoundationApiTest extends TestCase
         ])->assertForbidden();
     }
 
+    public function test_active_school_member_without_permission_cannot_manage_student_enrollments(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Enrollment Limited', 'slug' => 'enrollment-limited']);
+        $student = $school->students()->create([
+            'admission_no' => 'ADM-2026-0101',
+            'full_name' => 'Limited Enrollment Student',
+            'admitted_on' => '2026-01-10',
+        ]);
+        $academicYear = $school->academicYears()->create([
+            'name' => 'Academic Year 2026',
+            'code' => 'AY-2026',
+            'starts_on' => '2026-01-01',
+            'ends_on' => '2026-12-31',
+        ]);
+        $academicClass = $school->academicClasses()->create(['name' => 'Class One', 'code' => 'C1']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/student-enrollments", [
+            'student_id' => $student->id,
+            'academic_year_id' => $academicYear->id,
+            'academic_class_id' => $academicClass->id,
+            'enrolled_on' => '2026-01-15',
+        ])->assertForbidden();
+    }
+
     public function test_database_seeder_creates_enterprise_roles_and_permissions(): void
     {
         $this->seed();
@@ -1231,6 +1389,7 @@ class EnterpriseFoundationApiTest extends TestCase
         $this->assertDatabaseHas('permissions', ['key' => 'employees.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'guardians.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'students.manage']);
+        $this->assertDatabaseHas('permissions', ['key' => 'enrollments.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'audit.view']);
         $this->assertDatabaseHas('roles', ['key' => 'super-admin', 'is_system' => true]);
         $this->assertDatabaseHas('roles', ['key' => 'read-only-auditor', 'is_system' => true]);

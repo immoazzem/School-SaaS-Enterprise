@@ -57,7 +57,12 @@ const navItems = computed(() => [
   {
     label: 'People',
     active: false,
-    enabled: selectedSchool.value?.permissions?.includes('employees.manage') ?? false,
+    enabled: selectedSchool.value?.permissions?.includes('students.manage') ?? false,
+  },
+  {
+    label: 'Enrollments',
+    active: false,
+    enabled: selectedSchool.value?.permissions?.includes('enrollments.manage') ?? false,
   },
   {
     label: 'Designations',
@@ -204,6 +209,15 @@ async function openStudents() {
   await router.push(`/schools/${auth.selectedSchoolId.value}/students`)
 }
 
+async function openEnrollments() {
+  if (!auth.selectedSchoolId.value) {
+    error.value = 'Create or select a school first.'
+    return
+  }
+
+  await router.push(`/schools/${auth.selectedSchoolId.value}/enrollments`)
+}
+
 onMounted(loadDashboard)
 </script>
 
@@ -239,8 +253,10 @@ onMounted(loadDashboard)
                           ? openShifts()
                           : item.label === 'Designations'
                             ? openDesignations()
-                            : item.label === 'People'
-                              ? openStudents()
+                          : item.label === 'People'
+                            ? openStudents()
+                            : item.label === 'Enrollments'
+                              ? openEnrollments()
                               : undefined
           "
         >
@@ -380,6 +396,7 @@ onMounted(loadDashboard)
           <button class="button secondary" type="button" @click="openDesignations">Open designations</button>
           <button class="button secondary" type="button" @click="openEmployees">Open employees</button>
           <button class="button secondary" type="button" @click="openStudents">Open students</button>
+          <button class="button secondary" type="button" @click="openEnrollments">Open enrollments</button>
         </div>
       </section>
     </section>

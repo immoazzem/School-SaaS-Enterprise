@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\GuardianController;
 use App\Http\Controllers\Api\SchoolController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\StudentController;
+use App\Http\Controllers\Api\StudentEnrollmentController;
 use App\Http\Controllers\Api\StudentGroupController;
 use App\Http\Controllers\Api\SubjectController;
 use Illuminate\Http\Request;
@@ -40,6 +41,9 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::apiResource('schools.shifts', ShiftController::class)
         ->middleware('school.member');
     Route::apiResource('schools.students', StudentController::class)
+        ->middleware('school.member');
+    Route::apiResource('schools.student-enrollments', StudentEnrollmentController::class)
+        ->parameters(['student-enrollments' => 'studentEnrollment'])
         ->middleware('school.member');
     Route::apiResource('schools.student-groups', StudentGroupController::class)
         ->parameters(['student-groups' => 'studentGroup'])

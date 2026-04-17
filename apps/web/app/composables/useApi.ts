@@ -165,6 +165,27 @@ export interface Student {
   guardian?: Pick<Guardian, 'id' | 'full_name' | 'relationship' | 'phone'> | null
 }
 
+export interface StudentEnrollment {
+  id: number
+  school_id: number
+  student_id: number
+  academic_year_id: number
+  academic_class_id: number
+  academic_section_id: number | null
+  student_group_id: number | null
+  shift_id: number | null
+  roll_no: string | null
+  enrolled_on: string
+  status: 'active' | 'completed' | 'transferred' | 'archived'
+  notes: string | null
+  student?: Pick<Student, 'id' | 'admission_no' | 'full_name'>
+  academic_year?: Pick<AcademicYear, 'id' | 'name' | 'code'>
+  academic_class?: Pick<AcademicClass, 'id' | 'name' | 'code'>
+  academic_section?: Pick<AcademicSection, 'id' | 'name' | 'code'> | null
+  student_group?: Pick<StudentGroup, 'id' | 'name' | 'code'> | null
+  shift?: Pick<Shift, 'id' | 'name' | 'code'> | null
+}
+
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
   body?: Record<string, unknown>

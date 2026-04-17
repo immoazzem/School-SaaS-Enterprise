@@ -11,6 +11,7 @@ use App\Models\Employee;
 use App\Models\Guardian;
 use App\Models\Shift;
 use App\Models\Student;
+use App\Models\StudentEnrollment;
 use App\Models\StudentGroup;
 use App\Models\Subject;
 use App\Policies\AcademicClassPolicy;
@@ -21,6 +22,7 @@ use App\Policies\DesignationPolicy;
 use App\Policies\EmployeePolicy;
 use App\Policies\GuardianPolicy;
 use App\Policies\ShiftPolicy;
+use App\Policies\StudentEnrollmentPolicy;
 use App\Policies\StudentGroupPolicy;
 use App\Policies\StudentPolicy;
 use App\Policies\SubjectPolicy;
@@ -51,6 +53,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Guardian::class, GuardianPolicy::class);
         Gate::policy(Shift::class, ShiftPolicy::class);
         Gate::policy(Student::class, StudentPolicy::class);
+        Gate::policy(StudentEnrollment::class, StudentEnrollmentPolicy::class);
         Gate::policy(StudentGroup::class, StudentGroupPolicy::class);
         Gate::policy(Subject::class, SubjectPolicy::class);
     }
