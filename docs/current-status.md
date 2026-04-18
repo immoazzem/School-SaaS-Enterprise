@@ -153,6 +153,7 @@
 
 - MySQL database creation and local API switch are complete.
 - Phase 3 Exams foundation API is complete.
+- Nuxt Exams workspace is complete.
 
 ## Verification
 
@@ -246,6 +247,17 @@
 - `php artisan route:list --path=api/schools --except-vendor` from `apps/api`: passed after Exam foundation API, 89 routes.
 - `php artisan migrate:fresh --seed` from `apps/api`: passed against MySQL after Exam foundation API.
 - Live Herd API smoke passed for exam type, exam, exam schedule creation, and paginated schedule listing.
+- Added Nuxt Exams workspace:
+  - typed `ExamType`, `Exam`, and `ExamSchedule` API shapes
+  - `/schools/{schoolId}/exams`
+  - weighted exam type form
+  - exam window form
+  - class-subject schedule form
+  - exam and schedule tables
+  - dashboard navigation gated by `exams.manage`
+- `npm run build` from `apps/web`: passed after Nuxt Exams workspace, with existing Nuxt/Nitro warnings.
+- Agent-browser opened `http://127.0.0.1:3000/schools/1/exams`, confirmed no error overlay, and confirmed live MySQL data rendered (`Midterm 2026`, `Room 101`).
+- Saved browser screenshot at `docs/browser-checks/exams-workspace.png`.
 - Nuxt dev server startup from this Codex shell did not become reachable on port 3000; production build remains valid.
 - Initial sandbox runs hit Windows permission/process limits, then passed outside the sandbox with approval.
 
@@ -253,13 +265,13 @@
 
 Continue Phase 3 implementation:
 
-1. Add the Nuxt Exams workspace.
+1. Continue Phase 3 with Marks Entry.
 2. Continue browser walkthroughs with visible `agent-browser` as each page/module lands.
 
-Current page/module complete: Phase 3 Exams foundation API.
+Current page/module complete: Nuxt Exams workspace.
 Phase 2 status: complete for the current academic setup and people foundation.
-Phase 3 status: Exam foundation API complete.
-Next page/module: Nuxt Exams workspace.
+Phase 3 status: Exams foundation API and Nuxt workspace complete.
+Next page/module: Marks Entry.
 
 ## New Session Startup Prompt
 

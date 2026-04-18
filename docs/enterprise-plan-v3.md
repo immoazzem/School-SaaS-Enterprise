@@ -88,7 +88,8 @@ Status — 2026-04-18:
 - `exam_schedules` link to `class_subjects` so marks entry can source marks configuration from class-subject assignments.
 - `exams.manage` policies and `exams.publish` permission seeded.
 - Latest backend verification: `php artisan test` passed with 49 tests / 320 assertions; `vendor\bin\pint --test` passed; `php artisan migrate:fresh --seed` passed against MySQL; live Herd API smoke passed.
-- Frontend Nuxt workspace is next.
+- Frontend Nuxt workspace complete at `/schools/{schoolId}/exams`.
+- Latest frontend verification: `npm run build` passed with existing Nuxt/Nitro warnings; agent-browser confirmed the Exams page rendered live MySQL data.
 
 ### 3B — Marks Entry
 

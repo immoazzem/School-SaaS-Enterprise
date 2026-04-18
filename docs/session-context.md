@@ -208,6 +208,12 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
   - `/api/schools/{school}/exams`
   - `/api/schools/{school}/exam-schedules`
 - Seeded permissions include `exams.manage` and `exams.publish`.
+- Nuxt Exams workspace is complete:
+  - typed `ExamType`, `Exam`, and `ExamSchedule` API shapes
+  - route `/schools/{schoolId}/exams`
+  - dashboard navigation gated by `exams.manage`
+  - forms for weighted exam types, exam windows, and class-subject schedules
+  - browser smoke confirmed live MySQL data rendered
 - API index endpoints now return paginated envelopes with top-level `data`, `meta`, and `links`; frontend list code can continue reading `data` as the record array.
 - Shared audit logging lives in `App\Services\AuditLogger` and `App\Http\Controllers\Controller::recordAudit()`.
 - School show/update endpoints exist at `GET/PATCH /api/schools/{school}` with `school.member` and `schools.manage` enforcement for update.
@@ -250,7 +256,7 @@ School-SaaS-Enterprise/
 1. Phase 0: Audit the legacy app and write docs.
 2. Phase 1: Build enterprise foundation and Academic Classes vertical slice.
 3. Phase 2: Academic setup and people modules is complete for the current foundation: Academic Classes, Sections, Years, Subjects, Class Subjects, Student Groups, Shifts, Designations, Employees, Guardians, Students, Enrollments, and Teacher Profiles.
-4. Phase 3: Attendance foundation, Phase 3.0 Stabilization, and Exam foundation API are complete; Exam frontend, marks, finance, and leave remain.
+4. Phase 3: Attendance foundation, Phase 3.0 Stabilization, and Exams foundation API/Nuxt workspace are complete; marks, finance, and leave remain.
 5. Phase 4: Reports, PDFs, calendar, and operations.
 6. Phase 5: SaaS administration and billing placeholders.
 

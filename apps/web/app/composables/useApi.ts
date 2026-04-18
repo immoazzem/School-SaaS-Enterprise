@@ -100,6 +100,53 @@ export interface ClassSubject {
   status: string
 }
 
+export interface ExamType {
+  id: number
+  school_id: number
+  name: string
+  code: string
+  weightage_percent: string | null
+  description: string | null
+  sort_order: number
+  status: string
+}
+
+export interface Exam {
+  id: number
+  school_id: number
+  exam_type_id: number
+  academic_year_id: number
+  name: string
+  code: string
+  starts_on: string
+  ends_on: string
+  is_published: boolean
+  published_at: string | null
+  published_by: number | null
+  status: 'draft' | 'scheduled' | 'completed' | 'archived'
+  notes: string | null
+  exam_type?: Pick<ExamType, 'id' | 'name' | 'code' | 'weightage_percent'>
+  academic_year?: Pick<AcademicYear, 'id' | 'name' | 'code'>
+}
+
+export interface ExamSchedule {
+  id: number
+  school_id: number
+  exam_id: number
+  class_subject_id: number
+  exam_date: string
+  starts_at: string | null
+  ends_at: string | null
+  room: string | null
+  instructions: string | null
+  status: 'scheduled' | 'completed' | 'cancelled'
+  exam?: Pick<Exam, 'id' | 'name' | 'code' | 'starts_on' | 'ends_on'>
+  class_subject?: Pick<ClassSubject, 'id' | 'academic_class_id' | 'subject_id' | 'full_marks' | 'pass_marks'> & {
+    academic_class?: Pick<AcademicClass, 'id' | 'name' | 'code'>
+    subject?: Pick<Subject, 'id' | 'name' | 'code' | 'type'>
+  }
+}
+
 export interface Designation {
   id: number
   school_id: number

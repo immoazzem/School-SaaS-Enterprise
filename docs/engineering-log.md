@@ -304,3 +304,15 @@ Verification: `php artisan test` passed with 49 tests / 320 assertions; `vendor\
 Phase 3 status: Exam foundation API complete.
 
 Next: commit and push this checkpoint, then add the Nuxt Exams workspace.
+
+### Nuxt Exams Workspace
+
+Current page/module complete: Nuxt Exams workspace, route `/schools/{schoolId}/exams`.
+
+Scope: added typed Nuxt API shapes for exam types, exams, and exam schedules; added a combined Exams workspace for weighted exam types, exam windows, and class-subject schedules; added dashboard navigation and action button gated by `exams.manage`.
+
+Verification: `npm run build` passed with existing Nuxt/Nitro warnings; agent-browser logged in, opened the dashboard, verified the Exams navigation item, opened `http://127.0.0.1:3000/schools/1/exams`, confirmed no error overlay, and confirmed live MySQL data rendered (`Midterm 2026`, `Room 101`). Browser screenshot saved at `docs/browser-checks/exams-workspace.png`.
+
+Phase 3 status: Exams foundation API and Nuxt workspace complete.
+
+Next: commit and push this checkpoint, then continue Phase 3 with Marks Entry.

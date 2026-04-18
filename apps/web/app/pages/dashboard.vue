@@ -75,6 +75,11 @@ const navItems = computed(() => [
     enabled: selectedSchool.value?.permissions?.includes('attendance.manage') ?? false,
   },
   {
+    label: 'Exams',
+    active: false,
+    enabled: selectedSchool.value?.permissions?.includes('exams.manage') ?? false,
+  },
+  {
     label: 'Designations',
     active: false,
     enabled: selectedSchool.value?.permissions?.includes('designations.manage') ?? false,
@@ -246,6 +251,15 @@ async function openAttendance() {
   await router.push(`/schools/${auth.selectedSchoolId.value}/attendance`)
 }
 
+async function openExams() {
+  if (!auth.selectedSchoolId.value) {
+    error.value = 'Create or select a school first.'
+    return
+  }
+
+  await router.push(`/schools/${auth.selectedSchoolId.value}/exams`)
+}
+
 onMounted(loadDashboard)
 </script>
 
@@ -289,7 +303,9 @@ onMounted(loadDashboard)
                                 ? openTeachers()
                                 : item.label === 'Attendance'
                                   ? openAttendance()
-                                : undefined
+                                  : item.label === 'Exams'
+                                    ? openExams()
+                                    : undefined
           "
         >
           <span>{{ item.label }}</span>
@@ -431,6 +447,7 @@ onMounted(loadDashboard)
           <button class="button secondary" type="button" @click="openEnrollments">Open enrollments</button>
           <button class="button secondary" type="button" @click="openTeachers">Open teachers</button>
           <button class="button secondary" type="button" @click="openAttendance">Open attendance</button>
+          <button class="button secondary" type="button" @click="openExams">Open exams</button>
         </div>
       </section>
     </section>
