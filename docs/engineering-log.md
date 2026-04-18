@@ -381,4 +381,6 @@ Verification: targeted `php artisan test --filter=PhaseFourReportingApiTest` pas
 
 Phase 4 status: backend foundation started and checkpointed for result publication, result summary reports, employee attendance summary, and in-app notifications. Remaining Phase 4 work includes PDFs, school calendar, richer notification hooks, document management, Nuxt report/publication workspaces, browser checks, and analytics.
 
-Next: commit and push this Phase 4 backend checkpoint, then continue with Phase 4 PDFs/calendar/notification hooks or the Nuxt reports workspace.
+Checkpoint: committed and pushed as `8e6bc3a feat: add phase 4 reporting foundation`.
+
+Next: continue with Phase 4 PDFs/calendar/notification hooks or the Nuxt reports workspace.

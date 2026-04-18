@@ -288,7 +288,7 @@ Current page/module complete: Phase 4 Result Publication and Reports backend fou
 Phase 2 status: complete for the current academic setup and people foundation.
 Phase 3 status: complete for backend APIs, Nuxt workspaces, build, and browser smoke checks.
 Phase 4 status: backend foundation started for result publication, cached summaries, employee attendance summary, and in-app notifications.
-Git status: Phase 4 backend foundation is ready to commit and push.
+Git status: Phase 4 backend foundation committed and pushed as `8e6bc3a feat: add phase 4 reporting foundation`.
 Next page/module: Phase 4 PDFs, Calendar, Notifications, or Nuxt Reports workspace.
 
 ## New Session Startup Prompt
