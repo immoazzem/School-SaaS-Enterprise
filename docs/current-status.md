@@ -154,6 +154,7 @@
 - MySQL database creation and local API switch are complete.
 - Phase 3 Exams foundation API is complete.
 - Nuxt Exams workspace is complete.
+- Phase 3 Operations backend APIs are complete for Marks Entry, Grade Configuration, Fee Structure, Student Invoices and Payments, Salary Records, Employee Attendance, Employee Leave, and enhanced Student Attendance bulk entry.
 
 ## Verification
 
@@ -243,9 +244,13 @@
 - Agent-browser login reached `http://127.0.0.1:3000/dashboard` and confirmed the MySQL-created school was visible.
 - Saved browser screenshot at `docs/browser-checks/mysql-dashboard.png`.
 - `php artisan test` from `apps/api`: passed after Exam foundation API, 49 tests / 320 assertions.
+- `php artisan test` from `apps/api`: passed after Phase 3 Operations backend, 53 tests / 370 assertions.
 - `vendor\bin\pint --test` from `apps/api`: passed after Exam foundation API.
+- `vendor\bin\pint --test` from `apps/api`: passed after Phase 3 Operations backend.
 - `php artisan route:list --path=api/schools --except-vendor` from `apps/api`: passed after Exam foundation API, 89 routes.
+- `php artisan route:list --path=api/schools --except-vendor` from `apps/api`: passed after Phase 3 Operations backend, 161 routes.
 - `php artisan migrate:fresh --seed` from `apps/api`: passed against MySQL after Exam foundation API.
+- `php artisan migrate:fresh --seed` from `apps/api`: passed against MySQL after Phase 3 Operations backend.
 - Live Herd API smoke passed for exam type, exam, exam schedule creation, and paginated schedule listing.
 - Added Nuxt Exams workspace:
   - typed `ExamType`, `Exam`, and `ExamSchedule` API shapes
@@ -265,13 +270,13 @@
 
 Continue Phase 3 implementation:
 
-1. Continue Phase 3 with Marks Entry.
+1. Add Nuxt workspaces for Phase 3 Operations: Marks/Grades, Finance, Payroll/Leave/Employee Attendance.
 2. Continue browser walkthroughs with visible `agent-browser` as each page/module lands.
 
-Current page/module complete: Nuxt Exams workspace.
+Current page/module complete: Phase 3 Operations backend APIs.
 Phase 2 status: complete for the current academic setup and people foundation.
-Phase 3 status: Exams foundation API and Nuxt workspace complete.
-Next page/module: Marks Entry.
+Phase 3 status: Backend APIs complete through Phase 3I; remaining work is Nuxt workspaces and browser verification for the new operations modules.
+Next page/module: Nuxt Marks and Grades workspace.
 
 ## New Session Startup Prompt
 

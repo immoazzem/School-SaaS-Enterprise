@@ -316,3 +316,24 @@ Verification: `npm run build` passed with existing Nuxt/Nitro warnings; agent-br
 Phase 3 status: Exams foundation API and Nuxt workspace complete.
 
 Next: commit and push this checkpoint, then continue Phase 3 with Marks Entry.
+
+### Phase 3 Operations Backend
+
+Current page/module complete: Phase 3 Operations backend APIs.
+
+Scope: followed `docs/enterprise-plan-v3.md` for Phase 3B-3I backend by adding schemas/models/routes/controllers/services for marks entry, grade scales, fee categories/structures, discount policies, student discounts, student invoices, invoice payments, salary records, employee attendance, leave types, leave balances, leave applications, and enhanced bulk student attendance.
+
+Key implementation notes:
+- Marks entry stores absent separately from zero marks and sources `full_marks`/`pass_marks` from `class_subjects`.
+- Student invoices compute discounts from active student discount policies and expose bulk invoice generation through a queued job.
+- Salary records compute gross, deductions, and net amounts in `SalaryService`.
+- Employee attendance uses upsert behavior by employee/date.
+- Leave approval decrements balance and creates `on_leave` employee attendance records; cancellation restores approved leave balance.
+- Student attendance now supports `late_arrival_time`, `half_day`, `leave_reference`, and bulk upsert entry.
+- Seeded v3 permissions: `marks.enter.own`, `marks.enter.any`, `grades.manage`, `payroll.manage`, `employee_attendance.manage`, and `leave.manage`.
+
+Verification: `php artisan migrate:fresh --seed` passed against MySQL; `php artisan test` passed with 53 tests / 370 assertions; `vendor\bin\pint --test` passed; `php artisan route:list --path=api/schools --except-vendor` passed and showed 161 school routes.
+
+Phase 3 status: Backend APIs are complete for Exams, Marks, Grades, Finance, Payroll, Employee Attendance, Leave, and enhanced Student Attendance. Nuxt workspace coverage still needs to be added for Marks/Grades, Finance, Payroll/Leave/Employee Attendance.
+
+Next: commit and push this backend checkpoint, then add the remaining Phase 3 Nuxt workspaces and browser checks.

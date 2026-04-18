@@ -16,6 +16,9 @@ class StudentAttendanceRecord extends Model
         'student_enrollment_id',
         'attendance_date',
         'status',
+        'late_arrival_time',
+        'half_day',
+        'leave_reference',
         'remarks',
     ];
 
@@ -23,6 +26,7 @@ class StudentAttendanceRecord extends Model
     {
         return [
             'attendance_date' => 'date:Y-m-d',
+            'half_day' => 'boolean',
         ];
     }
 

@@ -317,6 +317,29 @@ All v2 tests remain plus:
 - Marks entry by teacher blocked for subject not assigned to them (with `marks.enter.own`)
 - `full_marks` sourced from `class_subjects`, not client input
 
+### Phase 3 Backend Status — 2026-04-18
+
+Completed:
+- 3A Exam foundation API and Nuxt Exams workspace.
+- 3B Marks Entry backend API with absent-vs-zero handling and server-sourced `full_marks`/`pass_marks`.
+- 3C Grade Configuration backend API with `fail_below_percent` and `gpa_calculation_method`.
+- 3D Fee Structure backend API with fee categories, fee structures, discount policies, student discounts, discount calculation, and bulk invoice job dispatch.
+- 3E Student Invoices and Payments backend API with Bangladesh payment methods and mobile-money transaction reference validation.
+- 3F Employee Salary Records backend API with service-computed gross, deductions, and net amounts.
+- 3G Employee Attendance backend API with employee/date upsert behavior.
+- 3H Employee Leave backend API with approve/reject/cancel workflow, balance updates, and `on_leave` attendance creation.
+- 3I Student Attendance enhancements with late arrival, half-day, leave reference, and bulk upsert endpoint.
+
+Latest verification:
+- `php artisan migrate:fresh --seed`: passed against MySQL.
+- `php artisan test`: 53 tests / 370 assertions.
+- `vendor\bin\pint --test`: passed.
+- `php artisan route:list --path=api/schools --except-vendor`: passed with 161 routes.
+
+Remaining Phase 3 work:
+- Nuxt workspaces and browser checks for Marks/Grades, Finance, Payroll, Employee Attendance, and Leave.
+- Teacher-assignment enforcement for `marks.enter.own` still needs the teacher-to-class-subject assignment model before it can be enforced safely. The permissions are seeded and the admin/principal `marks.enter.any` path is implemented.
+
 ---
 
 ## Phase 4 — Reports, PDFs, Calendar, Notifications

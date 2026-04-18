@@ -7,6 +7,7 @@ use App\Models\School;
 use App\Models\StudentAttendanceRecord;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -56,6 +57,47 @@ class StudentAttendanceRecordController extends Controller
         ]);
 
         return response()->json(['data' => $record->load($this->relations())], 201);
+    }
+
+    public function bulk(Request $request, School $school): JsonResponse
+    {
+        Gate::authorize('create', [StudentAttendanceRecord::class, $school]);
+
+        $validated = $request->validate([
+            'academic_class_id' => ['required', 'integer', Rule::exists('academic_classes', 'id')->where('school_id', $school->id)],
+            'date' => ['required', 'date'],
+            'records' => ['required', 'array', 'min:1'],
+            'records.*.enrollment_id' => ['required', 'integer', Rule::exists('student_enrollments', 'id')->where('school_id', $school->id)],
+            'records.*.status' => ['required', Rule::in(['present', 'absent', 'late', 'excused'])],
+            'records.*.late_arrival_time' => ['nullable', 'date_format:H:i'],
+            'records.*.half_day' => ['nullable', 'boolean'],
+            'records.*.leave_reference' => ['nullable', 'string', 'max:120'],
+            'records.*.remarks' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $records = DB::transaction(function () use ($school, $validated) {
+            return collect($validated['records'])->map(function (array $record) use ($school, $validated): StudentAttendanceRecord {
+                $enrollment = $school->studentEnrollments()
+                    ->where('academic_class_id', $validated['academic_class_id'])
+                    ->findOrFail($record['enrollment_id']);
+
+                return $school->studentAttendanceRecords()->updateOrCreate(
+                    [
+                        'student_enrollment_id' => $enrollment->id,
+                        'attendance_date' => $validated['date'],
+                    ],
+                    [
+                        'status' => $record['status'],
+                        'late_arrival_time' => $record['late_arrival_time'] ?? null,
+                        'half_day' => $record['half_day'] ?? false,
+                        'leave_reference' => $record['leave_reference'] ?? null,
+                        'remarks' => $record['remarks'] ?? null,
+                    ]
+                );
+            })->values();
+        });
+
+        return response()->json(['data' => $records->map->load($this->relations())], 201);
     }
 
     public function show(Request $request, School $school, StudentAttendanceRecord $studentAttendanceRecord): JsonResponse
@@ -109,6 +151,9 @@ class StudentAttendanceRecordController extends Controller
             ],
             'attendance_date' => [$record ? 'sometimes' : 'required', 'date'],
             'status' => [$record ? 'sometimes' : 'required', Rule::in(['present', 'absent', 'late', 'excused'])],
+            'late_arrival_time' => ['nullable', 'date_format:H:i'],
+            'half_day' => ['nullable', 'boolean'],
+            'leave_reference' => ['nullable', 'string', 'max:120'],
             'remarks' => ['nullable', 'string', 'max:2000'],
         ]);
 
@@ -136,7 +181,7 @@ class StudentAttendanceRecordController extends Controller
      */
     private function auditedFields(): array
     {
-        return ['student_enrollment_id', 'attendance_date', 'status', 'remarks'];
+        return ['student_enrollment_id', 'attendance_date', 'status', 'late_arrival_time', 'half_day', 'leave_reference', 'remarks'];
     }
 
     /**

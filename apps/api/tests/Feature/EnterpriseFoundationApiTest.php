@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\BulkGenerateStudentInvoices;
 use App\Models\AcademicClass;
 use App\Models\AcademicSection;
 use App\Models\AcademicYear;
@@ -23,6 +24,7 @@ use App\Models\Subject;
 use App\Models\TeacherProfile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -1553,6 +1555,240 @@ class EnterpriseFoundationApiTest extends TestCase
             'ends_on' => '2026-06-10',
         ])->assertUnprocessable()
             ->assertJsonValidationErrors('exam_type_id');
+    }
+
+    public function test_phase_three_marks_and_grade_configuration_follow_v3_rules(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Marks School', 'slug' => 'marks-school']);
+        $school->memberships()->create(['user_id' => $user->id, 'status' => 'active', 'joined_at' => now()]);
+        $this->grantSchoolPermission($user, $school, 'marks.enter.any', 'exams');
+        $this->grantSchoolPermission($user, $school, 'grades.manage', 'exams');
+
+        $academicYear = $school->academicYears()->create(['name' => 'Academic Year 2026', 'code' => 'AY-2026', 'starts_on' => '2026-01-01', 'ends_on' => '2026-12-31']);
+        $academicClass = $school->academicClasses()->create(['name' => 'Class Three', 'code' => 'C3']);
+        $student = $school->students()->create(['admission_no' => 'ADM-MARKS-01', 'full_name' => 'Marks Student', 'admitted_on' => '2026-01-10']);
+        $enrollment = $school->studentEnrollments()->create(['student_id' => $student->id, 'academic_year_id' => $academicYear->id, 'academic_class_id' => $academicClass->id, 'enrolled_on' => '2026-01-15']);
+        $subject = $school->subjects()->create(['name' => 'Mathematics', 'code' => 'MATH']);
+        $classSubject = $school->classSubjects()->create(['academic_class_id' => $academicClass->id, 'subject_id' => $subject->id, 'full_marks' => 80, 'pass_marks' => 27]);
+        $examType = $school->examTypes()->create(['name' => 'Midterm', 'code' => 'MID', 'weightage_percent' => 40]);
+        $exam = $school->exams()->create(['exam_type_id' => $examType->id, 'academic_year_id' => $academicYear->id, 'name' => 'Midterm 2026', 'code' => 'MID-2026', 'starts_on' => '2026-06-01', 'ends_on' => '2026-06-15']);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/grade-scales", [
+            'name' => 'A Plus',
+            'code' => 'A+',
+            'min_percent' => 80,
+            'max_percent' => 100,
+            'grade_point' => 5,
+            'fail_below_percent' => 33,
+            'gpa_calculation_method' => 'weighted',
+        ])->assertCreated()
+            ->assertJsonPath('data.fail_below_percent', '33.00')
+            ->assertJsonPath('data.gpa_calculation_method', 'weighted');
+
+        $entry = $this->postJson("/api/schools/{$school->id}/marks-entries", [
+            'exam_id' => $exam->id,
+            'class_subject_id' => $classSubject->id,
+            'student_enrollment_id' => $enrollment->id,
+            'marks_obtained' => 0,
+            'full_marks' => 999,
+        ])->assertCreated()
+            ->assertJsonPath('data.marks_obtained', '0.00')
+            ->assertJsonPath('data.full_marks', 80)
+            ->assertJsonPath('data.pass_marks', 27);
+
+        $this->patchJson("/api/schools/{$school->id}/marks-entries/{$entry->json('data.id')}", [
+            'is_absent' => true,
+            'absent_reason' => 'Sick leave',
+        ])->assertOk()
+            ->assertJsonPath('data.is_absent', true)
+            ->assertJsonPath('data.marks_obtained', null);
+    }
+
+    public function test_phase_three_finance_applies_discounts_and_dispatches_bulk_invoices(): void
+    {
+        Bus::fake();
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Finance School', 'slug' => 'finance-school']);
+        $school->memberships()->create(['user_id' => $user->id, 'status' => 'active', 'joined_at' => now()]);
+        $this->grantSchoolPermission($user, $school, 'finance.manage', 'finance');
+
+        $academicYear = $school->academicYears()->create(['name' => 'Academic Year 2026', 'code' => 'AY-2026', 'starts_on' => '2026-01-01', 'ends_on' => '2026-12-31']);
+        $academicClass = $school->academicClasses()->create(['name' => 'Class Four', 'code' => 'C4']);
+        $student = $school->students()->create(['admission_no' => 'ADM-FIN-01', 'full_name' => 'Finance Student', 'admitted_on' => '2026-01-10']);
+        $enrollment = $school->studentEnrollments()->create(['student_id' => $student->id, 'academic_year_id' => $academicYear->id, 'academic_class_id' => $academicClass->id, 'enrolled_on' => '2026-01-15']);
+
+        Sanctum::actingAs($user);
+
+        $categoryId = $this->postJson("/api/schools/{$school->id}/fee-categories", [
+            'name' => 'Monthly Tuition',
+            'code' => 'TUITION',
+            'billing_type' => 'monthly',
+        ])->assertCreated()->json('data.id');
+
+        $feeStructureId = $this->postJson("/api/schools/{$school->id}/fee-structures", [
+            'fee_category_id' => $categoryId,
+            'academic_year_id' => $academicYear->id,
+            'academic_class_id' => $academicClass->id,
+            'amount' => 1000,
+            'due_day_of_month' => 10,
+            'is_recurring' => true,
+        ])->assertCreated()->json('data.id');
+
+        $policyId = $this->postJson("/api/schools/{$school->id}/discount-policies", [
+            'name' => 'Scholarship',
+            'code' => 'SCHOLAR',
+            'discount_type' => 'percent',
+            'amount' => 10,
+            'applies_to_category_ids' => [$categoryId],
+        ])->assertCreated()->json('data.id');
+
+        $this->postJson("/api/schools/{$school->id}/student-discounts", [
+            'student_enrollment_id' => $enrollment->id,
+            'discount_policy_id' => $policyId,
+            'academic_year_id' => $academicYear->id,
+        ])->assertCreated();
+
+        $this->postJson("/api/schools/{$school->id}/student-invoices", [
+            'student_enrollment_id' => $enrollment->id,
+            'academic_year_id' => $academicYear->id,
+            'fee_month' => '2026-04',
+            'fee_structure_ids' => [$feeStructureId],
+        ])->assertCreated()
+            ->assertJsonPath('data.subtotal', '1000.00')
+            ->assertJsonPath('data.discount', '100.00')
+            ->assertJsonPath('data.total', '900.00');
+
+        $this->postJson("/api/schools/{$school->id}/student-invoices/bulk-generate", [
+            'academic_class_id' => $academicClass->id,
+            'academic_year_id' => $academicYear->id,
+            'month' => '2026-05',
+            'fee_structure_ids' => [$feeStructureId],
+        ])->assertAccepted()
+            ->assertJsonStructure(['data' => ['job_id', 'status']]);
+
+        Bus::assertDispatched(BulkGenerateStudentInvoices::class);
+    }
+
+    public function test_phase_three_payroll_attendance_and_leave_workflow(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Payroll School', 'slug' => 'payroll-school']);
+        $school->memberships()->create(['user_id' => $user->id, 'status' => 'active', 'joined_at' => now()]);
+        $this->grantSchoolPermission($user, $school, 'payroll.manage', 'finance');
+        $this->grantSchoolPermission($user, $school, 'employee_attendance.manage', 'attendance');
+        $this->grantSchoolPermission($user, $school, 'leave.manage', 'people');
+
+        $academicYear = $school->academicYears()->create(['name' => 'Academic Year 2026', 'code' => 'AY-2026', 'starts_on' => '2026-01-01', 'ends_on' => '2026-12-31', 'is_current' => true]);
+        $employee = $school->employees()->create(['employee_no' => 'EMP-PAY-01', 'full_name' => 'Payroll Employee', 'joined_on' => '2026-01-01']);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/salary-records", [
+            'employee_id' => $employee->id,
+            'academic_year_id' => $academicYear->id,
+            'month' => '2026-04',
+            'basic_amount' => 10000,
+            'allowances' => ['hra' => 3000, 'medical' => 500],
+            'deductions' => ['tax' => 700, 'advance' => 300],
+        ])->assertCreated()
+            ->assertJsonPath('data.gross_amount', '13500.00')
+            ->assertJsonPath('data.total_deductions', '1000.00')
+            ->assertJsonPath('data.net_amount', '12500.00');
+
+        $attendanceId = $this->postJson("/api/schools/{$school->id}/employee-attendance-records", [
+            'employee_id' => $employee->id,
+            'date' => '2026-04-18',
+            'status' => 'late',
+            'check_in_time' => '09:15',
+        ])->assertCreated()
+            ->assertJsonPath('data.status', 'late')
+            ->json('data.id');
+
+        $this->postJson("/api/schools/{$school->id}/employee-attendance-records", [
+            'employee_id' => $employee->id,
+            'date' => '2026-04-18',
+            'status' => 'present',
+            'check_in_time' => '08:55',
+        ])->assertCreated()
+            ->assertJsonPath('data.id', $attendanceId)
+            ->assertJsonPath('data.status', 'present');
+
+        $leaveTypeId = $this->postJson("/api/schools/{$school->id}/leave-types", [
+            'name' => 'Casual Leave',
+            'code' => 'CL',
+            'max_days_per_year' => 10,
+        ])->assertCreated()->json('data.id');
+
+        $this->postJson("/api/schools/{$school->id}/leave-balances", [
+            'employee_id' => $employee->id,
+            'leave_type_id' => $leaveTypeId,
+            'academic_year_id' => $academicYear->id,
+            'total_days' => 10,
+            'used_days' => 0,
+        ])->assertCreated()
+            ->assertJsonPath('data.remaining_days', 10);
+
+        $applicationId = $this->postJson("/api/schools/{$school->id}/leave-applications", [
+            'employee_id' => $employee->id,
+            'leave_type_id' => $leaveTypeId,
+            'from_date' => '2026-04-20',
+            'to_date' => '2026-04-21',
+            'reason' => 'Family event',
+        ])->assertCreated()
+            ->assertJsonPath('data.total_days', 2)
+            ->json('data.id');
+
+        $this->patchJson("/api/schools/{$school->id}/leave-applications/{$applicationId}/approve")
+            ->assertOk()
+            ->assertJsonPath('data.status', 'approved');
+
+        $this->assertDatabaseHas('leave_balances', ['employee_id' => $employee->id, 'used_days' => 2, 'remaining_days' => 8]);
+        $this->assertDatabaseHas('employee_attendance_records', ['employee_id' => $employee->id, 'date' => '2026-04-20', 'status' => 'on_leave']);
+
+        $this->patchJson("/api/schools/{$school->id}/leave-applications/{$applicationId}/cancel")
+            ->assertOk()
+            ->assertJsonPath('data.status', 'cancelled');
+
+        $this->assertDatabaseHas('leave_balances', ['employee_id' => $employee->id, 'used_days' => 0, 'remaining_days' => 10]);
+    }
+
+    public function test_phase_three_bulk_student_attendance_upserts_late_and_half_day_fields(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Bulk Attendance School', 'slug' => 'bulk-attendance-school']);
+        $school->memberships()->create(['user_id' => $user->id, 'status' => 'active', 'joined_at' => now()]);
+        $this->grantSchoolPermission($user, $school, 'attendance.manage', 'attendance');
+
+        $academicYear = $school->academicYears()->create(['name' => 'Academic Year 2026', 'code' => 'AY-2026', 'starts_on' => '2026-01-01', 'ends_on' => '2026-12-31']);
+        $academicClass = $school->academicClasses()->create(['name' => 'Class Five', 'code' => 'C5']);
+        $student = $school->students()->create(['admission_no' => 'ADM-BULK-01', 'full_name' => 'Bulk Student', 'admitted_on' => '2026-01-10']);
+        $enrollment = $school->studentEnrollments()->create(['student_id' => $student->id, 'academic_year_id' => $academicYear->id, 'academic_class_id' => $academicClass->id, 'enrolled_on' => '2026-01-15']);
+
+        Sanctum::actingAs($user);
+
+        $recordId = $this->postJson("/api/schools/{$school->id}/student-attendance/bulk", [
+            'academic_class_id' => $academicClass->id,
+            'date' => '2026-04-18',
+            'records' => [
+                ['enrollment_id' => $enrollment->id, 'status' => 'late', 'late_arrival_time' => '09:10', 'half_day' => true, 'leave_reference' => 'APP-1'],
+            ],
+        ])->assertCreated()
+            ->assertJsonPath('data.0.status', 'late')
+            ->assertJsonPath('data.0.half_day', true)
+            ->json('data.0.id');
+
+        $this->postJson("/api/schools/{$school->id}/student-attendance/bulk", [
+            'academic_class_id' => $academicClass->id,
+            'date' => '2026-04-18',
+            'records' => [
+                ['enrollment_id' => $enrollment->id, 'status' => 'present'],
+            ],
+        ])->assertCreated()
+            ->assertJsonPath('data.0.id', $recordId)
+            ->assertJsonPath('data.0.status', 'present');
     }
 
     public function test_section_creation_rejects_classes_from_another_school(): void

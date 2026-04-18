@@ -190,4 +190,108 @@ class School extends Model
     {
         return $this->hasMany(TeacherProfile::class);
     }
+
+    /**
+     * @return HasMany<GradeScale, $this>
+     */
+    public function gradeScales(): HasMany
+    {
+        return $this->hasMany(GradeScale::class);
+    }
+
+    /**
+     * @return HasMany<MarksEntry, $this>
+     */
+    public function marksEntries(): HasMany
+    {
+        return $this->hasMany(MarksEntry::class);
+    }
+
+    /**
+     * @return HasMany<FeeCategory, $this>
+     */
+    public function feeCategories(): HasMany
+    {
+        return $this->hasMany(FeeCategory::class);
+    }
+
+    /**
+     * @return HasMany<FeeStructure, $this>
+     */
+    public function feeStructures(): HasMany
+    {
+        return $this->hasMany(FeeStructure::class);
+    }
+
+    /**
+     * @return HasMany<DiscountPolicy, $this>
+     */
+    public function discountPolicies(): HasMany
+    {
+        return $this->hasMany(DiscountPolicy::class);
+    }
+
+    /**
+     * @return HasMany<StudentDiscount, $this>
+     */
+    public function studentDiscounts(): HasMany
+    {
+        return $this->hasMany(StudentDiscount::class);
+    }
+
+    /**
+     * @return HasMany<StudentInvoice, $this>
+     */
+    public function studentInvoices(): HasMany
+    {
+        return $this->hasMany(StudentInvoice::class);
+    }
+
+    /**
+     * @return HasMany<InvoicePayment, $this>
+     */
+    public function invoicePayments(): HasMany
+    {
+        return $this->hasMany(InvoicePayment::class);
+    }
+
+    /**
+     * @return HasMany<SalaryRecord, $this>
+     */
+    public function salaryRecords(): HasMany
+    {
+        return $this->hasMany(SalaryRecord::class);
+    }
+
+    /**
+     * @return HasMany<EmployeeAttendanceRecord, $this>
+     */
+    public function employeeAttendanceRecords(): HasMany
+    {
+        return $this->hasMany(EmployeeAttendanceRecord::class);
+    }
+
+    /**
+     * @return HasMany<LeaveType, $this>
+     */
+    public function leaveTypes(): HasMany
+    {
+        return $this->hasMany(LeaveType::class);
+    }
+
+    /**
+     * @return HasMany<LeaveBalance, $this>
+     */
+    public function leaveBalances(): HasMany
+    {
+        return $this->hasMany(LeaveBalance::class);
+    }
+
+    /**
+     * @return HasMany<LeaveApplication, $this>
+     */
+    public function leaveApplications(): HasMany
+    {
+        return $this->hasMany(LeaveApplication::class);
+    }
 }
