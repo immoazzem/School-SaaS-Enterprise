@@ -155,6 +155,10 @@
 - Phase 3 Exams foundation API is complete.
 - Nuxt Exams workspace is complete.
 - Phase 3 Operations backend APIs are complete for Marks Entry, Grade Configuration, Fee Structure, Student Invoices and Payments, Salary Records, Employee Attendance, Employee Leave, and enhanced Student Attendance bulk entry.
+- Phase 3 Operations Nuxt workspaces are complete:
+  - `/schools/{schoolId}/marks`
+  - `/schools/{schoolId}/finance`
+  - `/schools/{schoolId}/staff-operations`
 
 ## Verification
 
@@ -261,22 +265,28 @@
   - exam and schedule tables
   - dashboard navigation gated by `exams.manage`
 - `npm run build` from `apps/web`: passed after Nuxt Exams workspace, with existing Nuxt/Nitro warnings.
+- `npm run build` from `apps/web`: passed after Phase 3 Operations Nuxt workspaces, with existing Nuxt/Nitro warnings.
 - Agent-browser opened `http://127.0.0.1:3000/schools/1/exams`, confirmed no error overlay, and confirmed live MySQL data rendered (`Midterm 2026`, `Room 101`).
 - Saved browser screenshot at `docs/browser-checks/exams-workspace.png`.
+- Agent-browser opened `http://127.0.0.1:3000/schools/1/marks`, confirmed no error overlay, and confirmed the Marks and Grades workspace rendered.
+- Agent-browser opened `http://127.0.0.1:3000/schools/1/finance`, confirmed no error overlay, and confirmed the Finance workspace rendered.
+- Agent-browser opened `http://127.0.0.1:3000/schools/1/staff-operations`, confirmed no error overlay, and confirmed the Staff Operations workspace rendered.
+- Saved browser screenshots at `docs/browser-checks/marks-workspace.png`, `docs/browser-checks/finance-workspace.png`, and `docs/browser-checks/staff-operations-workspace.png`.
 - Nuxt dev server startup from this Codex shell did not become reachable on port 3000; production build remains valid.
 - Initial sandbox runs hit Windows permission/process limits, then passed outside the sandbox with approval.
 
 ## Next Step
 
-Continue Phase 3 implementation:
+Continue with Phase 4 implementation:
 
-1. Add Nuxt workspaces for Phase 3 Operations: Marks/Grades, Finance, Payroll/Leave/Employee Attendance.
+1. Begin Phase 4 result publication and reporting foundation.
 2. Continue browser walkthroughs with visible `agent-browser` as each page/module lands.
 
-Current page/module complete: Phase 3 Operations backend APIs.
+Current page/module complete: Phase 3 Operations Nuxt workspaces.
 Phase 2 status: complete for the current academic setup and people foundation.
-Phase 3 status: Backend APIs complete through Phase 3I; remaining work is Nuxt workspaces and browser verification for the new operations modules.
-Next page/module: Nuxt Marks and Grades workspace.
+Phase 3 status: complete for backend APIs, Nuxt workspaces, build, and browser smoke checks.
+Git status: local `master` is one commit ahead of `origin/master` because pushing `feat: add phase 3 operations workspaces` to GitHub timed out on `github.com:443`.
+Next page/module: Phase 4 Result Publication and Reports foundation.
 
 ## New Session Startup Prompt
 

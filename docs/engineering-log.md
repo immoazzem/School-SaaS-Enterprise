@@ -337,3 +337,30 @@ Verification: `php artisan migrate:fresh --seed` passed against MySQL; `php arti
 Phase 3 status: Backend APIs are complete for Exams, Marks, Grades, Finance, Payroll, Employee Attendance, Leave, and enhanced Student Attendance. Nuxt workspace coverage still needs to be added for Marks/Grades, Finance, Payroll/Leave/Employee Attendance.
 
 Next: commit and push this backend checkpoint, then add the remaining Phase 3 Nuxt workspaces and browser checks.
+
+### Phase 3 Operations Nuxt Workspaces
+
+Current page/module complete: Phase 3 Operations Nuxt workspaces.
+
+Scope: added typed Nuxt API shapes and operational screens for:
+- Marks and Grades at `/schools/{schoolId}/marks`
+- Finance at `/schools/{schoolId}/finance`
+- Staff Operations at `/schools/{schoolId}/staff-operations`
+
+Implemented dashboard navigation/action buttons for Marks, Finance, and Staff Ops, with permissions gating for `marks.enter.any`, `marks.enter.own`, `finance.manage`, `payroll.manage`, `employee_attendance.manage`, and `leave.manage`.
+
+Verification: `npm run build` passed with the existing Nuxt/Nitro warnings. Agent-browser opened:
+- `http://127.0.0.1:3000/schools/1/marks`
+- `http://127.0.0.1:3000/schools/1/finance`
+- `http://127.0.0.1:3000/schools/1/staff-operations`
+
+No Vite error overlay appeared, each page rendered its expected workspace heading, and screenshots were saved at:
+- `docs/browser-checks/marks-workspace.png`
+- `docs/browser-checks/finance-workspace.png`
+- `docs/browser-checks/staff-operations-workspace.png`
+
+Phase 3 status: complete for backend APIs, Nuxt workspaces, build, and browser smoke verification. Teacher-specific `marks.enter.own` assignment enforcement remains intentionally deferred until a teacher-to-class-subject assignment model is introduced.
+
+Checkpoint: committed locally as `feat: add phase 3 operations workspaces`. Push to GitHub failed because `github.com:443` was unreachable from the machine after repeated attempts; `master` is one commit ahead of `origin/master`.
+
+Next: push the local commit when GitHub connectivity returns, then begin Phase 4 reports, result publication, PDFs, calendar, notifications, and analytics.

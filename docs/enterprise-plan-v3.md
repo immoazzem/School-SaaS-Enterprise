@@ -337,8 +337,13 @@ Latest verification:
 - `php artisan route:list --path=api/schools --except-vendor`: passed with 161 routes.
 
 Remaining Phase 3 work:
-- Nuxt workspaces and browser checks for Marks/Grades, Finance, Payroll, Employee Attendance, and Leave.
+- Nuxt workspaces and browser checks are complete for Marks/Grades, Finance, Payroll, Employee Attendance, and Leave.
 - Teacher-assignment enforcement for `marks.enter.own` still needs the teacher-to-class-subject assignment model before it can be enforced safely. The permissions are seeded and the admin/principal `marks.enter.any` path is implemented.
+
+Latest frontend verification:
+- `npm run build`: passed with existing Nuxt/Nitro warnings.
+- Agent-browser rendered `/schools/1/marks`, `/schools/1/finance`, and `/schools/1/staff-operations` with no Vite overlay.
+- Screenshots saved at `docs/browser-checks/marks-workspace.png`, `docs/browser-checks/finance-workspace.png`, and `docs/browser-checks/staff-operations-workspace.png`.
 
 ---
 

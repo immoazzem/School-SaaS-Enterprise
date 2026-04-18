@@ -221,11 +221,21 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
   - employee attendance upsert records
   - leave types, leave balances, leave application approval/reject/cancel workflow
   - enhanced student attendance bulk upsert with late arrival, half-day, and leave references
+- Phase 3 Operations Nuxt workspaces are complete:
+  - `/schools/{schoolId}/marks`
+  - `/schools/{schoolId}/finance`
+  - `/schools/{schoolId}/staff-operations`
+  - dashboard navigation and actions for Marks, Finance, and Staff Ops
 - Latest backend verification after Phase 3 Operations backend:
   - `php artisan migrate:fresh --seed` passed against MySQL
   - `php artisan test` passed with 53 tests / 370 assertions
   - `vendor\bin\pint --test` passed
   - `php artisan route:list --path=api/schools --except-vendor` passed with 161 routes
+- Latest frontend verification after Phase 3 Operations Nuxt workspaces:
+  - `npm run build` passed with existing Nuxt/Nitro warnings
+  - agent-browser rendered Marks, Finance, and Staff Operations pages with no Vite overlay
+  - screenshots saved in `docs/browser-checks/`
+- Git note: `feat: add phase 3 operations workspaces` is committed locally, but pushing to GitHub failed because `github.com:443` was unreachable. Local `master` is one commit ahead of `origin/master`.
 - API index endpoints now return paginated envelopes with top-level `data`, `meta`, and `links`; frontend list code can continue reading `data` as the record array.
 - Shared audit logging lives in `App\Services\AuditLogger` and `App\Http\Controllers\Controller::recordAudit()`.
 - School show/update endpoints exist at `GET/PATCH /api/schools/{school}` with `school.member` and `schools.manage` enforcement for update.
@@ -268,7 +278,7 @@ School-SaaS-Enterprise/
 1. Phase 0: Audit the legacy app and write docs.
 2. Phase 1: Build enterprise foundation and Academic Classes vertical slice.
 3. Phase 2: Academic setup and people modules is complete for the current foundation: Academic Classes, Sections, Years, Subjects, Class Subjects, Student Groups, Shifts, Designations, Employees, Guardians, Students, Enrollments, and Teacher Profiles.
-4. Phase 3: Attendance foundation, Phase 3.0 Stabilization, Exams API/Nuxt workspace, and backend APIs through Phase 3I are complete; remaining Phase 3 work is Nuxt workspace coverage and browser verification for Marks/Grades, Finance, Payroll, Employee Attendance, and Leave.
+4. Phase 3: Attendance foundation, Phase 3.0 Stabilization, Exams API/Nuxt workspace, and backend/Nuxt workspaces through Phase 3I are complete.
 5. Phase 4: Reports, PDFs, calendar, and operations.
 6. Phase 5: SaaS administration and billing placeholders.
 

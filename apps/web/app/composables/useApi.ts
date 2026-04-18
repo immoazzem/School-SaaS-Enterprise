@@ -239,6 +239,9 @@ export interface StudentAttendanceRecord {
   student_enrollment_id: number
   attendance_date: string
   status: 'present' | 'absent' | 'late' | 'excused'
+  late_arrival_time: string | null
+  half_day: boolean
+  leave_reference: string | null
   remarks: string | null
   student_enrollment?: Pick<StudentEnrollment, 'id' | 'student_id' | 'academic_class_id' | 'roll_no'> & {
     student?: Pick<Student, 'id' | 'admission_no' | 'full_name'>
@@ -258,6 +261,169 @@ export interface TeacherProfile {
   bio: string | null
   status: string
   employee?: Pick<Employee, 'id' | 'employee_no' | 'full_name' | 'email' | 'phone'>
+}
+
+export interface GradeScale {
+  id: number
+  school_id: number
+  name: string
+  code: string
+  min_percent: string
+  max_percent: string
+  grade_point: string
+  fail_below_percent: string | null
+  gpa_calculation_method: 'weighted' | 'simple_average'
+  status: string
+}
+
+export interface MarksEntry {
+  id: number
+  school_id: number
+  exam_id: number
+  class_subject_id: number
+  student_enrollment_id: number
+  marks_obtained: string | null
+  full_marks: number
+  pass_marks: number
+  is_absent: boolean
+  absent_reason: string | null
+  verification_status: 'pending' | 'verified' | 'rejected'
+  voided: boolean
+  remarks: string | null
+  exam?: Pick<Exam, 'id' | 'name' | 'code'>
+  class_subject?: Pick<ClassSubject, 'id' | 'academic_class_id' | 'subject_id' | 'full_marks' | 'pass_marks'> & {
+    subject?: Pick<Subject, 'id' | 'name' | 'code'>
+    academic_class?: Pick<AcademicClass, 'id' | 'name' | 'code'>
+  }
+  student_enrollment?: Pick<StudentEnrollment, 'id' | 'student_id' | 'academic_class_id' | 'roll_no'> & {
+    student?: Pick<Student, 'id' | 'admission_no' | 'full_name'>
+  }
+}
+
+export interface FeeCategory {
+  id: number
+  school_id: number
+  name: string
+  code: string
+  description: string | null
+  billing_type: 'monthly' | 'one_time' | 'per_exam' | 'optional'
+  sort_order: number
+  status: string
+}
+
+export interface FeeStructure {
+  id: number
+  school_id: number
+  fee_category_id: number
+  academic_year_id: number
+  academic_class_id: number | null
+  amount: string
+  due_day_of_month: number | null
+  months_applicable: string[] | null
+  is_recurring: boolean
+  status: string
+  fee_category?: Pick<FeeCategory, 'id' | 'name' | 'code' | 'billing_type'>
+  academic_year?: Pick<AcademicYear, 'id' | 'name'>
+  academic_class?: Pick<AcademicClass, 'id' | 'name' | 'code'> | null
+}
+
+export interface DiscountPolicy {
+  id: number
+  school_id: number
+  name: string
+  code: string
+  discount_type: 'flat' | 'percent'
+  amount: string
+  applies_to_category_ids: number[] | null
+  is_stackable: boolean
+  status: string
+}
+
+export interface StudentInvoice {
+  id: number
+  school_id: number
+  student_enrollment_id: number
+  academic_year_id: number
+  invoice_no: string
+  fee_month: string | null
+  subtotal: string
+  discount: string
+  total: string
+  paid_amount: string
+  status: 'unpaid' | 'partial' | 'paid' | 'voided'
+  due_date: string | null
+  student_enrollment?: Pick<StudentEnrollment, 'id' | 'roll_no'> & {
+    student?: Pick<Student, 'id' | 'admission_no' | 'full_name'>
+    academic_class?: Pick<AcademicClass, 'id' | 'name' | 'code'>
+  }
+}
+
+export interface SalaryRecord {
+  id: number
+  school_id: number
+  employee_id: number
+  academic_year_id: number
+  month: string
+  basic_amount: string
+  allowances: Record<string, number> | null
+  gross_amount: string
+  deductions: Record<string, number> | null
+  total_deductions: string
+  net_amount: string
+  status: 'pending' | 'paid' | 'voided'
+  employee?: Pick<Employee, 'id' | 'employee_no' | 'full_name'>
+}
+
+export interface EmployeeAttendanceRecord {
+  id: number
+  school_id: number
+  employee_id: number
+  date: string
+  status: 'present' | 'absent' | 'late' | 'half_day' | 'on_leave'
+  check_in_time: string | null
+  check_out_time: string | null
+  notes: string | null
+  employee?: Pick<Employee, 'id' | 'employee_no' | 'full_name'>
+}
+
+export interface LeaveType {
+  id: number
+  school_id: number
+  name: string
+  code: string
+  max_days_per_year: number
+  is_paid: boolean
+  requires_approval: boolean
+  status: string
+}
+
+export interface LeaveBalance {
+  id: number
+  school_id: number
+  employee_id: number
+  leave_type_id: number
+  academic_year_id: number
+  total_days: number
+  used_days: number
+  remaining_days: number
+  employee?: Pick<Employee, 'id' | 'employee_no' | 'full_name'>
+  leave_type?: Pick<LeaveType, 'id' | 'name' | 'code'>
+  academic_year?: Pick<AcademicYear, 'id' | 'name'>
+}
+
+export interface LeaveApplication {
+  id: number
+  school_id: number
+  employee_id: number
+  leave_type_id: number
+  from_date: string
+  to_date: string
+  total_days: number
+  reason: string
+  status: 'pending' | 'approved' | 'rejected' | 'cancelled'
+  review_note: string | null
+  employee?: Pick<Employee, 'id' | 'employee_no' | 'full_name'>
+  leave_type?: Pick<LeaveType, 'id' | 'name' | 'code'>
 }
 
 type RequestOptions = {

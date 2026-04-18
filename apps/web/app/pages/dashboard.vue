@@ -80,6 +80,14 @@ const navItems = computed(() => [
     enabled: selectedSchool.value?.permissions?.includes('exams.manage') ?? false,
   },
   {
+    label: 'Marks',
+    active: false,
+    enabled:
+      selectedSchool.value?.permissions?.includes('marks.enter.any')
+      || selectedSchool.value?.permissions?.includes('marks.enter.own')
+      || false,
+  },
+  {
     label: 'Designations',
     active: false,
     enabled: selectedSchool.value?.permissions?.includes('designations.manage') ?? false,
@@ -88,6 +96,15 @@ const navItems = computed(() => [
     label: 'Finance',
     active: false,
     enabled: selectedSchool.value?.permissions?.includes('finance.manage') ?? false,
+  },
+  {
+    label: 'Staff Ops',
+    active: false,
+    enabled:
+      selectedSchool.value?.permissions?.includes('payroll.manage')
+      || selectedSchool.value?.permissions?.includes('employee_attendance.manage')
+      || selectedSchool.value?.permissions?.includes('leave.manage')
+      || false,
   },
 ])
 
@@ -260,6 +277,33 @@ async function openExams() {
   await router.push(`/schools/${auth.selectedSchoolId.value}/exams`)
 }
 
+async function openMarks() {
+  if (!auth.selectedSchoolId.value) {
+    error.value = 'Create or select a school first.'
+    return
+  }
+
+  await router.push(`/schools/${auth.selectedSchoolId.value}/marks`)
+}
+
+async function openFinance() {
+  if (!auth.selectedSchoolId.value) {
+    error.value = 'Create or select a school first.'
+    return
+  }
+
+  await router.push(`/schools/${auth.selectedSchoolId.value}/finance`)
+}
+
+async function openStaffOperations() {
+  if (!auth.selectedSchoolId.value) {
+    error.value = 'Create or select a school first.'
+    return
+  }
+
+  await router.push(`/schools/${auth.selectedSchoolId.value}/staff-operations`)
+}
+
 onMounted(loadDashboard)
 </script>
 
@@ -305,7 +349,13 @@ onMounted(loadDashboard)
                                   ? openAttendance()
                                   : item.label === 'Exams'
                                     ? openExams()
-                                    : undefined
+                                    : item.label === 'Marks'
+                                      ? openMarks()
+                                      : item.label === 'Finance'
+                                        ? openFinance()
+                                        : item.label === 'Staff Ops'
+                                          ? openStaffOperations()
+                                          : undefined
           "
         >
           <span>{{ item.label }}</span>
@@ -448,6 +498,9 @@ onMounted(loadDashboard)
           <button class="button secondary" type="button" @click="openTeachers">Open teachers</button>
           <button class="button secondary" type="button" @click="openAttendance">Open attendance</button>
           <button class="button secondary" type="button" @click="openExams">Open exams</button>
+          <button class="button secondary" type="button" @click="openMarks">Open marks</button>
+          <button class="button secondary" type="button" @click="openFinance">Open finance</button>
+          <button class="button secondary" type="button" @click="openStaffOperations">Open staff ops</button>
         </div>
       </section>
     </section>
