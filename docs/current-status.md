@@ -151,7 +151,7 @@
 
 ## Not Started
 
-- Local MySQL switch is blocked until usable credentials are available.
+- MySQL database creation and local API switch are complete.
 
 ## Verification
 
@@ -225,7 +225,14 @@
 - Saved browser screenshot at `docs/browser-checks/attendance-workspace.png`.
 - Agent-browser opened `http://127.0.0.1:3000/dashboard`, confirmed nonblank content and no error overlay, then opened Academic Classes after Phase 3.0 Stabilization.
 - Saved browser screenshots at `docs/browser-checks/phase-3-stabilization-home.png` and `docs/browser-checks/phase-3-stabilization-academic-classes.png`.
-- Local MySQL check found `mysql.exe` at `C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe`, but `root` without a password returned `ERROR 1045`; `.env` remains SQLite until credentials are available.
+- Local MySQL check found `mysql.exe` at `C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe`; the provided root password worked, MySQL reported version `8.0.45`, and `school_saas_enterprise` was created/confirmed.
+- `php artisan migrate:fresh --seed` from `apps/api`: passed against MySQL.
+- Live Herd API smoke against MySQL passed:
+  - login as `test@example.com`
+  - school creation
+  - paginated `GET /api/schools?per_page=1`
+- Agent-browser login reached `http://127.0.0.1:3000/dashboard` and confirmed the MySQL-created school was visible.
+- Saved browser screenshot at `docs/browser-checks/mysql-dashboard.png`.
 - Nuxt dev server startup from this Codex shell did not become reachable on port 3000; production build remains valid.
 - Initial sandbox runs hit Windows permission/process limits, then passed outside the sandbox with approval.
 
@@ -233,13 +240,12 @@
 
 Continue Phase 3 implementation:
 
-1. Configure Laravel API for local MySQL once DB credentials are confirmed or a dev MySQL user is created.
-2. Continue browser walkthroughs with visible `agent-browser` as each page/module lands.
-3. Continue Phase 3 with Exams.
+1. Continue browser walkthroughs with visible `agent-browser` as each page/module lands.
+2. Continue Phase 3 with Exams.
 
-Current page/module complete: Phase 3.0 Stabilization.
+Current page/module complete: Phase 3.0 MySQL local switch.
 Phase 2 status: complete for the current academic setup and people foundation.
-Phase 3 status: Phase 3.0 Stabilization complete except the credential-blocked MySQL switch.
+Phase 3 status: Phase 3.0 Stabilization fully complete.
 Next page/module: Phase 3 Exams.
 
 ## New Session Startup Prompt

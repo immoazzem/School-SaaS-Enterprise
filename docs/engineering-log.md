@@ -278,3 +278,17 @@ MySQL note: local MySQL is running on `3306`, and the client exists at `C:\Progr
 Phase 3 status: Phase 3.0 Stabilization complete except the credential-blocked local MySQL switch.
 
 Next: commit and push this checkpoint, then continue Phase 3 with Exams.
+
+### MySQL Local Switch
+
+Current page/module complete: Phase 3.0 MySQL local switch.
+
+Scope: created/confirmed the local MySQL database `school_saas_enterprise`, switched ignored local `apps/api/.env` from SQLite to MySQL, and verified the Laravel API through Herd against MySQL.
+
+Verification: MySQL accepted the provided root password and reported version `8.0.45`; `php artisan migrate:fresh --seed` passed against MySQL; `php artisan test` passed with 47 tests / 293 assertions; `vendor\bin\pint --test` passed; `php artisan route:list --path=api/schools` passed; live Herd API smoke passed for login, school creation, and paginated school listing; agent-browser login reached `http://127.0.0.1:3000/dashboard` and confirmed the MySQL-created school was visible. Browser screenshot saved at `docs/browser-checks/mysql-dashboard.png`.
+
+Local notes: MySQL client path is `C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe`; local API `.env` uses `DB_CONNECTION=mysql`, database `school_saas_enterprise`, username `root`, and the user-provided local password.
+
+Phase 3 status: Phase 3.0 Stabilization fully complete.
+
+Next: commit and push this checkpoint, then continue Phase 3 with Exams.

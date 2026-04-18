@@ -51,8 +51,8 @@ Completed:
 - Fix 3: School show/update endpoints with `schools.manage` enforcement and audit logging.
 - Fix 4: Named auth/API rate limiters.
 
-Blocked:
-- Fix 5: Local MySQL switch. MySQL is listening on `3306`, and the client is available at `C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe`, but `root` without a password returns `ERROR 1045`. The API local `.env` remains SQLite until usable credentials are available or a dev MySQL user is created.
+Completed after credential confirmation:
+- Fix 5: Local MySQL switch. MySQL is listening on `3306`, the client is available at `C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe`, MySQL reported version `8.0.45`, and `school_saas_enterprise` was created/confirmed. The ignored local API `.env` now uses MySQL.
 
 Latest verification:
 - `php artisan test`: 47 tests / 293 assertions.
@@ -60,6 +60,9 @@ Latest verification:
 - `php artisan route:list --path=api/schools`: passed.
 - `npm run build`: passed with existing Nuxt/Nitro warnings.
 - Agent-browser dashboard and Academic Classes smoke check passed.
+- `php artisan migrate:fresh --seed`: passed against MySQL.
+- Live Herd API smoke passed against MySQL for login, school creation, and paginated school listing.
+- Agent-browser login reached the dashboard and confirmed the MySQL-created school was visible.
 
 ---
 
