@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\InvoicePayment;
 use App\Models\School;
+use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,6 +14,8 @@ use Illuminate\Validation\Rule;
 
 class InvoicePaymentController extends Controller
 {
+    public function __construct(private readonly NotificationService $notificationService) {}
+
     public function index(Request $request, School $school): JsonResponse
     {
         $this->authorizeFinance($request, $school);
@@ -34,6 +38,8 @@ class InvoicePaymentController extends Controller
 
             return $payment->load($this->relations());
         });
+
+        $this->notifyPaymentReceived($school, $payment);
 
         return response()->json(['data' => $payment], 201);
     }
@@ -84,6 +90,35 @@ class InvoicePaymentController extends Controller
 
     private function relations(): array
     {
-        return ['studentInvoice:id,invoice_no,total,paid_amount,status,student_enrollment_id', 'studentInvoice.studentEnrollment.student:id,full_name,admission_no'];
+        return [
+            'studentInvoice:id,invoice_no,total,paid_amount,status,student_enrollment_id',
+            'studentInvoice.studentEnrollment.student:id,guardian_id,full_name,admission_no,email',
+            'studentInvoice.studentEnrollment.student.guardian:id,full_name,email',
+        ];
+    }
+
+    private function notifyPaymentReceived(School $school, InvoicePayment $payment): void
+    {
+        $payment->loadMissing($this->relations());
+        $student = $payment->studentInvoice?->studentEnrollment?->student;
+        $emails = collect([$student?->email, $student?->guardian?->email])->filter()->unique()->values();
+
+        if ($emails->isEmpty()) {
+            return;
+        }
+
+        User::query()
+            ->whereIn('email', $emails)
+            ->whereHas('schoolMemberships', fn ($query) => $query
+                ->where('school_id', $school->id)
+                ->where('status', 'active'))
+            ->get()
+            ->each(fn (User $recipient) => $this->notificationService->send($recipient, $school, 'payment.received', [
+                'title' => 'Payment received',
+                'body' => "Payment {$payment->amount} received for invoice {$payment->studentInvoice->invoice_no}.",
+                'invoice_id' => $payment->student_invoice_id,
+                'payment_id' => $payment->id,
+                'amount' => $payment->amount,
+            ]));
     }
 }

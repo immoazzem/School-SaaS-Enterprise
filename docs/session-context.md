@@ -241,7 +241,25 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
   - `npm run build` passed with existing Nuxt/Nitro warnings
   - agent-browser rendered Marks, Finance, and Staff Operations pages with no Vite overlay
   - screenshots saved in `docs/browser-checks/`
-- Git note: `feat: add phase 3 operations workspaces` is committed locally, but pushing to GitHub failed because `github.com:443` was unreachable. Local `master` is one commit ahead of `origin/master`.
+- Phase 4 reporting backend foundation is complete:
+  - `result_summaries`
+  - result publish endpoint
+  - result summary listing endpoint
+  - employee attendance summary endpoint
+  - in-app notification inbox endpoints
+- Phase 4 calendar and notification hooks backend is complete:
+  - `calendar_events`
+  - calendar CRUD routes
+  - holiday bulk import route
+  - `calendar.manage` permission
+  - `payment.received` notifications for matched student/guardian user accounts
+  - `leave.approved` and `leave.rejected` notifications for matched employee user accounts
+- Latest backend verification after Phase 4 calendar and notification hooks:
+  - `php artisan migrate:fresh --seed` passed against MySQL
+  - `php artisan test` passed with 60 tests / 410 assertions
+  - `vendor\bin\pint --test` passed
+  - `php artisan route:list --path=api/schools --except-vendor` passed with 173 routes
+- Git note: Phase 3 and Phase 4 reporting foundation are pushed to GitHub. Phase 4 calendar/notification hooks are ready to commit and push.
 - API index endpoints now return paginated envelopes with top-level `data`, `meta`, and `links`; frontend list code can continue reading `data` as the record array.
 - Shared audit logging lives in `App\Services\AuditLogger` and `App\Http\Controllers\Controller::recordAudit()`.
 - School show/update endpoints exist at `GET/PATCH /api/schools/{school}` with `school.member` and `schools.manage` enforcement for update.

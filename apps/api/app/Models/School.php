@@ -296,6 +296,14 @@ class School extends Model
     }
 
     /**
+     * @return HasMany<CalendarEvent, $this>
+     */
+    public function calendarEvents(): HasMany
+    {
+        return $this->hasMany(CalendarEvent::class);
+    }
+
+    /**
      * @return HasMany<ResultSummary, $this>
      */
     public function resultSummaries(): HasMany

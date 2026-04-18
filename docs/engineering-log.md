@@ -384,3 +384,21 @@ Phase 4 status: backend foundation started and checkpointed for result publicati
 Checkpoint: committed and pushed as `8e6bc3a feat: add phase 4 reporting foundation`.
 
 Next: continue with Phase 4 PDFs/calendar/notification hooks or the Nuxt reports workspace.
+
+### Phase 4 Calendar and Notification Hooks Backend
+
+Current page/module complete: Phase 4 Calendar and Notification Hooks backend.
+
+Scope: continued `docs/enterprise-plan-v3.md` with `docs/enterprise-plan.md` as the v2 baseline. Added:
+- `calendar_events` with optional academic year, optional class scope, holiday flag, RRULE storage, creator tracking, soft deletes, and tenant indexes.
+- Calendar CRUD routes under `/api/schools/{school}/calendar-events`.
+- Holiday bulk import route at `/api/schools/{school}/calendar-events/bulk-import-holidays`.
+- Seeded `calendar.manage` permission for owner/admin/principal-style management.
+- In-app `payment.received` notifications for matched student/guardian user accounts using active school membership and email matching.
+- In-app `leave.approved` and `leave.rejected` notifications for matched employee user accounts using active school membership and email matching.
+
+Verification: targeted `php artisan test --filter=PhaseFourReportingApiTest` passed with 7 tests / 40 assertions; full `php artisan test` passed with 60 tests / 410 assertions; `php artisan migrate:fresh --seed` passed against MySQL; `vendor\bin\pint --test` passed; `php artisan route:list --path=api/schools --except-vendor` passed and showed 173 school routes.
+
+Phase 4 status: result publication, cached summaries, employee attendance summary, in-app notification inbox, school calendar backend, holiday import, and payment/leave notification hooks are implemented. Remaining Phase 4 work includes PDFs, document management, dashboard analytics, Nuxt report/calendar/publication workspaces, browser checks, and richer recipient mapping once student/parent/employee account ownership models are introduced.
+
+Next: commit and push this Phase 4 calendar/notifications checkpoint, then continue with PDFs, document management, analytics, or the Nuxt Phase 4 workspace.

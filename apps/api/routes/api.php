@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AcademicClassController;
 use App\Http\Controllers\Api\AcademicSectionController;
 use App\Http\Controllers\Api\AcademicYearController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CalendarEventController;
 use App\Http\Controllers\Api\ClassSubjectController;
 use App\Http\Controllers\Api\DesignationController;
 use App\Http\Controllers\Api\DiscountPolicyController;
@@ -53,6 +54,11 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
     Route::apiResource('schools.academic-years', AcademicYearController::class)
         ->middleware('school.member');
     Route::apiResource('schools.academic-sections', AcademicSectionController::class)
+        ->middleware('school.member');
+    Route::post('schools/{school}/calendar-events/bulk-import-holidays', [CalendarEventController::class, 'bulkImportHolidays'])
+        ->middleware('school.member');
+    Route::apiResource('schools.calendar-events', CalendarEventController::class)
+        ->parameters(['calendar-events' => 'calendarEvent'])
         ->middleware('school.member');
     Route::apiResource('schools.class-subjects', ClassSubjectController::class)
         ->parameters(['class-subjects' => 'classSubject'])

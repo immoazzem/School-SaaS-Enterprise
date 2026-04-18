@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\LeaveApplication;
 use App\Models\School;
+use App\Models\User;
 use App\Services\LeaveWorkflowService;
+use App\Services\NotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -13,7 +15,10 @@ use Illuminate\Validation\Rule;
 
 class LeaveApplicationController extends Controller
 {
-    public function __construct(private readonly LeaveWorkflowService $leaveWorkflowService) {}
+    public function __construct(
+        private readonly LeaveWorkflowService $leaveWorkflowService,
+        private readonly NotificationService $notificationService,
+    ) {}
 
     public function index(Request $request, School $school): JsonResponse
     {
@@ -74,6 +79,7 @@ class LeaveApplicationController extends Controller
         $validated = $request->validate(['review_note' => ['nullable', 'string', 'max:2000']]);
         $application = $this->leaveWorkflowService->approve($school, $leaveApplication, $request->user(), $validated['review_note'] ?? null);
         $this->recordAudit($request, $school, 'leave.approved', $application, ['new' => $application->toArray()]);
+        $this->notifyLeaveDecision($school, $application, 'leave.approved');
 
         return response()->json(['data' => $application->load($this->relations())]);
     }
@@ -85,6 +91,7 @@ class LeaveApplicationController extends Controller
         $validated = $request->validate(['review_note' => ['nullable', 'string', 'max:2000']]);
         $application = $this->leaveWorkflowService->reject($leaveApplication, $request->user(), $validated['review_note'] ?? null);
         $this->recordAudit($request, $school, 'leave.rejected', $application, ['new' => $application->toArray()]);
+        $this->notifyLeaveDecision($school, $application, 'leave.rejected');
 
         return response()->json(['data' => $application->load($this->relations())]);
     }
@@ -118,5 +125,33 @@ class LeaveApplicationController extends Controller
     private function relations(): array
     {
         return ['employee:id,employee_no,full_name', 'leaveType:id,name,code', 'reviewer:id,name'];
+    }
+
+    private function notifyLeaveDecision(School $school, LeaveApplication $application, string $type): void
+    {
+        $application->loadMissing(['employee:id,email,full_name', 'leaveType:id,name,code']);
+
+        if (! $application->employee?->email) {
+            return;
+        }
+
+        $recipient = User::query()
+            ->where('email', $application->employee->email)
+            ->whereHas('schoolMemberships', fn ($query) => $query
+                ->where('school_id', $school->id)
+                ->where('status', 'active'))
+            ->first();
+
+        if (! $recipient) {
+            return;
+        }
+
+        $approved = $type === 'leave.approved';
+        $this->notificationService->send($recipient, $school, $type, [
+            'title' => $approved ? 'Leave approved' : 'Leave rejected',
+            'body' => "{$application->leaveType?->name} from {$application->from_date->toDateString()} to {$application->to_date->toDateString()} was ".($approved ? 'approved.' : 'rejected.'),
+            'leave_application_id' => $application->id,
+            'status' => $application->status,
+        ]);
     }
 }
