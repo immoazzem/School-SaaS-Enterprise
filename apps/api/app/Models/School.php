@@ -294,4 +294,36 @@ class School extends Model
     {
         return $this->hasMany(LeaveApplication::class);
     }
+
+    /**
+     * @return HasMany<ResultSummary, $this>
+     */
+    public function resultSummaries(): HasMany
+    {
+        return $this->hasMany(ResultSummary::class);
+    }
+
+    /**
+     * @return HasMany<SchoolNotification, $this>
+     */
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(SchoolNotification::class);
+    }
+
+    /**
+     * @return HasMany<NotificationTemplate, $this>
+     */
+    public function notificationTemplates(): HasMany
+    {
+        return $this->hasMany(NotificationTemplate::class);
+    }
+
+    /**
+     * @return HasMany<SmsLog, $this>
+     */
+    public function smsLogs(): HasMany
+    {
+        return $this->hasMany(SmsLog::class);
+    }
 }

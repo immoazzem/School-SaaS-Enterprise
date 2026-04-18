@@ -364,3 +364,21 @@ Phase 3 status: complete for backend APIs, Nuxt workspaces, build, and browser s
 Checkpoint: committed locally as `feat: add phase 3 operations workspaces`. Push to GitHub failed because `github.com:443` was unreachable from the machine after repeated attempts; `master` is one commit ahead of `origin/master`.
 
 Next: push the local commit when GitHub connectivity returns, then begin Phase 4 reports, result publication, PDFs, calendar, notifications, and analytics.
+
+### Phase 4 Result Publication and Reporting Backend Foundation
+
+Current page/module complete: Phase 4 Result Publication and Reports backend foundation.
+
+Scope: followed `docs/enterprise-plan-v3.md` with `docs/enterprise-plan.md` as the v2 baseline. Added the first Phase 4 backend slice:
+- `result_summaries` cache table for published exam totals, percentages, GPA, grade, pass/fail, and class position.
+- In-app notification tables and models, with SMS log scaffolding for the optional Phase 4 communication add-on.
+- Result publication service and `POST /api/schools/{school}/exams/{exam}/publish`, requiring `exams.publish`, setting publication fields, recomputing summaries, auditing `result.published`, and notifying active school members.
+- Result summaries endpoint at `GET /api/schools/{school}/exams/{exam}/result-summaries`, protecting unpublished results unless the actor has `exams.manage`.
+- Employee attendance summary endpoint at `GET /api/schools/{school}/attendance/employee-summary`.
+- Notification inbox endpoints for list, unread count, and mark-read.
+
+Verification: targeted `php artisan test --filter=PhaseFourReportingApiTest` passed with 4 tests / 26 assertions; full `php artisan test` passed with 57 tests / 396 assertions; `php artisan migrate:fresh --seed` passed against MySQL; `vendor\bin\pint --test` passed; `php artisan route:list --path=api/schools --except-vendor` passed and showed 167 school routes.
+
+Phase 4 status: backend foundation started and checkpointed for result publication, result summary reports, employee attendance summary, and in-app notifications. Remaining Phase 4 work includes PDFs, school calendar, richer notification hooks, document management, Nuxt report/publication workspaces, browser checks, and analytics.
+
+Next: commit and push this Phase 4 backend checkpoint, then continue with Phase 4 PDFs/calendar/notification hooks or the Nuxt reports workspace.

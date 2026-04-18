@@ -76,4 +76,12 @@ class Exam extends Model
     {
         return $this->hasMany(ExamSchedule::class);
     }
+
+    /**
+     * @return HasMany<ResultSummary, $this>
+     */
+    public function resultSummaries(): HasMany
+    {
+        return $this->hasMany(ResultSummary::class);
+    }
 }

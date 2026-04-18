@@ -16,6 +16,12 @@ Active implementation plan:
 D:\Development\School-SaaS-Enterprise\docs\enterprise-plan-v3.md
 ```
 
+Planning rule:
+
+```text
+docs/enterprise-plan.md is the v2 baseline. Whenever docs/enterprise-plan-v3.md mentions v2, it means docs/enterprise-plan.md. All v2 baseline rules remain primary, and v3 adds to and extends them unless a section explicitly says otherwise.
+```
+
 Target project folder:
 
 ```text
@@ -424,6 +430,7 @@ npm run lint
 ```text
 Read D:\Development\School-SaaS-Enterprise-CONTEXT.md first.
 Then continue the School SaaS Enterprise rebuild from the current workspace state.
-Use D:\Development\School-SaaS-Enterprise-PLAN.md only when you need full detail.
+Use D:\Development\School-SaaS-Enterprise\docs\enterprise-plan-v3.md as the active plan.
+When v3 mentions v2, read D:\Development\School-SaaS-Enterprise\docs\enterprise-plan.md as the v2 baseline.
 Minimize token usage by summarizing large files instead of pasting them.
 ```

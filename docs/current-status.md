@@ -1,5 +1,7 @@
 # Current Status
 
+Planning rule: `docs/enterprise-plan.md` is the v2 baseline. Whenever `docs/enterprise-plan-v3.md` mentions v2, it means `docs/enterprise-plan.md`. All v2 baseline rules remain primary, and v3 adds to and extends them unless a section explicitly says otherwise.
+
 ## Completed
 
 - Created new workspace at `D:\Development\School-SaaS-Enterprise`.
@@ -279,20 +281,22 @@
 
 Continue with Phase 4 implementation:
 
-1. Begin Phase 4 result publication and reporting foundation.
-2. Continue browser walkthroughs with visible `agent-browser` as each page/module lands.
+1. Continue from the Phase 4 backend foundation.
+2. Add the remaining Phase 4 PDFs, school calendar, richer notification hooks, document management, Nuxt report/publication workspace, browser checks, and analytics.
 
-Current page/module complete: Phase 3 Operations Nuxt workspaces.
+Current page/module complete: Phase 4 Result Publication and Reports backend foundation.
 Phase 2 status: complete for the current academic setup and people foundation.
 Phase 3 status: complete for backend APIs, Nuxt workspaces, build, and browser smoke checks.
-Git status: local `master` is one commit ahead of `origin/master` because pushing `feat: add phase 3 operations workspaces` to GitHub timed out on `github.com:443`.
-Next page/module: Phase 4 Result Publication and Reports foundation.
+Phase 4 status: backend foundation started for result publication, cached summaries, employee attendance summary, and in-app notifications.
+Git status: Phase 4 backend foundation is ready to commit and push.
+Next page/module: Phase 4 PDFs, Calendar, Notifications, or Nuxt Reports workspace.
 
 ## New Session Startup Prompt
 
 ```text
 Read D:\Development\School-SaaS-Enterprise-CONTEXT.md and D:\Development\School-SaaS-Enterprise\docs\current-status.md.
 Continue from the current status.
-Only read D:\Development\School-SaaS-Enterprise-PLAN.md or docs\enterprise-plan.md if more detail is needed.
+Use D:\Development\School-SaaS-Enterprise\docs\enterprise-plan-v3.md as the active plan.
+When v3 mentions v2, read D:\Development\School-SaaS-Enterprise\docs\enterprise-plan.md as the v2 baseline.
 Minimize token usage.
 ```
