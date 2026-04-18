@@ -199,6 +199,15 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - Show/use the browser during UI phases at natural checkpoints: after a page is added, after login/navigation changes, and before committing a successful phase.
 - Maintain `docs/engineering-log.md` after each successful step, and update `docs/current-status.md` plus this file before ending long sessions.
 - Phase 3.0 Stabilization is fully complete, including the local MySQL switch.
+- Phase 3 Exams foundation API is complete: `exam_types`, `exams`, and `exam_schedules`.
+- Exam types include `weightage_percent`.
+- Exams include `is_published`, `published_at`, and `published_by`.
+- Exam schedules link to `class_subjects` so future marks entry can source `full_marks` and `pass_marks` from class-subject assignments.
+- Exam foundation routes:
+  - `/api/schools/{school}/exam-types`
+  - `/api/schools/{school}/exams`
+  - `/api/schools/{school}/exam-schedules`
+- Seeded permissions include `exams.manage` and `exams.publish`.
 - API index endpoints now return paginated envelopes with top-level `data`, `meta`, and `links`; frontend list code can continue reading `data` as the record array.
 - Shared audit logging lives in `App\Services\AuditLogger` and `App\Http\Controllers\Controller::recordAudit()`.
 - School show/update endpoints exist at `GET/PATCH /api/schools/{school}` with `school.member` and `schools.manage` enforcement for update.
@@ -241,7 +250,7 @@ School-SaaS-Enterprise/
 1. Phase 0: Audit the legacy app and write docs.
 2. Phase 1: Build enterprise foundation and Academic Classes vertical slice.
 3. Phase 2: Academic setup and people modules is complete for the current foundation: Academic Classes, Sections, Years, Subjects, Class Subjects, Student Groups, Shifts, Designations, Employees, Guardians, Students, Enrollments, and Teacher Profiles.
-4. Phase 3: Attendance foundation and Phase 3.0 Stabilization are complete; exams and finance remain.
+4. Phase 3: Attendance foundation, Phase 3.0 Stabilization, and Exam foundation API are complete; Exam frontend, marks, finance, and leave remain.
 5. Phase 4: Reports, PDFs, calendar, and operations.
 6. Phase 5: SaaS administration and billing placeholders.
 

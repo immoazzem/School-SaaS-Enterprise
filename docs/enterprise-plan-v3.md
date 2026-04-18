@@ -81,6 +81,15 @@ exam_types    +  weightage_percent decimal(5,2) nullable
 exams         +  is_published boolean default false, published_at timestamp nullable, published_by FK users
 ```
 
+Status — 2026-04-18:
+- Backend API complete for `exam_types`, `exams`, and `exam_schedules`.
+- `exam_types.weightage_percent` implemented.
+- `exams.is_published`, `published_at`, and `published_by` implemented.
+- `exam_schedules` link to `class_subjects` so marks entry can source marks configuration from class-subject assignments.
+- `exams.manage` policies and `exams.publish` permission seeded.
+- Latest backend verification: `php artisan test` passed with 49 tests / 320 assertions; `vendor\bin\pint --test` passed; `php artisan migrate:fresh --seed` passed against MySQL; live Herd API smoke passed.
+- Frontend Nuxt workspace is next.
+
 ### 3B — Marks Entry
 
 No changes from v2. Keep voided boolean, verification workflow, and bulk endpoint.

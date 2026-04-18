@@ -160,6 +160,30 @@ class School extends Model
     }
 
     /**
+     * @return HasMany<ExamType, $this>
+     */
+    public function examTypes(): HasMany
+    {
+        return $this->hasMany(ExamType::class);
+    }
+
+    /**
+     * @return HasMany<Exam, $this>
+     */
+    public function exams(): HasMany
+    {
+        return $this->hasMany(Exam::class);
+    }
+
+    /**
+     * @return HasMany<ExamSchedule, $this>
+     */
+    public function examSchedules(): HasMany
+    {
+        return $this->hasMany(ExamSchedule::class);
+    }
+
+    /**
      * @return HasMany<TeacherProfile, $this>
      */
     public function teacherProfiles(): HasMany

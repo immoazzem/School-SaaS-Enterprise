@@ -292,3 +292,15 @@ Local notes: MySQL client path is `C:\Program Files\MySQL\MySQL Server 8.0\bin\m
 Phase 3 status: Phase 3.0 Stabilization fully complete.
 
 Next: commit and push this checkpoint, then continue Phase 3 with Exams.
+
+### Exam Foundation API
+
+Current page/module complete: Phase 3 Exams foundation API, routes `/api/schools/{school}/exam-types`, `/api/schools/{school}/exams`, and `/api/schools/{school}/exam-schedules`.
+
+Scope: followed `docs/enterprise-plan-v3.md` Phase 3A by adding exam type weightage, exam publication fields, and class-subject exam schedules. Added migrations, models, school relationships, policies, tenant-scoped controllers, routes, audit logs, seeded `exams.publish`, and feature tests for CRUD, pagination, default unpublished exams, eager-loaded schedule relationships, and cross-school rejection.
+
+Verification: `php artisan test` passed with 49 tests / 320 assertions; `vendor\bin\pint --test` passed; `php artisan route:list --path=api/schools --except-vendor` passed and showed 89 routes; `php artisan migrate:fresh --seed` passed against MySQL; live Herd API smoke passed for exam type, exam, and exam schedule creation plus paginated schedule listing.
+
+Phase 3 status: Exam foundation API complete.
+
+Next: commit and push this checkpoint, then add the Nuxt Exams workspace.

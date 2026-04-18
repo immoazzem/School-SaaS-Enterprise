@@ -7,6 +7,9 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClassSubjectController;
 use App\Http\Controllers\Api\DesignationController;
 use App\Http\Controllers\Api\EmployeeController;
+use App\Http\Controllers\Api\ExamController;
+use App\Http\Controllers\Api\ExamScheduleController;
+use App\Http\Controllers\Api\ExamTypeController;
 use App\Http\Controllers\Api\GuardianController;
 use App\Http\Controllers\Api\SchoolController;
 use App\Http\Controllers\Api\ShiftController;
@@ -40,6 +43,14 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
     Route::apiResource('schools.designations', DesignationController::class)
         ->middleware('school.member');
     Route::apiResource('schools.employees', EmployeeController::class)
+        ->middleware('school.member');
+    Route::apiResource('schools.exam-schedules', ExamScheduleController::class)
+        ->parameters(['exam-schedules' => 'examSchedule'])
+        ->middleware('school.member');
+    Route::apiResource('schools.exam-types', ExamTypeController::class)
+        ->parameters(['exam-types' => 'examType'])
+        ->middleware('school.member');
+    Route::apiResource('schools.exams', ExamController::class)
         ->middleware('school.member');
     Route::apiResource('schools.guardians', GuardianController::class)
         ->middleware('school.member');

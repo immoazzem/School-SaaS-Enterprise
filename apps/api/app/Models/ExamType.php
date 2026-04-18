@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class AcademicYear extends Model
+class ExamType extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -16,18 +16,17 @@ class AcademicYear extends Model
         'school_id',
         'name',
         'code',
-        'starts_on',
-        'ends_on',
-        'is_current',
+        'weightage_percent',
+        'description',
+        'sort_order',
         'status',
     ];
 
     protected function casts(): array
     {
         return [
-            'starts_on' => 'date:Y-m-d',
-            'ends_on' => 'date:Y-m-d',
-            'is_current' => 'boolean',
+            'weightage_percent' => 'decimal:2',
+            'sort_order' => 'integer',
         ];
     }
 
@@ -37,14 +36,6 @@ class AcademicYear extends Model
     public function school(): BelongsTo
     {
         return $this->belongsTo(School::class);
-    }
-
-    /**
-     * @return HasMany<StudentEnrollment, $this>
-     */
-    public function studentEnrollments(): HasMany
-    {
-        return $this->hasMany(StudentEnrollment::class);
     }
 
     /**

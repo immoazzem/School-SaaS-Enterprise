@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ClassSubject extends Model
@@ -54,5 +55,13 @@ class ClassSubject extends Model
     public function subject(): BelongsTo
     {
         return $this->belongsTo(Subject::class);
+    }
+
+    /**
+     * @return HasMany<ExamSchedule, $this>
+     */
+    public function examSchedules(): HasMany
+    {
+        return $this->hasMany(ExamSchedule::class);
     }
 }

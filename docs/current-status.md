@@ -149,9 +149,10 @@
 - Installed `agent-browser@0.26.0` globally for browser automation checks.
 - Installed agent-browser Chrome runtime `147.0.7727.57`.
 
-## Not Started
+## Milestone Notes
 
 - MySQL database creation and local API switch are complete.
+- Phase 3 Exams foundation API is complete.
 
 ## Verification
 
@@ -227,12 +228,24 @@
 - Saved browser screenshots at `docs/browser-checks/phase-3-stabilization-home.png` and `docs/browser-checks/phase-3-stabilization-academic-classes.png`.
 - Local MySQL check found `mysql.exe` at `C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe`; the provided root password worked, MySQL reported version `8.0.45`, and `school_saas_enterprise` was created/confirmed.
 - `php artisan migrate:fresh --seed` from `apps/api`: passed against MySQL.
+- Added exam foundation backend:
+  - `exam_types` with `weightage_percent`
+  - `exams` with `is_published`, `published_at`, and `published_by`
+  - `exam_schedules` linked to `class_subjects`
+  - tenant-scoped Exam Type, Exam, and Exam Schedule APIs
+  - `exams.manage` policies and `exams.publish` seeded permission
+  - audit logs for create/update/delete
 - Live Herd API smoke against MySQL passed:
   - login as `test@example.com`
   - school creation
   - paginated `GET /api/schools?per_page=1`
 - Agent-browser login reached `http://127.0.0.1:3000/dashboard` and confirmed the MySQL-created school was visible.
 - Saved browser screenshot at `docs/browser-checks/mysql-dashboard.png`.
+- `php artisan test` from `apps/api`: passed after Exam foundation API, 49 tests / 320 assertions.
+- `vendor\bin\pint --test` from `apps/api`: passed after Exam foundation API.
+- `php artisan route:list --path=api/schools --except-vendor` from `apps/api`: passed after Exam foundation API, 89 routes.
+- `php artisan migrate:fresh --seed` from `apps/api`: passed against MySQL after Exam foundation API.
+- Live Herd API smoke passed for exam type, exam, exam schedule creation, and paginated schedule listing.
 - Nuxt dev server startup from this Codex shell did not become reachable on port 3000; production build remains valid.
 - Initial sandbox runs hit Windows permission/process limits, then passed outside the sandbox with approval.
 
@@ -240,13 +253,13 @@
 
 Continue Phase 3 implementation:
 
-1. Continue browser walkthroughs with visible `agent-browser` as each page/module lands.
-2. Continue Phase 3 with Exams.
+1. Add the Nuxt Exams workspace.
+2. Continue browser walkthroughs with visible `agent-browser` as each page/module lands.
 
-Current page/module complete: Phase 3.0 MySQL local switch.
+Current page/module complete: Phase 3 Exams foundation API.
 Phase 2 status: complete for the current academic setup and people foundation.
-Phase 3 status: Phase 3.0 Stabilization fully complete.
-Next page/module: Phase 3 Exams.
+Phase 3 status: Exam foundation API complete.
+Next page/module: Nuxt Exams workspace.
 
 ## New Session Startup Prompt
 

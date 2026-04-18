@@ -5,29 +5,28 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class AcademicYear extends Model
+class ExamSchedule extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'school_id',
-        'name',
-        'code',
-        'starts_on',
-        'ends_on',
-        'is_current',
+        'exam_id',
+        'class_subject_id',
+        'exam_date',
+        'starts_at',
+        'ends_at',
+        'room',
+        'instructions',
         'status',
     ];
 
     protected function casts(): array
     {
         return [
-            'starts_on' => 'date:Y-m-d',
-            'ends_on' => 'date:Y-m-d',
-            'is_current' => 'boolean',
+            'exam_date' => 'date:Y-m-d',
         ];
     }
 
@@ -40,18 +39,18 @@ class AcademicYear extends Model
     }
 
     /**
-     * @return HasMany<StudentEnrollment, $this>
+     * @return BelongsTo<Exam, $this>
      */
-    public function studentEnrollments(): HasMany
+    public function exam(): BelongsTo
     {
-        return $this->hasMany(StudentEnrollment::class);
+        return $this->belongsTo(Exam::class);
     }
 
     /**
-     * @return HasMany<Exam, $this>
+     * @return BelongsTo<ClassSubject, $this>
      */
-    public function exams(): HasMany
+    public function classSubject(): BelongsTo
     {
-        return $this->hasMany(Exam::class);
+        return $this->belongsTo(ClassSubject::class);
     }
 }

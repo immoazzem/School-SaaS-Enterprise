@@ -9,6 +9,7 @@ use App\Models\AuditLog;
 use App\Models\ClassSubject;
 use App\Models\Designation;
 use App\Models\Employee;
+use App\Models\ExamSchedule;
 use App\Models\Guardian;
 use App\Models\Permission;
 use App\Models\Role;
@@ -1413,6 +1414,147 @@ class EnterpriseFoundationApiTest extends TestCase
             ->assertJsonValidationErrors('employee_id');
     }
 
+    public function test_school_member_can_manage_exam_types_exams_and_schedules(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Exam School', 'slug' => 'exam-school']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'exams.manage', 'exams');
+
+        $academicYear = $school->academicYears()->create([
+            'name' => 'Academic Year 2026',
+            'code' => 'AY-2026',
+            'starts_on' => '2026-01-01',
+            'ends_on' => '2026-12-31',
+        ]);
+        $academicClass = $school->academicClasses()->create(['name' => 'Class One', 'code' => 'C1']);
+        $subject = $school->subjects()->create(['name' => 'Mathematics', 'code' => 'MATH']);
+        $classSubject = $school->classSubjects()->create([
+            'academic_class_id' => $academicClass->id,
+            'subject_id' => $subject->id,
+            'full_marks' => 100,
+            'pass_marks' => 33,
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $type = $this->postJson("/api/schools/{$school->id}/exam-types", [
+            'name' => 'Midterm',
+            'code' => 'MID',
+            'weightage_percent' => 40,
+            'description' => 'First term weighted exam.',
+        ]);
+
+        $type
+            ->assertCreated()
+            ->assertJsonPath('data.code', 'MID')
+            ->assertJsonPath('data.weightage_percent', '40.00');
+
+        $examTypeId = $type->json('data.id');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'exam_type.created',
+            'auditable_id' => $examTypeId,
+        ]);
+
+        $exam = $this->postJson("/api/schools/{$school->id}/exams", [
+            'exam_type_id' => $examTypeId,
+            'academic_year_id' => $academicYear->id,
+            'name' => 'Midterm 2026',
+            'code' => 'MID-2026',
+            'starts_on' => '2026-06-01',
+            'ends_on' => '2026-06-15',
+            'status' => 'scheduled',
+        ]);
+
+        $exam
+            ->assertCreated()
+            ->assertJsonPath('data.code', 'MID-2026')
+            ->assertJsonPath('data.is_published', false)
+            ->assertJsonPath('data.exam_type.id', $examTypeId)
+            ->assertJsonPath('data.academic_year.id', $academicYear->id);
+
+        $examId = $exam->json('data.id');
+
+        $this->assertDatabaseHas('exams', [
+            'id' => $examId,
+            'is_published' => false,
+            'published_at' => null,
+            'published_by' => null,
+        ]);
+
+        $schedule = $this->postJson("/api/schools/{$school->id}/exam-schedules", [
+            'exam_id' => $examId,
+            'class_subject_id' => $classSubject->id,
+            'exam_date' => '2026-06-03',
+            'starts_at' => '10:00',
+            'ends_at' => '12:00',
+            'room' => 'Room 101',
+        ]);
+
+        $schedule
+            ->assertCreated()
+            ->assertJsonPath('data.class_subject.academic_class.name', 'Class One')
+            ->assertJsonPath('data.class_subject.subject.code', 'MATH')
+            ->assertJsonPath('data.class_subject.full_marks', 100);
+
+        $scheduleId = $schedule->json('data.id');
+
+        $this->getJson("/api/schools/{$school->id}/exam-schedules?exam_id={$examId}")
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $scheduleId)
+            ->assertJsonPath('meta.total', 1);
+
+        $this->patchJson("/api/schools/{$school->id}/exam-schedules/{$scheduleId}", [
+            'room' => 'Room 202',
+        ])->assertOk()
+            ->assertJsonPath('data.room', 'Room 202');
+
+        $this->deleteJson("/api/schools/{$school->id}/exam-schedules/{$scheduleId}")
+            ->assertNoContent();
+
+        $this->assertSoftDeleted(ExamSchedule::class, ['id' => $scheduleId]);
+    }
+
+    public function test_exam_foundation_rejects_cross_school_records(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Exam Tenant', 'slug' => 'exam-tenant']);
+        $otherSchool = School::query()->create(['name' => 'Foreign Exam Tenant', 'slug' => 'foreign-exam-tenant']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'exams.manage', 'exams');
+
+        $foreignExamType = $otherSchool->examTypes()->create(['name' => 'Foreign Type', 'code' => 'FOREIGN']);
+        $academicYear = $school->academicYears()->create([
+            'name' => 'Academic Year 2026',
+            'code' => 'AY-2026',
+            'starts_on' => '2026-01-01',
+            'ends_on' => '2026-12-31',
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/exams", [
+            'exam_type_id' => $foreignExamType->id,
+            'academic_year_id' => $academicYear->id,
+            'name' => 'Blocked Exam',
+            'code' => 'BLOCKED',
+            'starts_on' => '2026-06-01',
+            'ends_on' => '2026-06-10',
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors('exam_type_id');
+    }
+
     public function test_section_creation_rejects_classes_from_another_school(): void
     {
         $user = User::factory()->create();
@@ -1784,6 +1926,8 @@ class EnterpriseFoundationApiTest extends TestCase
         $this->assertDatabaseHas('permissions', ['key' => 'enrollments.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'teachers.manage']);
         $this->assertDatabaseHas('permissions', ['key' => 'attendance.manage']);
+        $this->assertDatabaseHas('permissions', ['key' => 'exams.manage']);
+        $this->assertDatabaseHas('permissions', ['key' => 'exams.publish']);
         $this->assertDatabaseHas('permissions', ['key' => 'audit.view']);
         $this->assertDatabaseHas('roles', ['key' => 'super-admin', 'is_system' => true]);
         $this->assertDatabaseHas('roles', ['key' => 'read-only-auditor', 'is_system' => true]);
