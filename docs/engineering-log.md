@@ -264,3 +264,17 @@ Verification: `php artisan test` passed with 43 tests / 274 assertions; `vendor\
 Phase 3 status: Attendance foundation complete.
 
 Next: commit and push this checkpoint, then continue Phase 3 with Exams.
+
+### Phase 3.0 Stabilization
+
+Current page/module complete: Phase 3.0 Stabilization foundation, before Exams.
+
+Scope: accepted `docs/enterprise-plan-v3.md` as the active enterprise plan, added a shared `AuditLogger` service, centralized controller audit logging, added capped pagination helpers, paginated all index API endpoints without changing the frontend-facing top-level `data` list shape, added School show/update endpoints with `schools.manage` enforcement and audit logging, and added named auth/API rate limiters.
+
+Verification: `php artisan test` passed with 47 tests / 293 assertions; `vendor\bin\pint --test` passed; `php artisan route:list --path=api/schools` passed and showed School index/store/show/update routes; `npm run build` passed with the existing Nuxt/Nitro warnings; agent-browser opened `http://127.0.0.1:3000/dashboard`, confirmed nonblank content and no error overlay, opened Academic Classes, and saved screenshots at `docs/browser-checks/phase-3-stabilization-home.png` and `docs/browser-checks/phase-3-stabilization-academic-classes.png`.
+
+MySQL note: local MySQL is running on `3306`, and the client exists at `C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe`, but `root` without a password is rejected with `ERROR 1045`. The API `.env` remains on SQLite until credentials are supplied or a passwordless/dev MySQL user is created.
+
+Phase 3 status: Phase 3.0 Stabilization complete except the credential-blocked local MySQL switch.
+
+Next: commit and push this checkpoint, then continue Phase 3 with Exams.

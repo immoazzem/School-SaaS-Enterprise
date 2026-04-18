@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\AcademicSection;
-use App\Models\AuditLog;
 use App\Models\School;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -35,9 +34,9 @@ class AcademicSectionController extends Controller
             ->with('academicClass:id,name,code')
             ->orderBy('sort_order')
             ->orderBy('name')
-            ->get();
+            ->paginate($this->perPage($request));
 
-        return response()->json(['data' => $sections]);
+        return response()->json($this->paginated($sections));
     }
 
     public function store(Request $request, School $school): JsonResponse
@@ -158,27 +157,5 @@ class AcademicSectionController extends Controller
         ]);
 
         return response()->json(status: 204);
-    }
-
-    /**
-     * @param  array<string, mixed>  $metadata
-     */
-    private function recordAudit(
-        Request $request,
-        School $school,
-        string $event,
-        AcademicSection $academicSection,
-        array $metadata
-    ): void {
-        AuditLog::query()->create([
-            'school_id' => $school->id,
-            'actor_id' => $request->user()->id,
-            'event' => $event,
-            'auditable_type' => $academicSection->getMorphClass(),
-            'auditable_id' => $academicSection->id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'metadata' => $metadata,
-        ]);
     }
 }

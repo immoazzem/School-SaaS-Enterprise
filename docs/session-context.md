@@ -10,6 +10,12 @@ Master plan:
 D:\Development\School-SaaS-Enterprise-PLAN.md
 ```
 
+Active implementation plan:
+
+```text
+D:\Development\School-SaaS-Enterprise\docs\enterprise-plan-v3.md
+```
+
 Target project folder:
 
 ```text
@@ -192,6 +198,16 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - `agent-browser@0.26.0` is installed globally with Chrome runtime `147.0.7727.57` and should be used after dev server starts.
 - Show/use the browser during UI phases at natural checkpoints: after a page is added, after login/navigation changes, and before committing a successful phase.
 - Maintain `docs/engineering-log.md` after each successful step, and update `docs/current-status.md` plus this file before ending long sessions.
+- Phase 3.0 Stabilization is complete except for the credential-blocked local MySQL switch.
+- API index endpoints now return paginated envelopes with top-level `data`, `meta`, and `links`; frontend list code can continue reading `data` as the record array.
+- Shared audit logging lives in `App\Services\AuditLogger` and `App\Http\Controllers\Controller::recordAudit()`.
+- School show/update endpoints exist at `GET/PATCH /api/schools/{school}` with `school.member` and `schools.manage` enforcement for update.
+- Auth/API rate limiters are registered in `App\Providers\AppServiceProvider`.
+- Local MySQL discovery:
+  - server is listening on `3306`
+  - client path is `C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe`
+  - `root` without password fails with `ERROR 1045`
+  - `apps/api/.env` remains SQLite until credentials are available or a dev MySQL user is created
 
 ## Required Project Structure
 
@@ -223,7 +239,7 @@ School-SaaS-Enterprise/
 1. Phase 0: Audit the legacy app and write docs.
 2. Phase 1: Build enterprise foundation and Academic Classes vertical slice.
 3. Phase 2: Academic setup and people modules is complete for the current foundation: Academic Classes, Sections, Years, Subjects, Class Subjects, Student Groups, Shifts, Designations, Employees, Guardians, Students, Enrollments, and Teacher Profiles.
-4. Phase 3: Attendance foundation is complete; exams and finance remain.
+4. Phase 3: Attendance foundation and Phase 3.0 Stabilization are complete except the credential-blocked MySQL switch; exams and finance remain.
 5. Phase 4: Reports, PDFs, calendar, and operations.
 6. Phase 5: SaaS administration and billing placeholders.
 

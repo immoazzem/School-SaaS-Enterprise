@@ -123,6 +123,16 @@
 - Added Nuxt Attendance workspace with active enrollment selection, date/status/search filters, create/edit/delete flows, and status summaries.
 - Added dashboard navigation/action button for Attendance.
 - Added typed Nuxt `StudentAttendanceRecord` API shape.
+- Accepted `docs/enterprise-plan-v3.md` as the active enterprise plan.
+- Added Phase 3.0 Stabilization before Exams:
+  - shared `AuditLogger` service
+  - centralized controller audit logging
+  - capped `per_page` helper
+  - consistent paginated API envelope with top-level `data`, `meta`, and `links`
+  - paginated all index endpoints
+  - School show/update endpoints
+  - `schools.manage` enforcement and audit logging for school updates
+  - auth and API rate limiters
 - Added explicit Laravel CORS config for local Nuxt origins.
 - Added project `agent-browser.json` so future browser checks can run visibly and tolerate Herd local HTTPS certificates.
 - Updated Laravel and Nuxt env examples for Herd/MySQL local development.
@@ -141,7 +151,7 @@
 
 ## Not Started
 
-- MySQL database creation.
+- Local MySQL switch is blocked until usable credentials are available.
 
 ## Verification
 
@@ -158,6 +168,7 @@
 - `php artisan test` from `apps/api`: passed after Enrollments workspace, 37 tests / 233 assertions.
 - `php artisan test` from `apps/api`: passed after Teacher Profiles workspace, 40 tests / 251 assertions.
 - `php artisan test` from `apps/api`: passed after Attendance workspace, 43 tests / 274 assertions.
+- `php artisan test` from `apps/api`: passed after Phase 3.0 Stabilization, 47 tests / 293 assertions.
 - `vendor\bin\pint --test` from `apps/api`: passed after Academic Years API.
 - `vendor\bin\pint --test` from `apps/api`: passed after Academic Years frontend/CORS phase.
 - `vendor\bin\pint --test` from `apps/api`: passed after Subjects workspace.
@@ -169,6 +180,7 @@
 - `vendor\bin\pint --test` from `apps/api`: passed after Enrollments workspace.
 - `vendor\bin\pint --test` from `apps/api`: passed after Teacher Profiles workspace.
 - `vendor\bin\pint --test` from `apps/api`: passed after Attendance workspace.
+- `vendor\bin\pint --test` from `apps/api`: passed after Phase 3.0 Stabilization.
 - `php artisan route:list` from `apps/api`: passed, 41 routes.
 - `agent-browser --version`: passed, `agent-browser 0.26.0`.
 - `agent-browser` local web smoke check passed:
@@ -194,6 +206,8 @@
 - `npm run build` from `apps/web`: passed after Enrollments workspace, with existing Nuxt/Nitro warnings.
 - `npm run build` from `apps/web`: passed after Teacher Profiles workspace, with existing Nuxt/Nitro warnings.
 - `npm run build` from `apps/web`: passed after Attendance workspace, with existing Nuxt/Nitro warnings.
+- `npm run build` from `apps/web`: passed after Phase 3.0 Stabilization, with existing Nuxt/Nitro warnings.
+- `php artisan route:list --path=api/schools` from `apps/api`: passed after Phase 3.0 Stabilization.
 - Agent-browser opened `http://127.0.0.1:3000/` and confirmed the login page rendered. Authenticated browser login was blocked inside the automation browser by local Herd HTTPS fetch handling before the project browser config was added; continue visual checks with the new `agent-browser.json`.
 - Agent-browser authenticated against the live app, reached `http://127.0.0.1:3000/dashboard`, opened `http://127.0.0.1:3000/schools/1/subjects`, and verified creating `Mathematics / MATH-101` through the live Herd API.
 - Agent-browser opened `http://127.0.0.1:3000/schools/1/student-groups` and verified creating `Science Group / SCI-01` through the live Herd API.
@@ -209,6 +223,9 @@
 - Saved browser screenshot at `docs/browser-checks/teacher-profiles-workspace.png`.
 - Agent-browser opened `http://127.0.0.1:3000/schools/1/attendance`, confirmed no error overlay and nonblank content, and verified creating `Nadia Rahman / ADM-2026-0001` as `Present` on `2026-04-18` through the live Herd API.
 - Saved browser screenshot at `docs/browser-checks/attendance-workspace.png`.
+- Agent-browser opened `http://127.0.0.1:3000/dashboard`, confirmed nonblank content and no error overlay, then opened Academic Classes after Phase 3.0 Stabilization.
+- Saved browser screenshots at `docs/browser-checks/phase-3-stabilization-home.png` and `docs/browser-checks/phase-3-stabilization-academic-classes.png`.
+- Local MySQL check found `mysql.exe` at `C:\Program Files\MySQL\MySQL Server 8.0\bin\mysql.exe`, but `root` without a password returned `ERROR 1045`; `.env` remains SQLite until credentials are available.
 - Nuxt dev server startup from this Codex shell did not become reachable on port 3000; production build remains valid.
 - Initial sandbox runs hit Windows permission/process limits, then passed outside the sandbox with approval.
 
@@ -216,13 +233,13 @@
 
 Continue Phase 3 implementation:
 
-1. Configure Laravel API for local MySQL once DB credentials are confirmed.
+1. Configure Laravel API for local MySQL once DB credentials are confirmed or a dev MySQL user is created.
 2. Continue browser walkthroughs with visible `agent-browser` as each page/module lands.
 3. Continue Phase 3 with Exams.
 
-Current page/module complete: Attendance API/Nuxt workspace.
+Current page/module complete: Phase 3.0 Stabilization.
 Phase 2 status: complete for the current academic setup and people foundation.
-Phase 3 status: Attendance foundation complete.
+Phase 3 status: Phase 3.0 Stabilization complete except the credential-blocked MySQL switch.
 Next page/module: Phase 3 Exams.
 
 ## New Session Startup Prompt

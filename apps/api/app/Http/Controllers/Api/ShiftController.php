@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\AuditLog;
 use App\Models\School;
 use App\Models\Shift;
 use Illuminate\Http\JsonResponse;
@@ -34,9 +33,9 @@ class ShiftController extends Controller
             ->orderBy('sort_order')
             ->orderBy('starts_at')
             ->orderBy('name')
-            ->get();
+            ->paginate($this->perPage($request));
 
-        return response()->json(['data' => $shifts]);
+        return response()->json($this->paginated($shifts));
     }
 
     public function store(Request $request, School $school): JsonResponse
@@ -125,22 +124,5 @@ class ShiftController extends Controller
         ]);
 
         return response()->json(status: 204);
-    }
-
-    /**
-     * @param  array<string, mixed>  $metadata
-     */
-    private function recordAudit(Request $request, School $school, string $event, Shift $shift, array $metadata): void
-    {
-        AuditLog::query()->create([
-            'school_id' => $school->id,
-            'actor_id' => $request->user()->id,
-            'event' => $event,
-            'auditable_type' => $shift->getMorphClass(),
-            'auditable_id' => $shift->id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'metadata' => $metadata,
-        ]);
     }
 }

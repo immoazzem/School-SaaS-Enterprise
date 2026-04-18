@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\AuditLog;
 use App\Models\Designation;
 use App\Models\School;
 use Illuminate\Http\JsonResponse;
@@ -33,9 +32,9 @@ class DesignationController extends Controller
             })
             ->orderBy('sort_order')
             ->orderBy('name')
-            ->get();
+            ->paginate($this->perPage($request));
 
-        return response()->json(['data' => $designations]);
+        return response()->json($this->paginated($designations));
     }
 
     public function store(Request $request, School $school): JsonResponse
@@ -128,22 +127,5 @@ class DesignationController extends Controller
     private function auditedFields(): array
     {
         return ['name', 'code', 'description', 'sort_order', 'status'];
-    }
-
-    /**
-     * @param  array<string, mixed>  $metadata
-     */
-    private function recordAudit(Request $request, School $school, string $event, Designation $designation, array $metadata): void
-    {
-        AuditLog::query()->create([
-            'school_id' => $school->id,
-            'actor_id' => $request->user()->id,
-            'event' => $event,
-            'auditable_type' => $designation->getMorphClass(),
-            'auditable_id' => $designation->id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'metadata' => $metadata,
-        ]);
     }
 }

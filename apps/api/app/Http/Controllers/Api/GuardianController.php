@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\AuditLog;
 use App\Models\Guardian;
 use App\Models\School;
 use Illuminate\Http\JsonResponse;
@@ -34,9 +33,9 @@ class GuardianController extends Controller
                 });
             })
             ->orderBy('full_name')
-            ->get();
+            ->paginate($this->perPage($request));
 
-        return response()->json(['data' => $guardians]);
+        return response()->json($this->paginated($guardians));
     }
 
     public function store(Request $request, School $school): JsonResponse
@@ -113,22 +112,5 @@ class GuardianController extends Controller
     private function auditedFields(): array
     {
         return ['full_name', 'relationship', 'phone', 'email', 'occupation', 'address', 'status'];
-    }
-
-    /**
-     * @param  array<string, mixed>  $metadata
-     */
-    private function recordAudit(Request $request, School $school, string $event, Guardian $guardian, array $metadata): void
-    {
-        AuditLog::query()->create([
-            'school_id' => $school->id,
-            'actor_id' => $request->user()->id,
-            'event' => $event,
-            'auditable_type' => $guardian->getMorphClass(),
-            'auditable_id' => $guardian->id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'metadata' => $metadata,
-        ]);
     }
 }

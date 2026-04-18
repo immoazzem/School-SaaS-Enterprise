@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\AuditLog;
 use App\Models\School;
 use App\Models\StudentAttendanceRecord;
 use Illuminate\Http\JsonResponse;
@@ -41,9 +40,9 @@ class StudentAttendanceRecordController extends Controller
             })
             ->orderByDesc('attendance_date')
             ->orderBy('id')
-            ->get();
+            ->paginate($this->perPage($request));
 
-        return response()->json(['data' => $records]);
+        return response()->json($this->paginated($records));
     }
 
     public function store(Request $request, School $school): JsonResponse
@@ -150,22 +149,5 @@ class StudentAttendanceRecordController extends Controller
             'studentEnrollment.student:id,admission_no,full_name',
             'studentEnrollment.academicClass:id,name,code',
         ];
-    }
-
-    /**
-     * @param  array<string, mixed>  $metadata
-     */
-    private function recordAudit(Request $request, School $school, string $event, StudentAttendanceRecord $record, array $metadata): void
-    {
-        AuditLog::query()->create([
-            'school_id' => $school->id,
-            'actor_id' => $request->user()->id,
-            'event' => $event,
-            'auditable_type' => $record->getMorphClass(),
-            'auditable_id' => $record->id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'metadata' => $metadata,
-        ]);
     }
 }

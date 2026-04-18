@@ -30,7 +30,10 @@ use App\Policies\StudentGroupPolicy;
 use App\Policies\StudentPolicy;
 use App\Policies\SubjectPolicy;
 use App\Policies\TeacherProfilePolicy;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -48,6 +51,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        RateLimiter::for('auth', fn (Request $request): Limit => Limit::perMinute(10)->by(
+            $request->ip().'|'.$request->input('email', '')
+        ));
+
+        RateLimiter::for('api', fn (Request $request): Limit => Limit::perMinute(120)->by(
+            optional($request->user())->id ?: $request->ip()
+        ));
+
         Gate::policy(AcademicClass::class, AcademicClassPolicy::class);
         Gate::policy(AcademicSection::class, AcademicSectionPolicy::class);
         Gate::policy(AcademicYear::class, AcademicYearPolicy::class);

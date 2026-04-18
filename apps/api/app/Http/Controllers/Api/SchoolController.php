@@ -9,6 +9,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class SchoolController extends Controller
 {
@@ -17,9 +18,9 @@ class SchoolController extends Controller
         $schools = $request->user()
             ->schools()
             ->orderBy('schools.name')
-            ->get(['schools.id', 'schools.public_id', 'schools.name', 'schools.slug', 'schools.status']);
+            ->paginate($this->perPage($request), ['schools.id', 'schools.public_id', 'schools.name', 'schools.slug', 'schools.status']);
 
-        return response()->json(['data' => $schools]);
+        return response()->json($this->paginated($schools));
     }
 
     public function store(Request $request): JsonResponse
@@ -63,5 +64,41 @@ class SchoolController extends Controller
         });
 
         return response()->json(['data' => $school], 201);
+    }
+
+    public function show(Request $request, School $school): JsonResponse
+    {
+        return response()->json(['data' => $school]);
+    }
+
+    public function update(Request $request, School $school): JsonResponse
+    {
+        abort_unless($request->user()->hasSchoolPermission($school, 'schools.manage'), 403);
+
+        $validated = $request->validate([
+            'name' => ['sometimes', 'required', 'string', 'max:160'],
+            'slug' => [
+                'sometimes',
+                'required',
+                'string',
+                'max:180',
+                Rule::unique('schools', 'slug')->ignore($school->id),
+            ],
+            'status' => ['sometimes', Rule::in(['active', 'archived'])],
+            'timezone' => ['sometimes', 'required', 'string', 'max:80'],
+            'locale' => ['sometimes', 'required', 'string', 'max:12'],
+            'settings' => ['sometimes', 'nullable', 'array'],
+        ]);
+
+        $oldValues = $school->only(array_keys($validated));
+
+        $school->update($validated);
+
+        $this->recordAudit($request, $school, 'school.updated', $school, [
+            'old' => $oldValues,
+            'new' => $school->fresh()->only(array_keys($validated)),
+        ]);
+
+        return response()->json(['data' => $school->fresh()]);
     }
 }

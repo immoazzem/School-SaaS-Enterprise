@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\AuditLog;
 use App\Models\School;
 use App\Models\TeacherProfile;
 use Illuminate\Http\JsonResponse;
@@ -38,9 +37,9 @@ class TeacherProfileController extends Controller
                 });
             })
             ->orderBy('teacher_no')
-            ->get();
+            ->paginate($this->perPage($request));
 
-        return response()->json(['data' => $profiles]);
+        return response()->json($this->paginated($profiles));
     }
 
     public function store(Request $request, School $school): JsonResponse
@@ -140,22 +139,5 @@ class TeacherProfileController extends Controller
             'bio',
             'status',
         ];
-    }
-
-    /**
-     * @param  array<string, mixed>  $metadata
-     */
-    private function recordAudit(Request $request, School $school, string $event, TeacherProfile $profile, array $metadata): void
-    {
-        AuditLog::query()->create([
-            'school_id' => $school->id,
-            'actor_id' => $request->user()->id,
-            'event' => $event,
-            'auditable_type' => $profile->getMorphClass(),
-            'auditable_id' => $profile->id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'metadata' => $metadata,
-        ]);
     }
 }

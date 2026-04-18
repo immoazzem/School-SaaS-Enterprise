@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\AuditLog;
 use App\Models\ClassSubject;
 use App\Models\School;
 use Illuminate\Http\JsonResponse;
@@ -42,9 +41,9 @@ class ClassSubjectController extends Controller
             })
             ->orderBy('sort_order')
             ->orderBy('id')
-            ->get();
+            ->paginate($this->perPage($request));
 
-        return response()->json(['data' => $assignments]);
+        return response()->json($this->paginated($assignments));
     }
 
     public function store(Request $request, School $school): JsonResponse
@@ -153,22 +152,5 @@ class ClassSubjectController extends Controller
             'sort_order',
             'status',
         ];
-    }
-
-    /**
-     * @param  array<string, mixed>  $metadata
-     */
-    private function recordAudit(Request $request, School $school, string $event, ClassSubject $assignment, array $metadata): void
-    {
-        AuditLog::query()->create([
-            'school_id' => $school->id,
-            'actor_id' => $request->user()->id,
-            'event' => $event,
-            'auditable_type' => $assignment->getMorphClass(),
-            'auditable_id' => $assignment->id,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'metadata' => $metadata,
-        ]);
     }
 }

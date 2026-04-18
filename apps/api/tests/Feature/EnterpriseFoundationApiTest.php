@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\AcademicClass;
 use App\Models\AcademicSection;
 use App\Models\AcademicYear;
+use App\Models\AuditLog;
 use App\Models\ClassSubject;
 use App\Models\Designation;
 use App\Models\Employee;
@@ -96,6 +97,104 @@ class EnterpriseFoundationApiTest extends TestCase
                 ->where('user.schools.0.permissions', fn ($permissions): bool => $permissions->contains('academic_classes.manage'))
                 ->etc()
             );
+    }
+
+    public function test_school_index_returns_paginated_school_memberships(): void
+    {
+        $user = User::factory()->create();
+        $alphaSchool = School::query()->create(['name' => 'Alpha Academy', 'slug' => 'alpha-academy']);
+        $betaSchool = School::query()->create(['name' => 'Beta Academy', 'slug' => 'beta-academy']);
+
+        foreach ([$alphaSchool, $betaSchool] as $school) {
+            $school->memberships()->create([
+                'user_id' => $user->id,
+                'status' => 'active',
+                'joined_at' => now(),
+            ]);
+        }
+
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/schools?per_page=1')
+            ->assertOk()
+            ->assertJsonPath('data.0.id', $alphaSchool->id)
+            ->assertJsonPath('meta.per_page', 1)
+            ->assertJsonPath('meta.total', 2)
+            ->assertJsonStructure(['data', 'meta', 'links']);
+    }
+
+    public function test_school_manager_can_show_and_update_school_settings(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Enterprise School', 'slug' => 'enterprise-school']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+        $this->grantSchoolPermission($user, $school, 'schools.manage', 'schools');
+
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/schools/{$school->id}")
+            ->assertOk()
+            ->assertJsonPath('data.id', $school->id);
+
+        $this->patchJson("/api/schools/{$school->id}", [
+            'name' => 'Enterprise School Prime',
+            'timezone' => 'Asia/Dhaka',
+            'settings' => ['academic_week_start' => 'sunday'],
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.name', 'Enterprise School Prime')
+            ->assertJsonPath('data.timezone', 'Asia/Dhaka')
+            ->assertJsonPath('data.settings.academic_week_start', 'sunday');
+
+        $this->assertDatabaseHas('schools', [
+            'id' => $school->id,
+            'name' => 'Enterprise School Prime',
+            'timezone' => 'Asia/Dhaka',
+        ]);
+
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'school.updated',
+            'auditable_type' => (new School)->getMorphClass(),
+            'auditable_id' => $school->id,
+        ]);
+
+        $auditLog = AuditLog::query()->where('event', 'school.updated')->firstOrFail();
+        $this->assertSame('Enterprise School', $auditLog->metadata['old']['name']);
+        $this->assertSame('Enterprise School Prime', $auditLog->metadata['new']['name']);
+    }
+
+    public function test_active_school_member_without_permission_cannot_update_school_settings(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Limited School', 'slug' => 'limited-school']);
+        $school->memberships()->create([
+            'user_id' => $user->id,
+            'status' => 'active',
+            'joined_at' => now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $this->patchJson("/api/schools/{$school->id}", [
+            'name' => 'Blocked Update',
+        ])->assertForbidden();
+    }
+
+    public function test_non_member_cannot_show_school_settings(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Private School', 'slug' => 'private-school']);
+
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/schools/{$school->id}")
+            ->assertForbidden();
     }
 
     public function test_school_member_can_manage_academic_classes(): void
