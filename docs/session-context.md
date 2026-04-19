@@ -566,6 +566,36 @@ npm run lint
 
 ## Latest Checkpoint
 
+Current page/module complete: Phase 7D Multi-Language Support backend foundation.
+
+Latest Phase 7D backend status:
+
+- Added nullable `name_bn` columns to students and employees.
+- Added localized `display_name` accessors to `Student` and `Employee`.
+- Added reusable school/request locale selection:
+  - explicit `?locale=bn|en` wins.
+  - Bengali `Accept-Language` can opt into Bengali responses.
+  - otherwise the school locale is used, falling back to English.
+- Student and employee APIs now apply school locale before serializing responses.
+- Student and employee create/update validation accepts `name_bn`.
+- Student and employee search includes Bengali names.
+- Student and employee audit payloads include `name_bn`.
+- Added Laravel JSON translations at `apps/api/lang/en.json` and `apps/api/lang/bn.json`.
+- Added `apps/api/tests/Feature/PhaseSevenLocalizationApiTest.php`.
+
+Latest Phase 7D backend verification:
+
+- `php artisan test --filter=PhaseSevenLocalization`: 3 tests / 20 assertions passed.
+- `vendor\bin\pint --dirty`: passed after import-order formatting.
+- `php artisan migrate --force`: applied `2026_04_20_010000_add_multilingual_name_fields`.
+- `php artisan test`: 117 tests / 702 assertions passed.
+
+Next page/module:
+
+- Phase 7D Nuxt i18n frontend integration.
+
+Previous checkpoint:
+
 Current page/module complete: Phase 7C Nuxt Payment Gateway Config workspace.
 
 Latest Phase 7C frontend status:

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +18,7 @@ class Student extends Model
         'guardian_id',
         'admission_no',
         'full_name',
+        'name_bn',
         'father_name',
         'mother_name',
         'email',
@@ -30,12 +32,29 @@ class Student extends Model
         'status',
     ];
 
+    /**
+     * @var list<string>
+     */
+    protected $appends = [
+        'display_name',
+    ];
+
     protected function casts(): array
     {
         return [
             'date_of_birth' => 'date',
             'admitted_on' => 'date',
         ];
+    }
+
+    /**
+     * @return Attribute<string, never>
+     */
+    protected function displayName(): Attribute
+    {
+        return Attribute::get(fn (): string => app()->getLocale() === 'bn' && filled($this->name_bn)
+            ? $this->name_bn
+            : $this->full_name);
     }
 
     /**

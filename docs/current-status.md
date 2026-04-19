@@ -186,7 +186,25 @@ Current page/module complete: Phase 7C Nuxt Payment Gateway Config workspace.
 
 Local site link: `http://127.0.0.1:3000/schools/1/payment-gateways`.
 
-Next page/module: Phase 7D Multi-Language Support planning/backend foundation.
+Current page/module complete: Phase 7D Multi-Language Support backend foundation.
+
+- Added nullable `name_bn` fields to students and employees.
+- Added localized `display_name` accessors to `Student` and `Employee`.
+- Added request/school locale handling for school-scoped responses:
+  - explicit `?locale=bn|en` wins.
+  - Bengali `Accept-Language` can opt into Bengali responses.
+  - otherwise the school locale is used, falling back to English.
+- Student and employee create/update validation now accepts `name_bn`.
+- Student and employee search now includes Bengali names.
+- Student and employee audit payloads include `name_bn`.
+- Added Laravel JSON translation files for `en` and `bn`.
+- Added `apps/api/tests/Feature/PhaseSevenLocalizationApiTest.php`.
+- `php artisan test --filter=PhaseSevenLocalization` passed with 3 tests / 20 assertions.
+- `vendor\bin\pint --dirty` passed after import-order formatting.
+- `php artisan migrate --force` applied the multilingual-name migration locally.
+- `php artisan test` passed with 117 tests / 702 assertions.
+
+Next page/module: Phase 7D Nuxt i18n frontend integration.
 
 ## Completed
 

@@ -23,6 +23,28 @@ abstract class Controller
         return min(max($request->integer('per_page', 15), 1), 100);
     }
 
+    protected function applySchoolLocale(Request $request, School $school): string
+    {
+        $locale = $request->query('locale');
+
+        if (! in_array($locale, ['bn', 'en'], true)) {
+            $acceptLanguage = strtolower((string) $request->header('Accept-Language', ''));
+            $schoolLocale = $school->locale ?: data_get($school->settings, 'locale', 'en');
+
+            $locale = match (true) {
+                str_starts_with($acceptLanguage, 'bn') => 'bn',
+                in_array($schoolLocale, ['bn', 'en'], true) => $schoolLocale,
+                str_starts_with($acceptLanguage, 'en') => 'en',
+                default => 'en',
+            };
+        }
+
+        $locale = in_array($locale, ['bn', 'en'], true) ? $locale : 'en';
+        app()->setLocale($locale);
+
+        return $locale;
+    }
+
     /**
      * @return array{
      *     data: array<int, mixed>,

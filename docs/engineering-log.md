@@ -907,3 +907,21 @@ Verification: `npm run build` from `apps/web` passed with existing classified Nu
 Phase 7C status: backend and Nuxt workspace are complete for gateway configuration. Provider checkout/webhook execution remains future work.
 
 Next: commit and push this Phase 7C UI checkpoint, then continue with Phase 7D Multi-Language Support planning/backend foundation.
+
+### Phase 7D Multi-Language Backend Foundation
+
+Current page/module complete: Phase 7D Multi-Language Support backend foundation.
+
+Scope: started the v3 multi-language support layer on the Laravel side:
+- added nullable `name_bn` fields to students and employees.
+- added localized `display_name` accessors for `Student` and `Employee`.
+- added reusable school/request locale selection for API controllers.
+- updated student and employee controllers to apply locale, accept `name_bn`, search Bengali names, and audit Bengali name changes.
+- added Laravel JSON translation files for English and Bengali under `apps/api/lang`.
+- added focused coverage in `apps/api/tests/Feature/PhaseSevenLocalizationApiTest.php`.
+
+Verification: `php artisan test --filter=PhaseSevenLocalization` passed with 3 tests / 20 assertions; `vendor\bin\pint --dirty` passed after import-order formatting; `php artisan migrate --force` applied `2026_04_20_010000_add_multilingual_name_fields`; full `php artisan test` passed with 117 tests / 702 assertions.
+
+Phase 7D status: backend localization foundation is complete for student and employee display names. Remaining Phase 7D work is the Nuxt i18n frontend integration and visible language switching.
+
+Next: commit and push this Phase 7D backend checkpoint, then continue with the Nuxt i18n frontend slice.

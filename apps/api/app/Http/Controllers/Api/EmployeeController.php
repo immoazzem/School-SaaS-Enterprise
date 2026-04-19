@@ -17,6 +17,7 @@ class EmployeeController extends Controller
 
     public function index(Request $request, School $school): JsonResponse
     {
+        $this->applySchoolLocale($request, $school);
         Gate::authorize('viewAny', [Employee::class, $school]);
 
         $validated = $request->validate([
@@ -35,6 +36,7 @@ class EmployeeController extends Controller
                 $query->where(function ($nestedQuery) use ($search): void {
                     $nestedQuery
                         ->where('full_name', 'like', "%{$search}%")
+                        ->orWhere('name_bn', 'like', "%{$search}%")
                         ->orWhere('employee_no', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%")
                         ->orWhere('phone', 'like', "%{$search}%");
@@ -48,6 +50,7 @@ class EmployeeController extends Controller
 
     public function store(Request $request, School $school): JsonResponse
     {
+        $this->applySchoolLocale($request, $school);
         Gate::authorize('create', [Employee::class, $school]);
         $this->planLimitService->assertCanCreateEmployee($school);
 
@@ -69,6 +72,7 @@ class EmployeeController extends Controller
 
     public function show(Request $request, School $school, Employee $employee): JsonResponse
     {
+        $this->applySchoolLocale($request, $school);
         Gate::authorize('view', [$employee, $school]);
 
         return response()->json(['data' => $employee->load('designation:id,name,code')]);
@@ -76,6 +80,7 @@ class EmployeeController extends Controller
 
     public function update(Request $request, School $school, Employee $employee): JsonResponse
     {
+        $this->applySchoolLocale($request, $school);
         Gate::authorize('update', [$employee, $school]);
 
         $validated = $this->validatedPayload($request, $school, $employee);
@@ -125,6 +130,7 @@ class EmployeeController extends Controller
                     ->ignore($employee?->id),
             ],
             'full_name' => [$employee ? 'sometimes' : 'required', 'string', 'max:160'],
+            'name_bn' => ['nullable', 'string', 'max:160'],
             'father_name' => ['nullable', 'string', 'max:120'],
             'mother_name' => ['nullable', 'string', 'max:120'],
             'email' => ['nullable', 'email', 'max:160'],
@@ -158,6 +164,7 @@ class EmployeeController extends Controller
             'designation_id',
             'employee_no',
             'full_name',
+            'name_bn',
             'father_name',
             'mother_name',
             'email',

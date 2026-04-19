@@ -17,6 +17,7 @@ class StudentController extends Controller
 
     public function index(Request $request, School $school): JsonResponse
     {
+        $this->applySchoolLocale($request, $school);
         Gate::authorize('viewAny', [Student::class, $school]);
 
         $validated = $request->validate([
@@ -33,6 +34,7 @@ class StudentController extends Controller
                 $query->where(function ($nestedQuery) use ($search): void {
                     $nestedQuery
                         ->where('full_name', 'like', "%{$search}%")
+                        ->orWhere('name_bn', 'like', "%{$search}%")
                         ->orWhere('admission_no', 'like', "%{$search}%")
                         ->orWhere('phone', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%");
@@ -46,6 +48,7 @@ class StudentController extends Controller
 
     public function store(Request $request, School $school): JsonResponse
     {
+        $this->applySchoolLocale($request, $school);
         Gate::authorize('create', [Student::class, $school]);
         $this->planLimitService->assertCanCreateStudent($school);
 
@@ -60,6 +63,7 @@ class StudentController extends Controller
 
     public function show(Request $request, School $school, Student $student): JsonResponse
     {
+        $this->applySchoolLocale($request, $school);
         Gate::authorize('view', [$student, $school]);
 
         return response()->json(['data' => $student->load('guardian:id,full_name,relationship,phone')]);
@@ -67,6 +71,7 @@ class StudentController extends Controller
 
     public function update(Request $request, School $school, Student $student): JsonResponse
     {
+        $this->applySchoolLocale($request, $school);
         Gate::authorize('update', [$student, $school]);
 
         $validated = $this->validatedPayload($request, $school, $student);
@@ -116,6 +121,7 @@ class StudentController extends Controller
                     ->ignore($student?->id),
             ],
             'full_name' => [$student ? 'sometimes' : 'required', 'string', 'max:160'],
+            'name_bn' => ['nullable', 'string', 'max:160'],
             'father_name' => ['nullable', 'string', 'max:120'],
             'mother_name' => ['nullable', 'string', 'max:120'],
             'email' => ['nullable', 'email', 'max:160'],
@@ -139,6 +145,7 @@ class StudentController extends Controller
             'guardian_id',
             'admission_no',
             'full_name',
+            'name_bn',
             'father_name',
             'mother_name',
             'email',
