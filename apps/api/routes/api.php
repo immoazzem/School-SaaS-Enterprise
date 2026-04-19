@@ -36,6 +36,7 @@ use App\Http\Controllers\Api\SalaryRecordController;
 use App\Http\Controllers\Api\SchoolAuditLogController;
 use App\Http\Controllers\Api\SchoolController;
 use App\Http\Controllers\Api\SchoolDocumentController;
+use App\Http\Controllers\Api\SchoolInvitationController;
 use App\Http\Controllers\Api\SchoolSettingsController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\StudentAttendanceRecordController;
@@ -55,6 +56,7 @@ Route::post('/auth/login', [AuthController::class, 'login'])->middleware('thrott
 Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/invitations/{token}/accept', [SchoolInvitationController::class, 'accept']);
     Route::middleware('super.admin')->prefix('admin')->group(function (): void {
         Route::get('schools', [SchoolAdminController::class, 'index']);
         Route::get('schools/{school}', [SchoolAdminController::class, 'show']);
@@ -91,6 +93,9 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
     Route::patch('schools/{school}/settings', [SchoolSettingsController::class, 'update'])
         ->middleware('school.member');
     Route::get('schools/{school}/audit-logs', SchoolAuditLogController::class)
+        ->middleware('school.member');
+    Route::apiResource('schools.invitations', SchoolInvitationController::class)
+        ->only(['index', 'store', 'destroy'])
         ->middleware('school.member');
     Route::apiResource('schools.designations', DesignationController::class)
         ->middleware('school.member');

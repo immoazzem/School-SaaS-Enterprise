@@ -513,3 +513,25 @@ Verification: `php artisan test --filter=PhaseFiveSaasAdminApiTest` passed with 
 Phase 5 status: backend foundation is started for v2 5A/5B/5C/5E and v3 5F. Remaining Phase 5 work includes invitation flows, parent/student portal endpoints, data export/right-to-erasure, self-hosted deployment docs, and backup/restore artisan commands.
 
 Next: commit and push this Phase 5 foundation checkpoint, then continue with Phase 5 invitations and portal/data-export APIs.
+
+### Phase 5 Invitation Flow
+
+Current page/module complete: Phase 5 User Invitation backend flow.
+
+Scope: added the v2 invitation system:
+- `school_invitations` table with UUID token, email/name, invited/accepted users, role, status, expiry, and accepted timestamp.
+- `SchoolInvitation` model and `School::invitations()` relationship.
+- Tenant-scoped invitation management endpoints:
+  - `POST /api/schools/{school}/invitations`
+  - `GET /api/schools/{school}/invitations`
+  - `DELETE /api/schools/{school}/invitations/{invitation}`
+- Authenticated token accept endpoint:
+  - `POST /api/invitations/{token}/accept`
+- `users.manage` enforcement for invitation management.
+- Accept flow that validates email ownership, rejects expired/revoked/non-pending tokens, activates school membership, assigns the invited role, and writes audit logs.
+
+Verification: `php artisan test --filter=PhaseFiveSaasAdminApiTest` passed with 7 tests / 42 assertions; full `php artisan test` passed with 72 tests / 487 assertions; `vendor\bin\pint --dirty` formatted the invitation controller; `php artisan migrate --force` applied the invitation migration to local MySQL.
+
+Phase 5 status: invitations are complete. Remaining Phase 5 work includes parent/student portal endpoints, data export/right-to-erasure, self-hosted deployment docs, and backup/restore artisan commands.
+
+Next: commit and push this invitation checkpoint, then continue with parent/student portal endpoints.

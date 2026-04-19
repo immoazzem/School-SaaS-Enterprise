@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\School;
+use App\Models\SchoolInvitation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -152,6 +153,92 @@ class PhaseFiveSaasAdminApiTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.0.school_id', $school->id)
             ->assertJsonPath('meta.total', 1);
+    }
+
+    public function test_school_user_manager_can_create_list_revoke_and_accept_invitation_tokens(): void
+    {
+        $manager = User::factory()->create();
+        $invitee = User::factory()->create(['email' => 'new.teacher@example.test']);
+        $school = School::query()->create(['name' => 'Invite School', 'slug' => 'invite-school']);
+        $this->addActiveMember($manager, $school);
+        $this->grantSchoolPermission($manager, $school, 'users.manage', 'users');
+        $teacherRole = Role::query()->create([
+            'school_id' => $school->id,
+            'name' => 'Teacher',
+            'key' => 'teacher',
+            'is_system' => true,
+        ]);
+
+        Sanctum::actingAs($manager);
+
+        $token = $this->postJson("/api/schools/{$school->id}/invitations", [
+            'email' => 'New.Teacher@example.test',
+            'name' => 'New Teacher',
+            'role_id' => $teacherRole->id,
+        ])
+            ->assertCreated()
+            ->assertJsonPath('data.email', 'new.teacher@example.test')
+            ->assertJsonPath('data.role.key', 'teacher')
+            ->json('data.token');
+
+        $this->getJson("/api/schools/{$school->id}/invitations")
+            ->assertOk()
+            ->assertJsonPath('data.0.email', 'new.teacher@example.test');
+
+        Sanctum::actingAs($invitee);
+
+        $this->postJson("/api/invitations/{$token}/accept")
+            ->assertOk()
+            ->assertJsonPath('data.status', 'accepted')
+            ->assertJsonPath('data.school.id', $school->id);
+
+        $this->assertDatabaseHas('school_memberships', [
+            'school_id' => $school->id,
+            'user_id' => $invitee->id,
+            'status' => 'active',
+        ]);
+        $this->assertDatabaseHas('user_role_assignments', [
+            'school_id' => $school->id,
+            'user_id' => $invitee->id,
+            'role_id' => $teacherRole->id,
+        ]);
+
+        Sanctum::actingAs($manager);
+        $revokedInvitationId = $this->postJson("/api/schools/{$school->id}/invitations", [
+            'email' => 'revoked@example.test',
+        ])->assertCreated()->json('data.id');
+
+        $this->deleteJson("/api/schools/{$school->id}/invitations/{$revokedInvitationId}")
+            ->assertNoContent();
+
+        $this->assertDatabaseHas('school_invitations', [
+            'id' => $revokedInvitationId,
+            'status' => 'revoked',
+        ]);
+    }
+
+    public function test_invitation_accept_rejects_expired_tokens(): void
+    {
+        $invitee = User::factory()->create(['email' => 'expired.invitee@example.test']);
+        $school = School::query()->create(['name' => 'Expired Invite School', 'slug' => 'expired-invite-school']);
+        $invitation = SchoolInvitation::query()->create([
+            'school_id' => $school->id,
+            'email' => $invitee->email,
+            'token' => '11111111-1111-4111-8111-111111111111',
+            'status' => 'pending',
+            'expires_at' => now()->subMinute(),
+        ]);
+
+        Sanctum::actingAs($invitee);
+
+        $this->postJson("/api/invitations/{$invitation->token}/accept")
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('token');
+
+        $this->assertDatabaseHas('school_invitations', [
+            'id' => $invitation->id,
+            'status' => 'expired',
+        ]);
     }
 
     private function addActiveMember(User $user, School $school): void

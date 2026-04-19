@@ -62,6 +62,14 @@ class School extends Model
     }
 
     /**
+     * @return HasMany<SchoolInvitation, $this>
+     */
+    public function invitations(): HasMany
+    {
+        return $this->hasMany(SchoolInvitation::class);
+    }
+
+    /**
      * @return HasMany<AcademicClass, $this>
      */
     public function academicClasses(): HasMany

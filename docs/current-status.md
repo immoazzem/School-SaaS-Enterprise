@@ -281,8 +281,8 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 Continue Phase 5 implementation:
 
-1. Commit and push the Phase 5 SaaS Administration backend foundation checkpoint.
-2. Continue with Phase 5 invitations, parent/student portal endpoints, data export/right-to-erasure, self-hosted deployment docs, and backup/restore commands from `docs/enterprise-plan-v3.md`.
+1. Commit and push the Phase 5 User Invitation backend checkpoint.
+2. Continue with Phase 5 parent/student portal endpoints, data export/right-to-erasure, self-hosted deployment docs, and backup/restore commands from `docs/enterprise-plan-v3.md`.
 
 Current page/module complete: Phase 4 Nuxt Reports, Calendar, Documents, and Publication workspace.
 Latest UI correction: the Nuxt frontend has been refreshed to follow `D:\Development\tailwindui-radiant\radiant-ts` more closely, including Radiant-style warm gradients, plus-grid background lines, black pill buttons, translucent secondary controls, glass-like panels, and larger tight-tracked headings. The old green theme tokens were removed from app source.
@@ -295,8 +295,11 @@ Latest UI verification: `npm run build` passed with existing Nuxt/Nitro warnings
 Current page/module complete: Phase 5 SaaS Administration backend foundation.
 Latest Phase 5 backend implementation: added SaaS school columns (`plan`, `subscription_status`, `trial_ends_at`, `plan_limits`), typed v3 school settings stored in `schools.settings`, `GET/PATCH /api/schools/{school}/settings`, `super.admin` middleware, super-admin school/user/audit/system endpoints, school-scoped audit log viewer, onboarding trial/default role setup, and plan-limit enforcement for students/employees/documents.
 Latest Phase 5 backend verification: `php artisan test --filter=PhaseFiveSaasAdminApiTest` passed with 5 tests / 24 assertions; full `php artisan test` passed with 70 tests / 469 assertions; `vendor\bin\pint --dirty` completed; `php artisan migrate --force` applied the migration to local MySQL.
-Git status: Phase 5 SaaS Administration backend foundation is ready to commit and push.
-Next page/module: Phase 5 invitations, parent/student portals, data export/right-to-erasure, and self-hosted operations docs.
+Current page/module complete: Phase 5 User Invitation backend flow.
+Latest Phase 5 invitation implementation: added `school_invitations`, `SchoolInvitation`, tenant invitation create/list/revoke endpoints, authenticated `POST /api/invitations/{token}/accept`, email ownership/expiry validation, membership activation, invited role assignment, and invitation audit logs.
+Latest Phase 5 invitation verification: `php artisan test --filter=PhaseFiveSaasAdminApiTest` passed with 7 tests / 42 assertions; full `php artisan test` passed with 72 tests / 487 assertions; `vendor\bin\pint --dirty` completed; `php artisan migrate --force` applied the invitation migration to local MySQL.
+Git status: Phase 5 User Invitation backend checkpoint is ready to commit and push.
+Next page/module: Phase 5 parent/student portals, data export/right-to-erasure, and self-hosted operations docs.
 
 ## New Session Startup Prompt
 
