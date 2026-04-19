@@ -131,7 +131,26 @@ Current page/module complete: Phase 7B Homework and Assignments backend foundati
 - `php artisan db:seed --class=EnterpriseRolePermissionSeeder --force` refreshed local RBAC.
 - `php artisan test` passed with 110 tests / 656 assertions.
 
-Next page/module: Phase 7B Nuxt Homework and Assignments workspace.
+Current page/module complete: Phase 7B Nuxt Homework and Assignments workspace.
+
+- Added typed Nuxt `Assignment` and `AssignmentSubmission` API shapes.
+- Added `/schools/{schoolId}/assignments`.
+- Added dashboard navigation and action access for users with `assignments.manage`.
+- Added assignment filters for class, subject, published/draft state, and status.
+- Added create/edit/archive flow for homework assignments with class, subject, title, description, due date, optional attachment path, published state, and status.
+- Added submission filters for assignment and status.
+- Added create/edit flow for assignment submissions with student enrollment, submitted timestamp, status, marks, optional attachment path, and feedback.
+- Added assignment summary cards plus assignment and submission registers.
+- Added Assignments links from Dashboard and Timetable.
+- `npm run build` from `apps/web` passed with the existing classified Nuxt/Nitro/Node warnings.
+- Local browser verification passed at `http://127.0.0.1:3000/schools/1/assignments`.
+- Browser created a real published `Algebra practice browser check` assignment for `Class One / Mathematics`.
+- Browser recorded a graded `87.00` submission for `Assignment Demo Student / ADM-ASSIGN-001 / Roll 21`.
+- Screenshot saved at `docs/browser-checks/assignments-workspace.png`.
+
+Local site link: `http://127.0.0.1:3000/schools/1/assignments`.
+
+Next page/module: Phase 7C Payment Gateway Integration planning/backend foundation.
 
 ## Completed
 

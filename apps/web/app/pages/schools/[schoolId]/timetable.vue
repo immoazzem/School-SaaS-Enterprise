@@ -257,6 +257,7 @@ onMounted(loadOptions)
         <NuxtLink :to="`/schools/${schoolId}/academic-classes`">Classes</NuxtLink>
         <NuxtLink :to="`/schools/${schoolId}/subjects`">Subjects</NuxtLink>
         <NuxtLink :to="`/schools/${schoolId}/shifts`">Shifts</NuxtLink>
+        <NuxtLink :to="`/schools/${schoolId}/assignments`">Assignments</NuxtLink>
         <NuxtLink :to="`/schools/${schoolId}/promotions`">Promotions</NuxtLink>
       </nav>
     </aside>

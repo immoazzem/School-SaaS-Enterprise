@@ -566,6 +566,36 @@ npm run lint
 
 ## Latest Checkpoint
 
+Current page/module complete: Phase 7B Nuxt Homework and Assignments workspace.
+
+Latest Phase 7B frontend status:
+
+- Added `Assignment` and `AssignmentSubmission` types to `apps/web/app/composables/useApi.ts`.
+- Added `/schools/{schoolId}/assignments`.
+- Dashboard now includes Assignments navigation/action for `assignments.manage`.
+- Timetable workspace links to Assignments.
+- Assignments UI supports filters for class, subject, published/draft state, and status.
+- Assignments UI supports create/edit/archive for homework assignments.
+- Submission UI supports create/edit for student submissions, marks, status, attachment path, and feedback.
+- Registers show visible assignments and submissions with summary counters.
+
+Latest Phase 7B frontend verification:
+
+- `npm run build` from `apps/web`: passed with existing classified Nuxt/Nitro/Node warnings.
+- Local web server: `http://127.0.0.1:3000`.
+- Local API server: `http://127.0.0.1:8010/api`.
+- Browser smoke opened `http://127.0.0.1:3000/schools/1/assignments`.
+- Browser confirmed no Vite/Nuxt error overlay.
+- Browser created a published `Algebra practice browser check` assignment for Class One / Mathematics.
+- Browser recorded a graded `87.00` submission for `Assignment Demo Student / ADM-ASSIGN-001 / Roll 21`.
+- Screenshot saved at `docs/browser-checks/assignments-workspace.png`.
+
+Next page/module:
+
+- Phase 7C Payment Gateway Integration planning/backend foundation.
+
+Previous checkpoint:
+
 Current page/module complete: Phase 7A Timetable / Routine backend foundation.
 
 Latest Phase 7A backend status:

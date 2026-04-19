@@ -845,3 +845,23 @@ Verification: `php artisan test --filter=PhaseSevenAssignments` passed with 6 te
 Phase 7B status: backend foundation is complete. Remaining Phase 7B work is the Nuxt assignments workspace and browser verification.
 
 Next: commit and push this Phase 7B backend checkpoint, then build the Nuxt homework/assignments workspace.
+
+### Phase 7B Nuxt Assignments Workspace
+
+Current page/module complete: Phase 7B Nuxt Homework and Assignments workspace, route `/schools/{schoolId}/assignments`.
+
+Scope: completed the school-facing homework and assignment UI:
+- added typed `Assignment` and `AssignmentSubmission` API shapes.
+- added dashboard navigation/action access for `assignments.manage`.
+- added `/schools/{schoolId}/assignments` with the shared Radiant-inspired operation shell.
+- added filters for assignment class, subject, published state, and status.
+- added create/edit/archive flow for homework assignments.
+- added create/edit flow for student submissions, marks, and feedback.
+- added assignment/submission summary cards, assignment register, and submission register.
+- linked Assignments from the Timetable workspace.
+
+Verification: `npm run build` from `apps/web` passed with the existing classified Nuxt/Nitro/Node warnings. Local browser smoke used API `http://127.0.0.1:8010/api` and web `http://127.0.0.1:3000`; agent-browser opened `/schools/1/assignments`, confirmed no Vite/Nuxt error overlay, created a published `Algebra practice browser check` assignment for Class One / Mathematics, recorded a graded `87.00` submission for `Assignment Demo Student / ADM-ASSIGN-001 / Roll 21`, and saved `docs/browser-checks/assignments-workspace.png`.
+
+Phase 7B status: backend and Nuxt workspace are complete for homework/assignment workflows.
+
+Next: commit and push this Phase 7B UI checkpoint, then continue with Phase 7C Payment Gateway Integration planning/backend foundation.

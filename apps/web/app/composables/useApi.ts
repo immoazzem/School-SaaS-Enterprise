@@ -107,6 +107,42 @@ export interface TimetablePeriod {
   teacher_user?: Pick<ApiUser, 'id' | 'name' | 'email'> | null
 }
 
+export interface Assignment {
+  id: number
+  school_id: number
+  academic_class_id: number
+  subject_id: number
+  assigned_by: number | null
+  title: string
+  description: string | null
+  due_date: string
+  attachment_path: string | null
+  is_published: boolean
+  status: 'active' | 'archived'
+  submissions_count?: number
+  academic_class?: Pick<AcademicClass, 'id' | 'name' | 'code'>
+  subject?: Pick<Subject, 'id' | 'name' | 'code' | 'type'>
+  assigner?: Pick<ApiUser, 'id' | 'name' | 'email'> | null
+}
+
+export interface AssignmentSubmission {
+  id: number
+  school_id: number
+  assignment_id: number
+  student_enrollment_id: number
+  submitted_at: string | null
+  attachment_path: string | null
+  marks_awarded: string | null
+  feedback: string | null
+  status: 'submitted' | 'graded' | 'returned' | 'late'
+  assignment?: Pick<Assignment, 'id' | 'title' | 'due_date' | 'academic_class_id' | 'subject_id'> & {
+    subject?: Pick<Subject, 'id' | 'name' | 'code'>
+  }
+  student_enrollment?: Pick<StudentEnrollment, 'id' | 'student_id' | 'academic_class_id' | 'roll_no' | 'status'> & {
+    student?: Pick<Student, 'id' | 'admission_no' | 'full_name'>
+  }
+}
+
 export interface ClassSubject {
   id: number
   school_id: number
