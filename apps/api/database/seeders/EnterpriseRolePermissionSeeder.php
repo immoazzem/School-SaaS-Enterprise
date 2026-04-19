@@ -39,6 +39,7 @@ class EnterpriseRolePermissionSeeder extends Seeder
             ['module' => 'exams', 'key' => 'marks.enter.any', 'description' => 'Enter and verify marks for any class and subject'],
             ['module' => 'exams', 'key' => 'grades.manage', 'description' => 'Manage grade scales and GPA rules'],
             ['module' => 'finance', 'key' => 'finance.manage', 'description' => 'Manage fees and accounting'],
+            ['module' => 'finance', 'key' => 'payment_gateways.manage', 'description' => 'Manage encrypted payment gateway credentials'],
             ['module' => 'finance', 'key' => 'payroll.manage', 'description' => 'Manage employee salary records'],
             ['module' => 'attendance', 'key' => 'employee_attendance.manage', 'description' => 'Manage employee attendance records'],
             ['module' => 'people', 'key' => 'leave.manage', 'description' => 'Manage employee leave workflows'],
@@ -99,6 +100,7 @@ class EnterpriseRolePermissionSeeder extends Seeder
                     'marks.enter.any',
                     'grades.manage',
                     'finance.manage',
+                    'payment_gateways.manage',
                     'payroll.manage',
                     'employee_attendance.manage',
                     'leave.manage',
@@ -145,7 +147,7 @@ class EnterpriseRolePermissionSeeder extends Seeder
             ],
             'accountant' => [
                 'name' => 'Accountant',
-                'permissions' => ['students.manage', 'guardians.manage', 'finance.manage', 'payroll.manage', 'reports.view'],
+                'permissions' => ['students.manage', 'guardians.manage', 'finance.manage', 'payment_gateways.manage', 'payroll.manage', 'reports.view'],
             ],
             'student' => [
                 'name' => 'Student',

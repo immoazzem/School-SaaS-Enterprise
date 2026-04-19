@@ -865,3 +865,25 @@ Verification: `npm run build` from `apps/web` passed with the existing classifie
 Phase 7B status: backend and Nuxt workspace are complete for homework/assignment workflows.
 
 Next: commit and push this Phase 7B UI checkpoint, then continue with Phase 7C Payment Gateway Integration planning/backend foundation.
+
+### Phase 7C Payment Gateway Config Backend Foundation
+
+Current page/module complete: Phase 7C Payment Gateway Integration backend foundation.
+
+Scope: added the enterprise gateway configuration layer from `docs/enterprise-plan-v3.md`:
+- added `payment_gateway_configs` with school, gateway, encrypted credentials, active flag, test mode flag, timestamps, and soft deletes.
+- supported `bkash`, `nagad`, `sslcommerz`, and `stripe` as planned gateways.
+- added `PaymentGatewayConfig` with Laravel encrypted array casting for `credentials_encrypted`.
+- hid plaintext credential payloads from API responses and exposed only `credentials_configured` plus sorted `credential_keys`.
+- added `School::paymentGatewayConfigs()`.
+- added tenant-scoped REST routes under `/api/v1/schools/{school}/payment-gateway-configs`.
+- added `payment_gateways.manage` to the enterprise RBAC baseline and granted it to school-owner, school-admin, and accountant flows.
+- added create/update/delete audit logging that records gateway state and credential key names, never credential values.
+- added validation for one live config per school/gateway and tenant-scoped access.
+- added focused coverage in `apps/api/tests/Feature/PhaseSevenPaymentGatewayConfigApiTest.php`.
+
+Verification: `php artisan test --filter=PhaseSevenPaymentGatewayConfig` passed with 4 tests / 26 assertions; `vendor\bin\pint --dirty` passed; `php artisan route:list --path=payment-gateway-configs --except-vendor` showed 5 REST routes; `php artisan migrate --force` applied the gateway migration locally; `php artisan db:seed --class=EnterpriseRolePermissionSeeder --force` refreshed local RBAC; full `php artisan test` passed with 114 tests / 682 assertions.
+
+Phase 7C status: backend gateway-config foundation is complete. The next slice is the Nuxt payment gateway configuration workspace; actual provider checkout/webhook handshakes remain future work after credentials and operational UI are in place.
+
+Next: commit and push this Phase 7C backend checkpoint, then build the Nuxt gateway config workspace.

@@ -150,7 +150,26 @@ Current page/module complete: Phase 7B Nuxt Homework and Assignments workspace.
 
 Local site link: `http://127.0.0.1:3000/schools/1/assignments`.
 
-Next page/module: Phase 7C Payment Gateway Integration planning/backend foundation.
+Current page/module complete: Phase 7C Payment Gateway Integration backend foundation.
+
+- Added `payment_gateway_configs` for tenant-scoped gateway setup.
+- Supported planned gateways: `bkash`, `nagad`, `sslcommerz`, and `stripe`.
+- Added encrypted credential storage through Laravel encrypted array casts.
+- Gateway credentials are never returned in API responses; responses expose only `credentials_configured` and sorted `credential_keys`.
+- Added `PaymentGatewayConfig` model and `School::paymentGatewayConfigs()` relationship.
+- Added tenant-scoped REST routes under `/api/v1/schools/{school}/payment-gateway-configs`.
+- Added `payment_gateways.manage` permission and granted it to school-owner, school-admin, and accountant flows.
+- Added audit logs for create/update/delete without storing plaintext secrets.
+- Added duplicate active gateway validation per school.
+- Added cross-tenant and missing-permission coverage in `apps/api/tests/Feature/PhaseSevenPaymentGatewayConfigApiTest.php`.
+- `php artisan test --filter=PhaseSevenPaymentGatewayConfig` passed with 4 tests / 26 assertions.
+- `vendor\bin\pint --dirty` passed.
+- `php artisan route:list --path=payment-gateway-configs --except-vendor` shows 5 REST routes.
+- `php artisan migrate --force` applied the payment gateway config migration to the local database.
+- `php artisan db:seed --class=EnterpriseRolePermissionSeeder --force` refreshed local RBAC.
+- `php artisan test` passed with 114 tests / 682 assertions.
+
+Next page/module: Phase 7C Nuxt Payment Gateway Config workspace.
 
 ## Completed
 

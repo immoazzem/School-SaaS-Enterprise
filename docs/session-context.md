@@ -566,6 +566,44 @@ npm run lint
 
 ## Latest Checkpoint
 
+Current page/module complete: Phase 7C Payment Gateway Integration backend foundation.
+
+Latest Phase 7C backend status:
+
+- Added `payment_gateway_configs`.
+- Added `App\Models\PaymentGatewayConfig`.
+- Added `App\Http\Controllers\Api\PaymentGatewayConfigController`.
+- Added `School::paymentGatewayConfigs()`.
+- Seeded `payment_gateways.manage`; school-owner receives it through the non-billing permission set, and school-admin/accountant receive it explicitly.
+- Added routes:
+  - `GET /api/v1/schools/{school}/payment-gateway-configs`
+  - `POST /api/v1/schools/{school}/payment-gateway-configs`
+  - `GET /api/v1/schools/{school}/payment-gateway-configs/{paymentGatewayConfig}`
+  - `PATCH /api/v1/schools/{school}/payment-gateway-configs/{paymentGatewayConfig}`
+  - `DELETE /api/v1/schools/{school}/payment-gateway-configs/{paymentGatewayConfig}`
+- Supported gateways: `bkash`, `nagad`, `sslcommerz`, and `stripe`.
+- Credentials are stored in `credentials_encrypted` using Laravel encrypted array casting.
+- API responses hide `credentials_encrypted` and never return plaintext credentials.
+- Responses expose only `credentials_configured` and sorted `credential_keys`.
+- Audit events include `payment_gateway_config.created`, `payment_gateway_config.updated`, and `payment_gateway_config.deleted`, without credential values.
+- Duplicate live configs for the same school/gateway are rejected.
+- Added `apps/api/tests/Feature/PhaseSevenPaymentGatewayConfigApiTest.php`.
+
+Latest Phase 7C backend verification:
+
+- `php artisan test --filter=PhaseSevenPaymentGatewayConfig`: 4 tests / 26 assertions passed.
+- `vendor\bin\pint --dirty`: passed.
+- `php artisan route:list --path=payment-gateway-configs --except-vendor`: 5 routes.
+- `php artisan migrate --force`: applied `2026_04_19_070000_create_payment_gateway_configs_table`.
+- `php artisan db:seed --class=EnterpriseRolePermissionSeeder --force`: refreshed local RBAC.
+- `php artisan test`: 114 tests / 682 assertions passed.
+
+Next page/module:
+
+- Phase 7C Nuxt Payment Gateway Config workspace.
+
+Previous checkpoint:
+
 Current page/module complete: Phase 7B Nuxt Homework and Assignments workspace.
 
 Latest Phase 7B frontend status:

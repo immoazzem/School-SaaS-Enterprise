@@ -318,6 +318,14 @@ class School extends Model
     }
 
     /**
+     * @return HasMany<PaymentGatewayConfig, $this>
+     */
+    public function paymentGatewayConfigs(): HasMany
+    {
+        return $this->hasMany(PaymentGatewayConfig::class);
+    }
+
+    /**
      * @return HasMany<SalaryRecord, $this>
      */
     public function salaryRecords(): HasMany

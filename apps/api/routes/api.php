@@ -34,6 +34,7 @@ use App\Http\Controllers\Api\LeaveBalanceController;
 use App\Http\Controllers\Api\LeaveTypeController;
 use App\Http\Controllers\Api\MarksEntryController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\PaymentGatewayConfigController;
 use App\Http\Controllers\Api\PortalController;
 use App\Http\Controllers\Api\PromotionController;
 use App\Http\Controllers\Api\ReportExportController;
@@ -198,6 +199,9 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('school.member');
         Route::apiResource('schools.invoice-payments', InvoicePaymentController::class)
             ->parameters(['invoice-payments' => 'invoicePayment'])
+            ->middleware('school.member');
+        Route::apiResource('schools.payment-gateway-configs', PaymentGatewayConfigController::class)
+            ->parameters(['payment-gateway-configs' => 'paymentGatewayConfig'])
             ->middleware('school.member');
         Route::patch('schools/{school}/leave-applications/{leaveApplication}/approve', [LeaveApplicationController::class, 'approve'])
             ->middleware('school.member');
