@@ -566,7 +566,7 @@ npm run lint
 
 ## Latest Checkpoint
 
-Current page/module complete: Production Stabilization Checkpoint H, Background Job Observability.
+Current page/module complete: Production Stabilization Checkpoint I, Final Stabilization Review.
 
 Production stabilization status:
 
@@ -634,10 +634,18 @@ Production stabilization status:
 - `php artisan test --filter=JobObservability` passed with 4 tests / 15 assertions.
 - `vendor\bin\pint --dirty` passed.
 - Full `php artisan test` passed with 99 tests / 600 assertions.
+- Checkpoint I Final Stabilization Review is complete.
+- `php artisan route:list --path=api/v1 --except-vendor` showed 230 versioned routes.
+- `npm run build` from `apps/web` passed with exit code 0.
+- Remaining frontend build warnings are classified in `docs/KNOWN-BUILD-WARNINGS.md`:
+  - duplicated `useAppConfig` from Nuxt/Nitro internals.
+  - `nuxt:module-preload-polyfill` sourcemap warning.
+  - Node `DEP0155` under this shell's Node 25 runtime.
+- Production stabilization before Phase 7 is complete.
 
 Next page/module:
 
-- Production Stabilization Checkpoint I: final stabilization review.
+- Phase 7 planning and implementation from `docs/enterprise-plan-v3.md`.
 
 Previous product checkpoint:
 
