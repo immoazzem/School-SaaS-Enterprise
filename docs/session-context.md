@@ -315,7 +315,6 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
   - local MySQL migration applied with `php artisan migrate --force`
   - full backend verification passed: `php artisan test` = 70 tests / 469 assertions
 - Phase 5 remaining:
-  - parent/student portal endpoints
   - data export and right-to-erasure
   - `docs/self-hosted-deployment.md`
   - `school:backup` and `school:restore` artisan commands
@@ -331,6 +330,23 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
   - invitation audit logs are written for create, revoke, and accept
   - local MySQL migration applied with `php artisan migrate --force`
   - full backend verification passed: `php artisan test` = 72 tests / 487 assertions
+- Phase 5 Parent and Student Portal backend endpoints are complete:
+  - `App\Http\Controllers\Api\PortalController`
+  - student portal uses `students.email` to link the authenticated user
+  - parent portal uses `guardians.email` and existing guardian-to-student records
+  - portal settings honor `allow_student_portal` and `allow_parent_portal`
+  - routes:
+    - `GET /api/schools/{school}/portal/student/profile`
+    - `GET /api/schools/{school}/portal/student/attendance`
+    - `GET /api/schools/{school}/portal/student/results`
+    - `GET /api/schools/{school}/portal/student/invoices`
+    - `GET /api/schools/{school}/portal/student/notifications`
+    - `GET /api/schools/{school}/portal/parent/children`
+    - `GET /api/schools/{school}/portal/parent/children/{enrollment}/attendance`
+    - `GET /api/schools/{school}/portal/parent/children/{enrollment}/results`
+    - `GET /api/schools/{school}/portal/parent/children/{enrollment}/invoices`
+    - `GET /api/schools/{school}/portal/parent/notifications`
+  - full backend verification passed: `php artisan test` = 74 tests / 509 assertions
 - API index endpoints now return paginated envelopes with top-level `data`, `meta`, and `links`; frontend list code can continue reading `data` as the record array.
 - Shared audit logging lives in `App\Services\AuditLogger` and `App\Http\Controllers\Controller::recordAudit()`.
 - School show/update endpoints exist at `GET/PATCH /api/schools/{school}` with `school.member` and `schools.manage` enforcement for update.

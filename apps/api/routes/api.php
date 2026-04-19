@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\LeaveBalanceController;
 use App\Http\Controllers\Api\LeaveTypeController;
 use App\Http\Controllers\Api\MarksEntryController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\PortalController;
 use App\Http\Controllers\Api\ReportExportController;
 use App\Http\Controllers\Api\ResultSummaryController;
 use App\Http\Controllers\Api\SalaryRecordController;
@@ -144,6 +145,26 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
         ->parameters(['grade-scales' => 'gradeScale'])
         ->middleware('school.member');
     Route::apiResource('schools.guardians', GuardianController::class)
+        ->middleware('school.member');
+    Route::get('schools/{school}/portal/student/profile', [PortalController::class, 'studentProfile'])
+        ->middleware('school.member');
+    Route::get('schools/{school}/portal/student/attendance', [PortalController::class, 'studentAttendance'])
+        ->middleware('school.member');
+    Route::get('schools/{school}/portal/student/results', [PortalController::class, 'studentResults'])
+        ->middleware('school.member');
+    Route::get('schools/{school}/portal/student/invoices', [PortalController::class, 'studentInvoices'])
+        ->middleware('school.member');
+    Route::get('schools/{school}/portal/student/notifications', [PortalController::class, 'studentNotifications'])
+        ->middleware('school.member');
+    Route::get('schools/{school}/portal/parent/children', [PortalController::class, 'parentChildren'])
+        ->middleware('school.member');
+    Route::get('schools/{school}/portal/parent/children/{enrollment}/attendance', [PortalController::class, 'parentChildAttendance'])
+        ->middleware('school.member');
+    Route::get('schools/{school}/portal/parent/children/{enrollment}/results', [PortalController::class, 'parentChildResults'])
+        ->middleware('school.member');
+    Route::get('schools/{school}/portal/parent/children/{enrollment}/invoices', [PortalController::class, 'parentChildInvoices'])
+        ->middleware('school.member');
+    Route::get('schools/{school}/portal/parent/notifications', [PortalController::class, 'parentNotifications'])
         ->middleware('school.member');
     Route::apiResource('schools.invoice-payments', InvoicePaymentController::class)
         ->parameters(['invoice-payments' => 'invoicePayment'])

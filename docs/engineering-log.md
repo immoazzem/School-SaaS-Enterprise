@@ -535,3 +535,29 @@ Verification: `php artisan test --filter=PhaseFiveSaasAdminApiTest` passed with 
 Phase 5 status: invitations are complete. Remaining Phase 5 work includes parent/student portal endpoints, data export/right-to-erasure, self-hosted deployment docs, and backup/restore artisan commands.
 
 Next: commit and push this invitation checkpoint, then continue with parent/student portal endpoints.
+
+### Phase 5 Parent and Student Portal Endpoints
+
+Current page/module complete: Phase 5 Parent and Student Portal backend endpoints.
+
+Scope: added the v3 portal endpoints using the current email-based links already present in the domain model:
+- Student portal links authenticated users to `students.email`.
+- Parent portal links authenticated users to `guardians.email` and the guardian's students.
+- Portal access also respects `allow_student_portal` and `allow_parent_portal` from `SchoolSettings`.
+- Added all v3 portal routes:
+  - `GET /api/schools/{school}/portal/student/profile`
+  - `GET /api/schools/{school}/portal/student/attendance`
+  - `GET /api/schools/{school}/portal/student/results`
+  - `GET /api/schools/{school}/portal/student/invoices`
+  - `GET /api/schools/{school}/portal/student/notifications`
+  - `GET /api/schools/{school}/portal/parent/children`
+  - `GET /api/schools/{school}/portal/parent/children/{enrollment}/attendance`
+  - `GET /api/schools/{school}/portal/parent/children/{enrollment}/results`
+  - `GET /api/schools/{school}/portal/parent/children/{enrollment}/invoices`
+  - `GET /api/schools/{school}/portal/parent/notifications`
+
+Verification: `php artisan test --filter=PhaseFiveSaasAdminApiTest` passed with 9 tests / 64 assertions; full `php artisan test` passed with 74 tests / 509 assertions; `vendor\bin\pint --dirty` passed; `php artisan route:list --path=api/schools --except-vendor` confirmed the 10 portal routes.
+
+Phase 5 status: SaaS admin foundation, invitations, and parent/student portal backend endpoints are complete. Remaining Phase 5 work includes data export/right-to-erasure, self-hosted deployment docs, and backup/restore artisan commands.
+
+Next: commit and push this portal checkpoint, then continue with data export and right-to-erasure.

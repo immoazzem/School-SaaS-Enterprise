@@ -241,6 +241,71 @@ class PhaseFiveSaasAdminApiTest extends TestCase
         ]);
     }
 
+    public function test_student_portal_endpoints_return_only_authenticated_student_records(): void
+    {
+        $studentUser = User::factory()->create(['email' => 'student.portal@example.test']);
+        $school = School::query()->create(['name' => 'Student Portal School', 'slug' => 'student-portal-school']);
+        $this->addActiveMember($studentUser, $school);
+        $this->grantSchoolPermission($studentUser, $school, 'student.portal.view', 'portal');
+        $records = $this->createPortalRecords($school, 'student.portal@example.test', 'guardian.portal@example.test', $studentUser);
+
+        Sanctum::actingAs($studentUser);
+
+        $this->getJson("/api/schools/{$school->id}/portal/student/profile")
+            ->assertOk()
+            ->assertJsonPath('data.email', 'student.portal@example.test')
+            ->assertJsonPath('data.enrollments.0.id', $records['enrollment']->id);
+
+        $this->getJson("/api/schools/{$school->id}/portal/student/attendance")
+            ->assertOk()
+            ->assertJsonPath('data.0.status', 'present');
+
+        $this->getJson("/api/schools/{$school->id}/portal/student/results")
+            ->assertOk()
+            ->assertJsonPath('data.0.grade', 'A+');
+
+        $this->getJson("/api/schools/{$school->id}/portal/student/invoices")
+            ->assertOk()
+            ->assertJsonPath('data.0.invoice_no', 'INV-PORTAL-01');
+
+        $this->getJson("/api/schools/{$school->id}/portal/student/notifications")
+            ->assertOk()
+            ->assertJsonPath('data.0.type', 'portal.notice');
+    }
+
+    public function test_parent_portal_endpoints_return_linked_children_records(): void
+    {
+        $parentUser = User::factory()->create(['email' => 'parent.portal@example.test']);
+        $school = School::query()->create(['name' => 'Parent Portal School', 'slug' => 'parent-portal-school']);
+        $this->addActiveMember($parentUser, $school);
+        $this->grantSchoolPermission($parentUser, $school, 'parent.portal.view', 'portal');
+        $records = $this->createPortalRecords($school, 'child.portal@example.test', 'parent.portal@example.test', $parentUser);
+        $enrollmentId = $records['enrollment']->id;
+
+        Sanctum::actingAs($parentUser);
+
+        $this->getJson("/api/schools/{$school->id}/portal/parent/children")
+            ->assertOk()
+            ->assertJsonPath('data.0.email', 'child.portal@example.test')
+            ->assertJsonPath('data.0.enrollments.0.id', $enrollmentId);
+
+        $this->getJson("/api/schools/{$school->id}/portal/parent/children/{$enrollmentId}/attendance")
+            ->assertOk()
+            ->assertJsonPath('data.0.status', 'present');
+
+        $this->getJson("/api/schools/{$school->id}/portal/parent/children/{$enrollmentId}/results")
+            ->assertOk()
+            ->assertJsonPath('data.0.grade', 'A+');
+
+        $this->getJson("/api/schools/{$school->id}/portal/parent/children/{$enrollmentId}/invoices")
+            ->assertOk()
+            ->assertJsonPath('data.0.invoice_no', 'INV-PORTAL-01');
+
+        $this->getJson("/api/schools/{$school->id}/portal/parent/notifications")
+            ->assertOk()
+            ->assertJsonPath('data.0.type', 'portal.notice');
+    }
+
     private function addActiveMember(User $user, School $school): void
     {
         $school->memberships()->create([
@@ -285,5 +350,83 @@ class PhaseFiveSaasAdminApiTest extends TestCase
             'school_id' => $school->id,
             'role_id' => $role->id,
         ]);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function createPortalRecords(School $school, string $studentEmail, string $guardianEmail, User $notificationUser): array
+    {
+        $academicYear = $school->academicYears()->create([
+            'name' => 'Academic Year 2026',
+            'code' => 'AY-2026',
+            'starts_on' => '2026-01-01',
+            'ends_on' => '2026-12-31',
+        ]);
+        $academicClass = $school->academicClasses()->create(['name' => 'Class Four', 'code' => 'C4']);
+        $guardian = $school->guardians()->create([
+            'full_name' => 'Portal Guardian',
+            'email' => $guardianEmail,
+        ]);
+        $student = $school->students()->create([
+            'guardian_id' => $guardian->id,
+            'admission_no' => 'ADM-PORTAL-01',
+            'full_name' => 'Portal Student',
+            'email' => $studentEmail,
+            'admitted_on' => '2026-01-05',
+        ]);
+        $enrollment = $school->studentEnrollments()->create([
+            'student_id' => $student->id,
+            'academic_year_id' => $academicYear->id,
+            'academic_class_id' => $academicClass->id,
+            'roll_no' => '7',
+            'enrolled_on' => '2026-01-10',
+        ]);
+        $examType = $school->examTypes()->create(['name' => 'Final', 'code' => 'FIN']);
+        $exam = $school->exams()->create([
+            'exam_type_id' => $examType->id,
+            'academic_year_id' => $academicYear->id,
+            'name' => 'Final 2026',
+            'code' => 'FIN-2026',
+            'starts_on' => '2026-11-01',
+            'ends_on' => '2026-11-15',
+            'is_published' => true,
+        ]);
+
+        $school->studentAttendanceRecords()->create([
+            'student_enrollment_id' => $enrollment->id,
+            'attendance_date' => '2026-04-19',
+            'status' => 'present',
+        ]);
+        $school->resultSummaries()->create([
+            'exam_id' => $exam->id,
+            'student_enrollment_id' => $enrollment->id,
+            'total_marks_obtained' => 95,
+            'total_full_marks' => 100,
+            'percentage' => 95,
+            'gpa' => 5,
+            'grade' => 'A+',
+            'position_in_class' => 1,
+            'is_pass' => true,
+            'computed_at' => now(),
+        ]);
+        $school->studentInvoices()->create([
+            'student_enrollment_id' => $enrollment->id,
+            'academic_year_id' => $academicYear->id,
+            'invoice_no' => 'INV-PORTAL-01',
+            'subtotal' => 1000,
+            'discount' => 0,
+            'total' => 1000,
+            'paid_amount' => 500,
+            'status' => 'partial',
+        ]);
+        $school->notifications()->create([
+            'recipient_user_id' => $notificationUser->id,
+            'type' => 'portal.notice',
+            'title' => 'Portal notice',
+            'body' => 'A portal update is ready.',
+        ]);
+
+        return ['student' => $student, 'guardian' => $guardian, 'enrollment' => $enrollment];
     }
 }

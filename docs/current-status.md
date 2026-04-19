@@ -281,8 +281,8 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 Continue Phase 5 implementation:
 
-1. Commit and push the Phase 5 User Invitation backend checkpoint.
-2. Continue with Phase 5 parent/student portal endpoints, data export/right-to-erasure, self-hosted deployment docs, and backup/restore commands from `docs/enterprise-plan-v3.md`.
+1. Commit and push the Phase 5 Parent and Student Portal backend checkpoint.
+2. Continue with Phase 5 data export/right-to-erasure, self-hosted deployment docs, and backup/restore commands from `docs/enterprise-plan-v3.md`.
 
 Current page/module complete: Phase 4 Nuxt Reports, Calendar, Documents, and Publication workspace.
 Latest UI correction: the Nuxt frontend has been refreshed to follow `D:\Development\tailwindui-radiant\radiant-ts` more closely, including Radiant-style warm gradients, plus-grid background lines, black pill buttons, translucent secondary controls, glass-like panels, and larger tight-tracked headings. The old green theme tokens were removed from app source.
@@ -298,8 +298,11 @@ Latest Phase 5 backend verification: `php artisan test --filter=PhaseFiveSaasAdm
 Current page/module complete: Phase 5 User Invitation backend flow.
 Latest Phase 5 invitation implementation: added `school_invitations`, `SchoolInvitation`, tenant invitation create/list/revoke endpoints, authenticated `POST /api/invitations/{token}/accept`, email ownership/expiry validation, membership activation, invited role assignment, and invitation audit logs.
 Latest Phase 5 invitation verification: `php artisan test --filter=PhaseFiveSaasAdminApiTest` passed with 7 tests / 42 assertions; full `php artisan test` passed with 72 tests / 487 assertions; `vendor\bin\pint --dirty` completed; `php artisan migrate --force` applied the invitation migration to local MySQL.
-Git status: Phase 5 User Invitation backend checkpoint is ready to commit and push.
-Next page/module: Phase 5 parent/student portals, data export/right-to-erasure, and self-hosted operations docs.
+Current page/module complete: Phase 5 Parent and Student Portal backend endpoints.
+Latest Phase 5 portal implementation: added all v3 student and parent portal routes through `PortalController`, linking students by `students.email` and parents by `guardians.email`; endpoints return profile/children, attendance, results, invoices, and notifications while enforcing `student.portal.view`/`parent.portal.view` and school portal settings.
+Latest Phase 5 portal verification: `php artisan test --filter=PhaseFiveSaasAdminApiTest` passed with 9 tests / 64 assertions; full `php artisan test` passed with 74 tests / 509 assertions; `vendor\bin\pint --dirty` passed; route list confirmed 10 portal routes.
+Git status: Phase 5 Parent and Student Portal backend checkpoint is ready to commit and push.
+Next page/module: Phase 5 data export/right-to-erasure and self-hosted operations docs.
 
 ## New Session Startup Prompt
 
