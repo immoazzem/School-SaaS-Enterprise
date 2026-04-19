@@ -279,10 +279,10 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Next Step
 
-Continue with Phase 5 implementation:
+Continue Phase 5 implementation:
 
-1. Commit and push the Phase 4 Nuxt completion checkpoint.
-2. Begin Phase 5 SaaS administration and billing placeholders from `docs/enterprise-plan-v3.md`.
+1. Commit and push the Phase 5 SaaS Administration backend foundation checkpoint.
+2. Continue with Phase 5 invitations, parent/student portal endpoints, data export/right-to-erasure, self-hosted deployment docs, and backup/restore commands from `docs/enterprise-plan-v3.md`.
 
 Current page/module complete: Phase 4 Nuxt Reports, Calendar, Documents, and Publication workspace.
 Latest UI correction: the Nuxt frontend has been refreshed to follow `D:\Development\tailwindui-radiant\radiant-ts` more closely, including Radiant-style warm gradients, plus-grid background lines, black pill buttons, translucent secondary controls, glass-like panels, and larger tight-tracked headings. The old green theme tokens were removed from app source.
@@ -292,8 +292,11 @@ Phase 4 status: complete for backend APIs, queued PDFs, signed report downloads,
 Latest Phase 4 backend verification: `php artisan test` passed with 65 tests / 445 assertions; `vendor\bin\pint --test` passed; `composer audit` passed with no advisories; `php artisan route:list --path=api/schools --except-vendor` passed with 190 routes; `php artisan migrate:fresh --seed` passed against MySQL.
 Latest Phase 4 frontend verification: `npm run build` passed with existing Nuxt/Nitro warnings; agent-browser rendered `/schools/1/reports`, `/schools/1/calendar`, and `/schools/1/documents` with no Vite error overlay; screenshots are saved under `docs/browser-checks/phase-4-*-workspace.png`.
 Latest UI verification: `npm run build` passed with existing Nuxt/Nitro warnings; agent-browser refreshed screenshots at `docs/browser-checks/radiant-login-refresh.png`, `docs/browser-checks/radiant-dashboard-refresh.png`, and `docs/browser-checks/radiant-reports-refresh.png`.
-Git status: Phase 4 Nuxt completion checkpoint is ready to commit and push.
-Next page/module: Phase 5 SaaS administration and billing placeholders.
+Current page/module complete: Phase 5 SaaS Administration backend foundation.
+Latest Phase 5 backend implementation: added SaaS school columns (`plan`, `subscription_status`, `trial_ends_at`, `plan_limits`), typed v3 school settings stored in `schools.settings`, `GET/PATCH /api/schools/{school}/settings`, `super.admin` middleware, super-admin school/user/audit/system endpoints, school-scoped audit log viewer, onboarding trial/default role setup, and plan-limit enforcement for students/employees/documents.
+Latest Phase 5 backend verification: `php artisan test --filter=PhaseFiveSaasAdminApiTest` passed with 5 tests / 24 assertions; full `php artisan test` passed with 70 tests / 469 assertions; `vendor\bin\pint --dirty` completed; `php artisan migrate --force` applied the migration to local MySQL.
+Git status: Phase 5 SaaS Administration backend foundation is ready to commit and push.
+Next page/module: Phase 5 invitations, parent/student portals, data export/right-to-erasure, and self-hosted operations docs.
 
 ## New Session Startup Prompt
 

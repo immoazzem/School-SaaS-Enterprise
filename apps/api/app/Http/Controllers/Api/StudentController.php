@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\School;
 use App\Models\Student;
+use App\Services\PlanLimitService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -12,6 +13,8 @@ use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
+    public function __construct(private readonly PlanLimitService $planLimitService) {}
+
     public function index(Request $request, School $school): JsonResponse
     {
         Gate::authorize('viewAny', [Student::class, $school]);
@@ -44,6 +47,7 @@ class StudentController extends Controller
     public function store(Request $request, School $school): JsonResponse
     {
         Gate::authorize('create', [Student::class, $school]);
+        $this->planLimitService->assertCanCreateStudent($school);
 
         $student = $school->students()->create($this->validatedPayload($request, $school));
 

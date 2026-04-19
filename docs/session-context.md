@@ -293,6 +293,33 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
   - mechanically removed old green theme tokens from app source
   - `npm run build` passed with existing Nuxt/Nitro warnings
   - screenshots saved at `docs/browser-checks/radiant-login-refresh.png`, `docs/browser-checks/radiant-dashboard-refresh.png`, and `docs/browser-checks/radiant-reports-refresh.png`
+- Phase 5 SaaS Administration backend foundation is complete:
+  - new school SaaS columns: `plan`, `subscription_status`, `trial_ends_at`, `plan_limits`
+  - typed `App\ValueObjects\SchoolSettings` matching the v3 `schools.settings` JSON shape
+  - `GET/PATCH /api/schools/{school}/settings` with `SchoolSettingsRequest`
+  - `super.admin` middleware backed by `User::hasSystemRole('super-admin')`
+  - admin endpoints:
+    - `GET /api/admin/schools`
+    - `GET /api/admin/schools/{school}`
+    - `PATCH /api/admin/schools/{school}`
+    - `DELETE /api/admin/schools/{school}`
+    - `POST /api/admin/schools/{school}/onboard`
+    - `GET /api/admin/audit-logs`
+    - `GET /api/admin/users`
+    - `GET /api/admin/system/health`
+    - `GET /api/admin/system/stats`
+  - school audit viewer: `GET /api/schools/{school}/audit-logs`
+  - onboarding sets trial status/date, default plan limits, and school-scoped default roles
+  - `PlanLimitService` now reads `schools.plan_limits` first and enforces student/employee limits
+  - seeded `student.portal.view` and `parent.portal.view`
+  - local MySQL migration applied with `php artisan migrate --force`
+  - full backend verification passed: `php artisan test` = 70 tests / 469 assertions
+- Phase 5 remaining:
+  - invitation system
+  - parent/student portal endpoints
+  - data export and right-to-erasure
+  - `docs/self-hosted-deployment.md`
+  - `school:backup` and `school:restore` artisan commands
 - API index endpoints now return paginated envelopes with top-level `data`, `meta`, and `links`; frontend list code can continue reading `data` as the record array.
 - Shared audit logging lives in `App\Services\AuditLogger` and `App\Http\Controllers\Controller::recordAudit()`.
 - School show/update endpoints exist at `GET/PATCH /api/schools/{school}` with `school.member` and `schools.manage` enforcement for update.

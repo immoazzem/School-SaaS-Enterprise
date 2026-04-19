@@ -493,3 +493,23 @@ Verification: `npm run build` passed with the existing Nuxt/Nitro warnings. Visi
 - `docs/browser-checks/radiant-reports-refresh.png`
 
 Next: review the refreshed UI in the browser, then continue the next product phase.
+
+### Phase 5 SaaS Administration Foundation
+
+Current page/module complete: Phase 5 SaaS Administration backend foundation.
+
+Scope: began Phase 5 from `docs/enterprise-plan-v3.md`, using `docs/enterprise-plan-v2.md` as the v2 baseline. Added:
+- SaaS school columns for `plan`, `subscription_status`, `trial_ends_at`, and `plan_limits`.
+- `SchoolSettings` value object with the v3 settings shape stored in `schools.settings`.
+- `SchoolSettingsRequest` and `GET/PATCH /api/schools/{school}/settings`.
+- `super.admin` middleware backed by `User::hasSystemRole('super-admin')`.
+- Super-admin console endpoints for schools, onboarding, audit logs, users, system health, and system stats.
+- School-scoped audit log viewer at `GET /api/schools/{school}/audit-logs`.
+- Plan-limit checks for student and employee creation, plus document storage limits now read the new `plan_limits` column first.
+- Seeded Phase 5 portal permissions `student.portal.view` and `parent.portal.view`.
+
+Verification: `php artisan test --filter=PhaseFiveSaasAdminApiTest` passed with 5 tests / 24 assertions; full `php artisan test` passed with 70 tests / 469 assertions; `vendor\bin\pint --dirty` formatted the changed API routes; `php artisan migrate --force` applied the new Phase 5 SaaS migration to the local MySQL database.
+
+Phase 5 status: backend foundation is started for v2 5A/5B/5C/5E and v3 5F. Remaining Phase 5 work includes invitation flows, parent/student portal endpoints, data export/right-to-erasure, self-hosted deployment docs, and backup/restore artisan commands.
+
+Next: commit and push this Phase 5 foundation checkpoint, then continue with Phase 5 invitations and portal/data-export APIs.

@@ -45,6 +45,8 @@ class EnterpriseRolePermissionSeeder extends Seeder
             ['module' => 'reports', 'key' => 'reports.view', 'description' => 'View operational reports'],
             ['module' => 'audit', 'key' => 'audit.view', 'description' => 'View audit logs'],
             ['module' => 'billing', 'key' => 'billing.manage', 'description' => 'Manage SaaS billing settings'],
+            ['module' => 'portal', 'key' => 'student.portal.view', 'description' => 'View student portal data'],
+            ['module' => 'portal', 'key' => 'parent.portal.view', 'description' => 'View parent portal data'],
         ];
 
         $permissionModels = collect($permissions)
@@ -138,11 +140,11 @@ class EnterpriseRolePermissionSeeder extends Seeder
             ],
             'student' => [
                 'name' => 'Student',
-                'permissions' => ['reports.view'],
+                'permissions' => ['reports.view', 'student.portal.view'],
             ],
             'parent' => [
                 'name' => 'Parent',
-                'permissions' => ['reports.view'],
+                'permissions' => ['reports.view', 'parent.portal.view'],
             ],
             'read-only-auditor' => [
                 'name' => 'Read-only Auditor',

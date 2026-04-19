@@ -56,6 +56,15 @@ class User extends Authenticatable
             ->exists();
     }
 
+    public function hasSystemRole(string $role): bool
+    {
+        return $this->roleAssignments()
+            ->whereHas('role', fn ($query) => $query
+                ->where('key', $role)
+                ->where('is_system', true))
+            ->exists();
+    }
+
     /**
      * Get the attributes that should be cast.
      *

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\School;
+use App\Services\PlanLimitService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -12,6 +13,8 @@ use Illuminate\Validation\Rule;
 
 class EmployeeController extends Controller
 {
+    public function __construct(private readonly PlanLimitService $planLimitService) {}
+
     public function index(Request $request, School $school): JsonResponse
     {
         Gate::authorize('viewAny', [Employee::class, $school]);
@@ -46,6 +49,7 @@ class EmployeeController extends Controller
     public function store(Request $request, School $school): JsonResponse
     {
         Gate::authorize('create', [Employee::class, $school]);
+        $this->planLimitService->assertCanCreateEmployee($school);
 
         $validated = $this->validatedPayload($request, $school);
 

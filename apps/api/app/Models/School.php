@@ -17,6 +17,10 @@ class School extends Model
         'name',
         'slug',
         'status',
+        'plan',
+        'subscription_status',
+        'trial_ends_at',
+        'plan_limits',
         'locale',
         'timezone',
         'settings',
@@ -25,7 +29,9 @@ class School extends Model
     protected function casts(): array
     {
         return [
+            'plan_limits' => 'array',
             'settings' => 'array',
+            'trial_ends_at' => 'datetime',
         ];
     }
 
