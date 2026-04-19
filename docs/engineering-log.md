@@ -579,3 +579,21 @@ Verification: `php artisan test --filter=PhaseFiveSaasAdminApiTest` passed with 
 Phase 5 status: SaaS admin foundation, invitations, parent/student portal endpoints, data export, and student anonymization are complete. Remaining Phase 5 work is self-hosted deployment docs plus backup/restore artisan commands.
 
 Next: commit and push this data export checkpoint, then continue with self-hosted deployment and backup/restore commands.
+
+### Phase 5 Self-Hosted Operations
+
+Current page/module complete: Phase 5 Self-hosted deployment and backup/restore operations.
+
+Scope: completed the v3 self-hosted operations requirement:
+- Added `docs/self-hosted-deployment.md` covering runtime, API deploy, web deploy, queue worker, scheduler, environment, backups, and operational checklist.
+- Added `php artisan school:backup` command.
+- Added `php artisan school:backup --school={id}` tenant-filtered backup mode.
+- Added `php artisan school:restore {archive}` with confirmation.
+- Added `php artisan school:restore {archive} --force` for controlled automation.
+- Backup archives are JSON files under `storage/app/backups` and use `school-saas-enterprise-backup-v1` format.
+
+Verification: `php artisan list school` showed both commands; `php artisan school:backup --help` passed; `php artisan school:backup --school=1` wrote a local backup archive; `vendor\bin\pint --dirty` passed; full `php artisan test` passed with 76 tests / 522 assertions.
+
+Phase 5 status: backend Phase 5 is complete for SaaS admin foundation, settings, plan limits, onboarding, audit viewer, invitations, parent/student portals, data export/right-to-erasure, self-hosted deployment docs, and backup/restore commands.
+
+Next: commit and push this Phase 5 completion checkpoint, then begin the next planned phase or add Nuxt admin screens for the Phase 5 APIs.

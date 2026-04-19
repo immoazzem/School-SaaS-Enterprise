@@ -315,8 +315,7 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
   - local MySQL migration applied with `php artisan migrate --force`
   - full backend verification passed: `php artisan test` = 70 tests / 469 assertions
 - Phase 5 remaining:
-  - `docs/self-hosted-deployment.md`
-  - `school:backup` and `school:restore` artisan commands
+  - Nuxt administration screens for Phase 5 APIs, unless the next plan phase supersedes them
 - Phase 5 User Invitation backend flow is complete:
   - `school_invitations` table and `SchoolInvitation` model
   - `School::invitations()` relationship
@@ -356,6 +355,16 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
   - student anonymization clears personal fields, detaches guardian linkage, archives the student, and writes `student.anonymized`
   - local MySQL migration applied with `php artisan migrate --force`
   - full backend verification passed: `php artisan test` = 76 tests / 522 assertions
+- Phase 5 Self-hosted Operations are complete:
+  - `docs/self-hosted-deployment.md`
+  - `php artisan school:backup`
+  - `php artisan school:backup --school={id}`
+  - `php artisan school:restore {archive}`
+  - `php artisan school:restore {archive} --force`
+  - command discovery confirmed by `php artisan list school`
+  - local backup command verified with `php artisan school:backup --school=1`
+  - full backend verification passed: `php artisan test` = 76 tests / 522 assertions
+- Phase 5 backend status: complete for SaaS admin foundation, settings, plan limits, onboarding, audit viewer, invitations, parent/student portals, data export/right-to-erasure, self-hosted deployment docs, and backup/restore commands.
 - API index endpoints now return paginated envelopes with top-level `data`, `meta`, and `links`; frontend list code can continue reading `data` as the record array.
 - Shared audit logging lives in `App\Services\AuditLogger` and `App\Http\Controllers\Controller::recordAudit()`.
 - School show/update endpoints exist at `GET/PATCH /api/schools/{school}` with `school.member` and `schools.manage` enforcement for update.

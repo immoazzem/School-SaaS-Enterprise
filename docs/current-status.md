@@ -281,8 +281,8 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 Continue Phase 5 implementation:
 
-1. Commit and push the Phase 5 Data Export and Right-to-Erasure backend checkpoint.
-2. Continue with Phase 5 self-hosted deployment docs and backup/restore commands from `docs/enterprise-plan-v3.md`.
+1. Commit and push the Phase 5 Self-hosted Operations checkpoint.
+2. Begin the next planned phase or add Nuxt admin screens for the Phase 5 APIs.
 
 Current page/module complete: Phase 4 Nuxt Reports, Calendar, Documents, and Publication workspace.
 Latest UI correction: the Nuxt frontend has been refreshed to follow `D:\Development\tailwindui-radiant\radiant-ts` more closely, including Radiant-style warm gradients, plus-grid background lines, black pill buttons, translucent secondary controls, glass-like panels, and larger tight-tracked headings. The old green theme tokens were removed from app source.
@@ -304,8 +304,12 @@ Latest Phase 5 portal verification: `php artisan test --filter=PhaseFiveSaasAdmi
 Current page/module complete: Phase 5 Data Export and Student Anonymization backend.
 Latest Phase 5 data export implementation: added `data_export_jobs`, `DataExportJob`, data export request/download endpoints, JSON export artifact generation, and student anonymization endpoint that clears personal fields, detaches guardian linkage, archives the student, and writes audit logs.
 Latest Phase 5 data export verification: `php artisan test --filter=PhaseFiveSaasAdminApiTest` passed with 11 tests / 77 assertions; full `php artisan test` passed with 76 tests / 522 assertions; `vendor\bin\pint --dirty` completed; `php artisan migrate --force` applied the export job migration to local MySQL.
-Git status: Phase 5 Data Export and Right-to-Erasure backend checkpoint is ready to commit and push.
-Next page/module: Phase 5 self-hosted deployment docs and backup/restore commands.
+Current page/module complete: Phase 5 Self-hosted deployment and backup/restore operations.
+Latest Phase 5 operations implementation: added `docs/self-hosted-deployment.md`, `php artisan school:backup`, `php artisan school:backup --school={id}`, and `php artisan school:restore {archive}` with confirmation plus `--force`.
+Latest Phase 5 operations verification: `php artisan list school` showed both commands; `php artisan school:backup --help` passed; `php artisan school:backup --school=1` wrote a local backup archive; `vendor\bin\pint --dirty` passed; full `php artisan test` passed with 76 tests / 522 assertions.
+Git status: Phase 5 Self-hosted Operations checkpoint is ready to commit and push.
+Next page/module: next planned phase or Phase 5 Nuxt administration screens.
+Phase 5 status: backend Phase 5 is complete for SaaS admin foundation, settings, plan limits, onboarding, audit viewer, invitations, parent/student portals, data export/right-to-erasure, self-hosted deployment docs, and backup/restore commands.
 
 ## New Session Startup Prompt
 
