@@ -7,6 +7,8 @@ use App\Models\Role;
 use App\Models\School;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -290,6 +292,72 @@ class PhaseFourReportingApiTest extends TestCase
             'type' => 'leave.approved',
             'title' => 'Leave approved',
         ]);
+    }
+
+    public function test_phase_four_document_upload_rejects_oversized_files_by_plan_limit(): void
+    {
+        Storage::fake('local');
+        $user = User::factory()->create();
+        $school = School::query()->create([
+            'name' => 'Document Limit School',
+            'slug' => 'document-limit-school',
+            'settings' => ['plan_limits' => ['max_storage_mb' => 1]],
+        ]);
+        $this->addActiveMember($user, $school);
+        $this->grantSchoolPermission($user, $school, 'documents.manage', 'documents');
+
+        Sanctum::actingAs($user);
+
+        $this->postJson("/api/schools/{$school->id}/documents", [
+            'category' => 'student_document',
+            'title' => 'Admission Form',
+            'is_public' => false,
+            'file' => UploadedFile::fake()->create('admission.pdf', 2048, 'application/pdf'),
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors(['file', 'error']);
+
+        $this->assertDatabaseMissing('school_documents', [
+            'school_id' => $school->id,
+            'title' => 'Admission Form',
+        ]);
+    }
+
+    public function test_phase_four_document_download_returns_signed_url_without_exposing_storage_path(): void
+    {
+        Storage::fake('local');
+        $manager = User::factory()->create();
+        $viewer = User::factory()->create();
+        $school = School::query()->create(['name' => 'Document School', 'slug' => 'document-school']);
+        $this->addActiveMember($manager, $school);
+        $this->addActiveMember($viewer, $school);
+        $this->grantSchoolPermission($manager, $school, 'documents.manage', 'documents');
+
+        Sanctum::actingAs($manager);
+
+        $documentId = $this->postJson("/api/schools/{$school->id}/documents", [
+            'category' => 'circular',
+            'title' => 'Annual Circular',
+            'is_public' => true,
+            'file' => UploadedFile::fake()->create('annual-circular.pdf', 32, 'application/pdf'),
+        ])->assertCreated()
+            ->assertJsonMissingPath('data.file_path')
+            ->json('data.id');
+
+        $document = $school->documents()->firstOrFail();
+        Storage::disk('local')->assertExists($document->file_path);
+
+        Sanctum::actingAs($viewer);
+
+        $response = $this->getJson("/api/schools/{$school->id}/documents/{$documentId}")
+            ->assertOk()
+            ->assertJsonMissingPath('data.file_path')
+            ->assertJsonPath('data.title', 'Annual Circular');
+
+        $downloadUrl = $response->json('data.download_url');
+        $this->assertIsString($downloadUrl);
+        $this->assertStringContainsString('signature=', $downloadUrl);
+        $this->assertStringNotContainsString($document->file_path, $downloadUrl);
+        $this->assertStringNotContainsString($document->file_path, $response->getContent());
     }
 
     private function addActiveMember(User $user, School $school): void

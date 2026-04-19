@@ -304,6 +304,14 @@ class School extends Model
     }
 
     /**
+     * @return HasMany<SchoolDocument, $this>
+     */
+    public function documents(): HasMany
+    {
+        return $this->hasMany(SchoolDocument::class);
+    }
+
+    /**
      * @return HasMany<ResultSummary, $this>
      */
     public function resultSummaries(): HasMany

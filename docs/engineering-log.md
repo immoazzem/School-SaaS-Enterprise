@@ -369,7 +369,7 @@ Next: push the local commit when GitHub connectivity returns, then begin Phase 4
 
 Current page/module complete: Phase 4 Result Publication and Reports backend foundation.
 
-Scope: followed `docs/enterprise-plan-v3.md` with `docs/enterprise-plan.md` as the v2 baseline. Added the first Phase 4 backend slice:
+Scope: followed `docs/enterprise-plan-v3.md` with the v2 baseline now tracked in `docs/enterprise-plan-v2.md`. Added the first Phase 4 backend slice:
 - `result_summaries` cache table for published exam totals, percentages, GPA, grade, pass/fail, and class position.
 - In-app notification tables and models, with SMS log scaffolding for the optional Phase 4 communication add-on.
 - Result publication service and `POST /api/schools/{school}/exams/{exam}/publish`, requiring `exams.publish`, setting publication fields, recomputing summaries, auditing `result.published`, and notifying active school members.
@@ -389,7 +389,7 @@ Next: continue with Phase 4 PDFs/calendar/notification hooks or the Nuxt reports
 
 Current page/module complete: Phase 4 Calendar and Notification Hooks backend.
 
-Scope: continued `docs/enterprise-plan-v3.md` with `docs/enterprise-plan.md` as the v2 baseline. Added:
+Scope: continued `docs/enterprise-plan-v3.md` with the v2 baseline now tracked in `docs/enterprise-plan-v2.md`. Added:
 - `calendar_events` with optional academic year, optional class scope, holiday flag, RRULE storage, creator tracking, soft deletes, and tenant indexes.
 - Calendar CRUD routes under `/api/schools/{school}/calendar-events`.
 - Holiday bulk import route at `/api/schools/{school}/calendar-events/bulk-import-holidays`.
@@ -401,4 +401,24 @@ Verification: targeted `php artisan test --filter=PhaseFourReportingApiTest` pas
 
 Phase 4 status: result publication, cached summaries, employee attendance summary, in-app notification inbox, school calendar backend, holiday import, and payment/leave notification hooks are implemented. Remaining Phase 4 work includes PDFs, document management, dashboard analytics, Nuxt report/calendar/publication workspaces, browser checks, and richer recipient mapping once student/parent/employee account ownership models are introduced.
 
-Next: commit and push this Phase 4 calendar/notifications checkpoint, then continue with PDFs, document management, analytics, or the Nuxt Phase 4 workspace.
+Checkpoint: committed and pushed as `ae0fe9f feat: add phase 4 calendar notifications`.
+
+Next: continue with PDFs, document management, analytics, or the Nuxt Phase 4 workspace.
+
+### Phase 4 Document Management Backend
+
+Current page/module complete: Phase 4 Document Management backend.
+
+Scope: continued `docs/enterprise-plan-v3.md` with `docs/enterprise-plan-v2.md` as the v2 baseline. Added:
+- `docs/enterprise-plan-v2.md` as the explicit v2 reference used by v3.
+- `school_documents` with category, uploader, stored file metadata, public/private visibility, optional related model reference, upload timestamp, and soft deletes.
+- Document upload/list/show/delete routes under `/api/schools/{school}/documents`.
+- Signed document download route at `/api/schools/{school}/documents/{document}/download`.
+- `PlanLimitService` storage check using `school.settings.plan_limits.max_storage_mb` until formal Phase 5 plan columns land.
+- Seeded `documents.manage` permission for owner/admin/principal-style document management.
+
+Verification: targeted `php artisan test --filter=PhaseFourReportingApiTest` passed with 9 tests / 55 assertions; full `php artisan test` passed with 62 tests / 425 assertions; `php artisan migrate:fresh --seed` passed against MySQL; `vendor\bin\pint --test` passed; `php artisan route:list --path=api/schools --except-vendor` passed and showed 178 school routes.
+
+Phase 4 status: result publication, cached summaries, employee attendance summary, in-app notification inbox, school calendar backend, holiday import, payment/leave notification hooks, and document management backend are implemented. Remaining Phase 4 work includes PDFs, dashboard analytics, Nuxt report/calendar/publication/document workspaces, browser checks, and richer recipient mapping once account ownership models are introduced.
+
+Next: commit and push this Phase 4 document checkpoint, then continue with PDFs, dashboard analytics, or the Nuxt Phase 4 workspace.

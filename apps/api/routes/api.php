@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ResultSummaryController;
 use App\Http\Controllers\Api\SalaryRecordController;
 use App\Http\Controllers\Api\SchoolController;
+use App\Http\Controllers\Api\SchoolDocumentController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\StudentAttendanceRecordController;
 use App\Http\Controllers\Api\StudentController;
@@ -64,6 +65,13 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
         ->parameters(['class-subjects' => 'classSubject'])
         ->middleware('school.member');
     Route::apiResource('schools.designations', DesignationController::class)
+        ->middleware('school.member');
+    Route::get('schools/{school}/documents/{document}/download', [SchoolDocumentController::class, 'download'])
+        ->middleware(['school.member', 'signed'])
+        ->name('schools.documents.download');
+    Route::apiResource('schools.documents', SchoolDocumentController::class)
+        ->only(['index', 'store', 'show', 'destroy'])
+        ->parameters(['documents' => 'document'])
         ->middleware('school.member');
     Route::apiResource('schools.employees', EmployeeController::class)
         ->middleware('school.member');

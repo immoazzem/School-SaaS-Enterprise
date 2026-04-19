@@ -1,6 +1,6 @@
 # Current Status
 
-Planning rule: `docs/enterprise-plan.md` is the v2 baseline. Whenever `docs/enterprise-plan-v3.md` mentions v2, it means `docs/enterprise-plan.md`. All v2 baseline rules remain primary, and v3 adds to and extends them unless a section explicitly says otherwise.
+Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 mentions v2, it means `docs/enterprise-plan-v2.md`. All v2 baseline rules remain primary, and v3 adds to and extends them unless a section explicitly says otherwise.
 
 ## Completed
 
@@ -281,15 +281,15 @@ Planning rule: `docs/enterprise-plan.md` is the v2 baseline. Whenever `docs/ente
 
 Continue with Phase 4 implementation:
 
-1. Continue from the Phase 4 calendar and notification hooks backend checkpoint.
-2. Add the remaining Phase 4 PDFs, document management, dashboard analytics, Nuxt report/calendar/publication workspace, and browser checks.
+1. Continue from the Phase 4 document management backend checkpoint.
+2. Add the remaining Phase 4 PDFs, dashboard analytics, Nuxt report/calendar/publication/document workspace, and browser checks.
 
-Current page/module complete: Phase 4 Calendar and Notification Hooks backend.
+Current page/module complete: Phase 4 Document Management backend.
 Phase 2 status: complete for the current academic setup and people foundation.
 Phase 3 status: complete for backend APIs, Nuxt workspaces, build, and browser smoke checks.
-Phase 4 status: backend implemented for result publication, cached summaries, employee attendance summary, in-app notification inbox, school calendar, holiday import, and payment/leave notification hooks.
-Git status: Phase 4 calendar/notifications checkpoint is ready to commit and push.
-Next page/module: Phase 4 PDFs, Document Management, Dashboard Analytics, or Nuxt Reports/Calendar workspace.
+Phase 4 status: backend implemented for result publication, cached summaries, employee attendance summary, in-app notification inbox, school calendar, holiday import, payment/leave notification hooks, and document management.
+Git status: Phase 4 document management checkpoint is ready to commit and push.
+Next page/module: Phase 4 PDFs, Dashboard Analytics, or Nuxt Reports/Calendar/Documents workspace.
 
 ## New Session Startup Prompt
 
@@ -297,6 +297,6 @@ Next page/module: Phase 4 PDFs, Document Management, Dashboard Analytics, or Nux
 Read D:\Development\School-SaaS-Enterprise-CONTEXT.md and D:\Development\School-SaaS-Enterprise\docs\current-status.md.
 Continue from the current status.
 Use D:\Development\School-SaaS-Enterprise\docs\enterprise-plan-v3.md as the active plan.
-When v3 mentions v2, read D:\Development\School-SaaS-Enterprise\docs\enterprise-plan.md as the v2 baseline.
+When v3 mentions v2, read D:\Development\School-SaaS-Enterprise\docs\enterprise-plan-v2.md as the v2 baseline.
 Minimize token usage.
 ```

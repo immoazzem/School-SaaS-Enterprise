@@ -19,7 +19,7 @@ D:\Development\School-SaaS-Enterprise\docs\enterprise-plan-v3.md
 Planning rule:
 
 ```text
-docs/enterprise-plan.md is the v2 baseline. Whenever docs/enterprise-plan-v3.md mentions v2, it means docs/enterprise-plan.md. All v2 baseline rules remain primary, and v3 adds to and extends them unless a section explicitly says otherwise.
+docs/enterprise-plan-v3.md is the active plan. Whenever v3 mentions v2, it means docs/enterprise-plan-v2.md. All v2 baseline rules remain primary, and v3 adds to and extends them unless a section explicitly says otherwise.
 ```
 
 Target project folder:
@@ -254,12 +254,18 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
   - `calendar.manage` permission
   - `payment.received` notifications for matched student/guardian user accounts
   - `leave.approved` and `leave.rejected` notifications for matched employee user accounts
-- Latest backend verification after Phase 4 calendar and notification hooks:
+- Phase 4 document management backend is complete:
+  - `school_documents`
+  - upload/list/show/delete document APIs
+  - signed download URL route
+  - storage plan-limit check through `PlanLimitService`
+  - `documents.manage` permission
+- Latest backend verification after Phase 4 document management:
   - `php artisan migrate:fresh --seed` passed against MySQL
-  - `php artisan test` passed with 60 tests / 410 assertions
+  - `php artisan test` passed with 62 tests / 425 assertions
   - `vendor\bin\pint --test` passed
-  - `php artisan route:list --path=api/schools --except-vendor` passed with 173 routes
-- Git note: Phase 3 and Phase 4 reporting foundation are pushed to GitHub. Phase 4 calendar/notification hooks are ready to commit and push.
+  - `php artisan route:list --path=api/schools --except-vendor` passed with 178 routes
+- Git note: Phase 3, Phase 4 reporting foundation, and Phase 4 calendar/notification hooks are pushed to GitHub. Phase 4 document management is ready to commit and push.
 - API index endpoints now return paginated envelopes with top-level `data`, `meta`, and `links`; frontend list code can continue reading `data` as the record array.
 - Shared audit logging lives in `App\Services\AuditLogger` and `App\Http\Controllers\Controller::recordAudit()`.
 - School show/update endpoints exist at `GET/PATCH /api/schools/{school}` with `school.member` and `schools.manage` enforcement for update.
@@ -449,6 +455,6 @@ npm run lint
 Read D:\Development\School-SaaS-Enterprise-CONTEXT.md first.
 Then continue the School SaaS Enterprise rebuild from the current workspace state.
 Use D:\Development\School-SaaS-Enterprise\docs\enterprise-plan-v3.md as the active plan.
-When v3 mentions v2, read D:\Development\School-SaaS-Enterprise\docs\enterprise-plan.md as the v2 baseline.
+When v3 mentions v2, read D:\Development\School-SaaS-Enterprise\docs\enterprise-plan-v2.md as the v2 baseline.
 Minimize token usage by summarizing large files instead of pasting them.
 ```
