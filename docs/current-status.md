@@ -4,7 +4,7 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Production Stabilization Status
 
-Current page/module complete: Production Stabilization Checkpoint G, PDF Rendering Reliability.
+Current page/module complete: Production Stabilization Checkpoint H, Background Job Observability.
 
 - Checkpoint A roadmap is complete and pushed as `933a920 docs: add production stabilization roadmap`.
 - Checkpoint B frontend foundation is complete locally and ready for checkpoint commit:
@@ -62,7 +62,20 @@ Current page/module complete: Production Stabilization Checkpoint G, PDF Renderi
 - `vendor\bin\pint --dirty` fixed and passed for the PDF changes.
 - `php artisan test` passes with 95 tests / 585 assertions.
 
-Next page/module: Production Stabilization Checkpoint H, Background Job Observability.
+- Checkpoint H Background Job Observability is complete:
+  - confirmed `jobs`, `job_batches`, and `failed_jobs` already exist in the default Laravel jobs migration.
+  - set database and Redis queue connections to dispatch after commit.
+  - added `tries = 3` and `backoff = 60` to `BulkGenerateStudentInvoices`.
+  - added super-admin endpoints:
+    - `GET /api/v1/admin/jobs/status`
+    - `POST /api/v1/admin/jobs/{id}/retry`
+  - retry uses Laravel's `queue:retry` Artisan command path rather than manual payload reinsertion.
+  - added `apps/api/tests/Feature/JobObservabilityTest.php`.
+- `php artisan test --filter=JobObservability` passes with 4 tests / 15 assertions.
+- `vendor\bin\pint --dirty` passes.
+- `php artisan test` passes with 99 tests / 600 assertions.
+
+Next page/module: Production Stabilization Checkpoint I, Final Stabilization Review.
 
 ## Completed
 

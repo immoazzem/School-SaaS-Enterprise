@@ -566,7 +566,7 @@ npm run lint
 
 ## Latest Checkpoint
 
-Current page/module complete: Production Stabilization Checkpoint G, PDF Rendering Reliability.
+Current page/module complete: Production Stabilization Checkpoint H, Background Job Observability.
 
 Production stabilization status:
 
@@ -622,10 +622,22 @@ Production stabilization status:
 - `php artisan test --filter=PdfGeneration` passed with 4 tests / 12 assertions.
 - `vendor\bin\pint --dirty` passed after formatting the PDF changes.
 - Full `php artisan test` passed with 95 tests / 585 assertions.
+- Checkpoint H Background Job Observability is complete.
+- The default Laravel jobs migration already creates `jobs`, `job_batches`, and `failed_jobs`.
+- Queue config now sets database and Redis queue connections to `after_commit = true`.
+- `BulkGenerateStudentInvoices` has `tries = 3` and `backoff = 60`.
+- Super-admin job endpoints exist:
+  - `GET /api/v1/admin/jobs/status`
+  - `POST /api/v1/admin/jobs/{id}/retry`
+- Retry delegates to Laravel's `queue:retry` Artisan command, not manual payload reinsertion.
+- `apps/api/tests/Feature/JobObservabilityTest.php` exists.
+- `php artisan test --filter=JobObservability` passed with 4 tests / 15 assertions.
+- `vendor\bin\pint --dirty` passed.
+- Full `php artisan test` passed with 99 tests / 600 assertions.
 
 Next page/module:
 
-- Production Stabilization Checkpoint H: background job observability.
+- Production Stabilization Checkpoint I: final stabilization review.
 
 Previous product checkpoint:
 

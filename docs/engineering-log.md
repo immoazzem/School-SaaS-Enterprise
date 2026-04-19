@@ -751,3 +751,20 @@ Scope: hardened queued report PDFs before Phase 7:
 Verification: `php artisan test --filter=PdfGeneration` passed with 4 tests / 12 assertions; `vendor\bin\pint --dirty` fixed formatting and passed; full `php artisan test` passed with 95 tests / 585 assertions.
 
 Next: continue with Production Stabilization Checkpoint H: background job observability.
+
+### Production Stabilization Background Job Observability
+
+Current page/module complete: Production Stabilization Checkpoint H, Background Job Observability.
+
+Scope: added queue visibility and retry controls before Phase 7:
+- confirmed the default Laravel jobs migration already creates `jobs`, `job_batches`, and `failed_jobs`.
+- changed database and Redis queue connections to run after transaction commit.
+- added retry policy to `BulkGenerateStudentInvoices` with 3 tries and 60-second backoff.
+- added `App\Http\Controllers\Api\Admin\JobStatusController`.
+- added super-admin routes for `GET /api/v1/admin/jobs/status` and `POST /api/v1/admin/jobs/{id}/retry`.
+- implemented retry through Laravel's `queue:retry` Artisan command instead of manually copying payloads back into `jobs`.
+- added `apps/api/tests/Feature/JobObservabilityTest.php` for super-admin status visibility, non-super-admin denial, retry command delegation, and queue config/job retry policy.
+
+Verification: `php artisan test --filter=JobObservability` passed with 4 tests / 15 assertions; `vendor\bin\pint --dirty` passed; full `php artisan test` passed with 99 tests / 600 assertions.
+
+Next: continue with Production Stabilization Checkpoint I: final stabilization review.

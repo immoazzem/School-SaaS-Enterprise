@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AcademicClassController;
 use App\Http\Controllers\Api\AcademicSectionController;
 use App\Http\Controllers\Api\AcademicYearController;
 use App\Http\Controllers\Api\Admin\AuditLogAdminController;
+use App\Http\Controllers\Api\Admin\JobStatusController;
 use App\Http\Controllers\Api\Admin\SchoolAdminController;
 use App\Http\Controllers\Api\Admin\SystemController;
 use App\Http\Controllers\Api\Admin\UserAdminController;
@@ -69,6 +70,8 @@ Route::prefix('v1')->group(function (): void {
             Route::delete('schools/{school}', [SchoolAdminController::class, 'destroy']);
             Route::post('schools/{school}/onboard', [SchoolAdminController::class, 'onboard']);
             Route::get('audit-logs', AuditLogAdminController::class);
+            Route::get('jobs/status', [JobStatusController::class, 'index']);
+            Route::post('jobs/{id}/retry', [JobStatusController::class, 'retry']);
             Route::get('users', UserAdminController::class);
             Route::get('system/health', [SystemController::class, 'health']);
             Route::get('system/stats', [SystemController::class, 'stats']);

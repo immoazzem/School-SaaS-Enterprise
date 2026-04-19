@@ -187,7 +187,7 @@ Acceptance:
 
 ## Checkpoint H: Background Job Observability
 
-**Status:** Pending
+**Status:** Complete
 
 Deliverables:
 
@@ -200,11 +200,12 @@ Deliverables:
 
 Acceptance:
 
-- `failed_jobs` exists after migration.
-- Super-admin can see job status.
+- `failed_jobs` exists in the default Laravel jobs migration.
+- Super-admin can see pending and failed job counts plus recent failures.
 - Non-super-admin cannot access job status.
-- Retry uses Laravel's queue retry path, not manual payload reinsertion.
-- Relevant job tests pass.
+- Retry uses Laravel's `queue:retry` command path, not manual payload reinsertion.
+- `php artisan test --filter=JobObservability` passes with 4 tests / 15 assertions.
+- Full `php artisan test` passes with 99 tests / 600 assertions.
 
 ## Checkpoint I: Final Stabilization Review
 
