@@ -690,3 +690,17 @@ Scope: moved the current Laravel API surface under a v1 route prefix and kept th
 Verification: `vendor\bin\pint --dirty` passed after formatting `routes/api.php`; `php artisan route:list --path=api/v1 --except-vendor` showed 228 versioned routes; `php artisan test` passed with 79 tests / 547 assertions; `npm run build` from `apps/web` passed after the API client change.
 
 Next: commit and push this checkpoint, then continue with Production Stabilization Checkpoint D: environment examples and local-development docs.
+
+### Production Stabilization Environment Docs
+
+Current page/module complete: Production Stabilization Checkpoint D, Environment and Local Development cleanup.
+
+Scope: made local setup clearer for the current Herd/MySQL/Nuxt shape:
+- expanded `apps/web/.env.example` with `NUXT_PUBLIC_APP_NAME`.
+- updated `apps/api/.env.example` to use the product app name while keeping database-backed queue/cache/session defaults.
+- rewrote `docs/local-development.md` with prerequisites, Herd setup, MySQL setup, API v1 checks, direct PHP server fallback, Nuxt setup, seeded login, and backend/frontend quality gates.
+- documented that `NUXT_PUBLIC_API_BASE` stays at `/api` and `useApi()` appends `/v1`.
+
+Verification: documentation and env-template checkpoint. Previous Checkpoint C verification remains current: `php artisan test` passed with 79 tests / 547 assertions and `npm run build` passed.
+
+Next: commit and push this checkpoint, then continue with Production Stabilization Checkpoint E: Pinia state migration.

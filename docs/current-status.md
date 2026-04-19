@@ -28,7 +28,12 @@ Current page/module complete: Production Stabilization Checkpoint B, Frontend Fo
 - `php artisan test` from `apps/api` passes with 79 tests / 547 assertions.
 - `npm run build` from `apps/web` passes after the API client change.
 
-Next page/module: Production Stabilization Checkpoint D, Environment and Local Development cleanup.
+- Checkpoint D Environment and Local Development cleanup is complete locally and ready for checkpoint commit:
+  - `apps/web/.env.example` now includes `NUXT_PUBLIC_APP_NAME`.
+  - `apps/api/.env.example` uses the product app name and keeps the current database-backed local drivers.
+  - `docs/local-development.md` is rewritten with copy-paste setup for Herd, MySQL, API v1, fallback PHP server, Nuxt, seeded login, and quality gates.
+
+Next page/module: Production Stabilization Checkpoint E, Pinia State Migration.
 
 ## Completed
 

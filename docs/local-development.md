@@ -1,23 +1,51 @@
 # Local Development
 
-## Environment
+## Prerequisites
 
-- Windows workspace: `D:\Development`
-- Project folder: `D:\Development\School-SaaS-Enterprise`
-- Laravel Herd is installed and running.
-- MySQL Workbench is installed.
-- Docker is not required for Phase 1.
+- PHP 8.5 through Laravel Herd
+- Composer
+- MySQL 8.0+
+- Node.js 20.11.0
+- npm 10.2.0+
+- Git
 
-## Planned Local URLs
+Redis is optional at the current checkpoint. The default local queue, cache, and session drivers use the database.
+
+## Local URLs
 
 ```text
 API: https://school-api.test
+API v1: https://school-api.test/api/v1
 Web: http://localhost:3000
 ```
 
-## Database
+## API Setup
 
-Create a local MySQL database:
+```bash
+cd D:\Development\School-SaaS-Enterprise\apps\api
+composer install
+cp .env.example .env
+php artisan key:generate
+```
+
+Edit `.env` for the local MySQL credentials:
+
+```env
+APP_URL=https://school-api.test
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=school_saas_enterprise
+DB_USERNAME=root
+DB_PASSWORD=
+SANCTUM_STATEFUL_DOMAINS=localhost:3000,127.0.0.1:3000,school-api.test
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+QUEUE_CONNECTION=database
+CACHE_STORE=database
+SESSION_DRIVER=database
+```
+
+Create the database if it does not already exist:
 
 ```sql
 CREATE DATABASE school_saas_enterprise
@@ -25,109 +53,107 @@ CREATE DATABASE school_saas_enterprise
   COLLATE utf8mb4_unicode_ci;
 ```
 
-The Laravel `.env` in `apps/api` should use:
+Run migrations and seeders:
 
-```text
-APP_URL=https://school-api.test
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=school_saas_enterprise
-SANCTUM_STATEFUL_DOMAINS=localhost:3000,127.0.0.1:3000,school-api.test
-```
-
-Fill in local `DB_USERNAME` and `DB_PASSWORD` from the machine's MySQL setup. Do not commit `.env`.
-
-The Nuxt `.env` in `apps/web` should use:
-
-```text
-NUXT_PUBLIC_API_BASE=https://school-api.test/api
+```bash
+php artisan migrate:fresh --seed
 ```
 
 ## Herd Setup
 
-The API app exists at:
+The API app folder is:
 
 ```text
 D:\Development\School-SaaS-Enterprise\apps\api
 ```
 
-In Herd, the API has been linked as:
-
-```text
-https://school-api.test
-D:\Development\School-SaaS-Enterprise\apps\api
-PHP 8.5
-```
-
-Command used:
+Link it in Herd:
 
 ```bash
 herd link school-api --secure --isolate=8.5
 ```
 
-For a fresh machine:
-
-1. Add or link the API app folder.
-2. Set the local site domain to `school-api.test`.
-3. Confirm PHP is 8.5.
-4. Confirm the site serves Laravel over HTTPS.
-
-After the site is available:
-
-```bash
-composer install
-php artisan key:generate
-php artisan migrate:fresh --seed
-```
-
 Expected unauthenticated API check:
 
 ```bash
-GET https://school-api.test/api/me
-401 {"message":"Unauthenticated."}
+curl https://school-api.test/api/v1/me
 ```
 
-## Nuxt Setup
+Expected response:
 
-After `apps/web` exists:
+```json
+{"message":"Unauthenticated."}
+```
+
+If Herd is not running, the fallback local API server is:
 
 ```bash
+cd D:\Development\School-SaaS-Enterprise\apps\api
+php -S 127.0.0.1:8010 -t public public\index.php
+```
+
+Then set the web env API base to:
+
+```env
+NUXT_PUBLIC_API_BASE=http://127.0.0.1:8010/api
+```
+
+## Frontend Setup
+
+```bash
+cd D:\Development\School-SaaS-Enterprise\apps\web
+nvm use 20.11.0
+cp .env.example .env
 npm install
 npm run dev
 ```
 
-Nuxt should run at:
+The Nuxt app reads:
 
-```text
-http://localhost:3000
+```env
+NUXT_PUBLIC_API_BASE=https://school-api.test/api
+NUXT_PUBLIC_APP_NAME="School SaaS Enterprise"
 ```
 
-## Sanctum Local Notes
+Keep the base at `/api`. The Nuxt `useApi()` composable appends `/v1` centrally.
 
-The current Phase 1 implementation uses Sanctum personal access tokens for the API:
+## Login Smoke Test
 
-- `POST /api/auth/login` returns a bearer token.
+After seeding, the local test login is:
+
+```text
+Email: test@example.com
+Password: password
+```
+
+The login endpoint is:
+
+```text
+POST https://school-api.test/api/v1/auth/login
+```
+
+The current auth flow uses Sanctum personal access tokens:
+
+- Login returns a bearer token.
 - Nuxt stores the token in local storage.
 - API requests send `Authorization: Bearer <token>`.
-
-The env template already includes stateful domains so cookie-based Sanctum SPA auth can be introduced later without changing the local hostnames.
 
 ## Quality Gates
 
 Backend:
 
 ```bash
+cd D:\Development\School-SaaS-Enterprise\apps\api
 php artisan test
-vendor/bin/pint --test
-php artisan route:list
+vendor\bin\pint --test
+php artisan route:list --path=api/v1 --except-vendor
 php artisan migrate:fresh --seed
 ```
 
 Frontend:
 
 ```bash
+cd D:\Development\School-SaaS-Enterprise\apps\web
 npm run build
-npm run typecheck
-npm run lint
 ```
+

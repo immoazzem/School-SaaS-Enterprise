@@ -566,7 +566,7 @@ npm run lint
 
 ## Latest Checkpoint
 
-Current page/module complete: Production Stabilization Checkpoint C, API Versioning to `/api/v1`.
+Current page/module complete: Production Stabilization Checkpoint D, Environment and Local Development cleanup.
 
 Production stabilization status:
 
@@ -583,7 +583,7 @@ Production stabilization status:
 - `npm install` passed.
 - `npm run build` from `apps/web` passed with exit code `0`.
 - Current Codex shell reports Node `v25.0.0`; project target is Node `20.11.0`.
-- Checkpoint C is complete locally and ready to commit/push.
+- Checkpoint C API versioning was committed and pushed as `73cf83b feat: version api routes`.
 - Laravel routes are wrapped under `Route::prefix('v1')`; current application routes are under `/api/v1`.
 - Nuxt `useApi()` appends `/v1` centrally while `.env` keeps `NUXT_PUBLIC_API_BASE` at the `/api` level.
 - Feature tests now target `/api/v1/...`.
@@ -591,10 +591,14 @@ Production stabilization status:
 - `php artisan route:list --path=api/v1 --except-vendor` showed 228 versioned routes.
 - `php artisan test` passed with 79 tests / 547 assertions.
 - `npm run build` passed after the API client change.
+- Checkpoint D is complete locally and ready to commit/push.
+- `apps/web/.env.example` includes `NUXT_PUBLIC_API_BASE` and `NUXT_PUBLIC_APP_NAME`.
+- `apps/api/.env.example` uses the product app name and keeps database-backed local queue/cache/session defaults.
+- `docs/local-development.md` is copy-paste ready for Herd, MySQL, API v1, fallback PHP server, Nuxt, seeded login, and quality gates.
 
 Next page/module:
 
-- Production Stabilization Checkpoint D: environment examples and local-development docs.
+- Production Stabilization Checkpoint E: Pinia state migration.
 
 Previous product checkpoint:
 

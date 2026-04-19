@@ -92,7 +92,7 @@ Acceptance:
 
 ## Checkpoint D: Environment And Local Development
 
-**Status:** Pending
+**Status:** Complete
 
 Deliverables:
 
