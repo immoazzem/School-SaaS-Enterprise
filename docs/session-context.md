@@ -365,6 +365,22 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
   - local backup command verified with `php artisan school:backup --school=1`
   - full backend verification passed: `php artisan test` = 76 tests / 522 assertions
 - Phase 5 backend status: complete for SaaS admin foundation, settings, plan limits, onboarding, audit viewer, invitations, parent/student portals, data export/right-to-erasure, self-hosted deployment docs, and backup/restore commands.
+- Phase 6 Student Promotion backend foundation is complete:
+  - `promotion_batches`
+  - `promotion_records`
+  - `PromotionBatch` and `PromotionRecord` models
+  - `School::promotionBatches()` relationship
+  - `promotions.manage` permission seeded
+  - `POST /api/schools/{school}/promotions/preview`
+  - `POST /api/schools/{school}/promotions`
+  - `PATCH /api/schools/{school}/promotions/{batch}/records/{record}`
+  - `POST /api/schools/{school}/promotions/{batch}/execute`
+  - `POST /api/schools/{school}/promotions/{batch}/rollback`
+  - Preview suggests `retained` when a result summary has `is_pass=false`, otherwise `promoted`
+  - Execute creates new enrollments, completes old enrollments, stores `new_enrollment_id`, and audits `promotion.executed`
+  - Rollback works within 48 hours and audits `promotion.rolled_back`
+  - local MySQL migration applied with `php artisan migrate --force`
+  - full backend verification passed: `php artisan test` = 79 tests / 547 assertions
 - API index endpoints now return paginated envelopes with top-level `data`, `meta`, and `links`; frontend list code can continue reading `data` as the record array.
 - Shared audit logging lives in `App\Services\AuditLogger` and `App\Http\Controllers\Controller::recordAudit()`.
 - School show/update endpoints exist at `GET/PATCH /api/schools/{school}` with `school.member` and `schools.manage` enforcement for update.

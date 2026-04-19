@@ -597,3 +597,28 @@ Verification: `php artisan list school` showed both commands; `php artisan schoo
 Phase 5 status: backend Phase 5 is complete for SaaS admin foundation, settings, plan limits, onboarding, audit viewer, invitations, parent/student portals, data export/right-to-erasure, self-hosted deployment docs, and backup/restore commands.
 
 Next: commit and push this Phase 5 completion checkpoint, then begin the next planned phase or add Nuxt admin screens for the Phase 5 APIs.
+
+### Phase 6 Promotion Backend Foundation
+
+Current page/module complete: Phase 6 Student Promotion and Academic Year Transition backend foundation.
+
+Scope: started Phase 6 from `docs/enterprise-plan-v3.md`:
+- Added `promotion_batches` and `promotion_records`.
+- Added `PromotionBatch` and `PromotionRecord` models.
+- Added `School::promotionBatches()` relationship.
+- Seeded `promotions.manage` permission for super-admin, school-owner, and school-admin flows.
+- Added promotion endpoints:
+  - `POST /api/schools/{school}/promotions/preview`
+  - `POST /api/schools/{school}/promotions`
+  - `PATCH /api/schools/{school}/promotions/{batch}/records/{record}`
+  - `POST /api/schools/{school}/promotions/{batch}/execute`
+  - `POST /api/schools/{school}/promotions/{batch}/rollback`
+- Preview suggests `retained` when a student has a failed result summary and `promoted` otherwise.
+- Execute creates new enrollments for promoted/retained students, marks old enrollments completed, stores new enrollment links, and audits `promotion.executed`.
+- Rollback is available within the 48-hour window, deletes generated enrollments, reactivates old enrollments, clears generated links, and audits `promotion.rolled_back`.
+
+Verification: `php artisan migrate --force` applied the promotion migration to local MySQL after shortening the MySQL index name; `php artisan test --filter=PhaseSixPromotionApiTest` passed with 3 tests / 25 assertions; `vendor\bin\pint --dirty` passed; full `php artisan test` passed with 79 tests / 547 assertions.
+
+Phase 6 status: backend foundation is complete for preview, draft creation, record override, execute, rollback, and duplicate-execute protection. Remaining Phase 6 work is the Nuxt promotion workflow UI and deeper production hardening for large batches/job dispatch.
+
+Next: commit and push this Phase 6 backend checkpoint, then build the Nuxt promotion workflow.

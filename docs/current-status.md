@@ -279,10 +279,10 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Next Step
 
-Continue Phase 5 implementation:
+Continue Phase 6 implementation:
 
-1. Commit and push the Phase 5 Self-hosted Operations checkpoint.
-2. Begin the next planned phase or add Nuxt admin screens for the Phase 5 APIs.
+1. Commit and push the Phase 6 Promotion backend foundation checkpoint.
+2. Build the Nuxt promotion workflow UI.
 
 Current page/module complete: Phase 4 Nuxt Reports, Calendar, Documents, and Publication workspace.
 Latest UI correction: the Nuxt frontend has been refreshed to follow `D:\Development\tailwindui-radiant\radiant-ts` more closely, including Radiant-style warm gradients, plus-grid background lines, black pill buttons, translucent secondary controls, glass-like panels, and larger tight-tracked headings. The old green theme tokens were removed from app source.
@@ -310,6 +310,11 @@ Latest Phase 5 operations verification: `php artisan list school` showed both co
 Git status: Phase 5 Self-hosted Operations checkpoint is ready to commit and push.
 Next page/module: next planned phase or Phase 5 Nuxt administration screens.
 Phase 5 status: backend Phase 5 is complete for SaaS admin foundation, settings, plan limits, onboarding, audit viewer, invitations, parent/student portals, data export/right-to-erasure, self-hosted deployment docs, and backup/restore commands.
+Current page/module complete: Phase 6 Student Promotion backend foundation.
+Latest Phase 6 implementation: added promotion batch/record tables, models, `promotions.manage`, preview/create/record override/execute/rollback APIs, failed-result retention suggestions, enrollment creation/completion, rollback within 48 hours, and promotion audit logs.
+Latest Phase 6 verification: `php artisan migrate --force` applied the promotion migration to local MySQL after shortening a MySQL index name; `php artisan test --filter=PhaseSixPromotionApiTest` passed with 3 tests / 25 assertions; `vendor\bin\pint --dirty` passed; full `php artisan test` passed with 79 tests / 547 assertions.
+Git status: Phase 6 Promotion backend foundation is ready to commit and push.
+Next page/module: Phase 6 Nuxt promotion workflow UI.
 
 ## New Session Startup Prompt
 

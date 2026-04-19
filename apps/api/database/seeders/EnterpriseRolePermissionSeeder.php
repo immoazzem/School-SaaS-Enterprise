@@ -47,6 +47,7 @@ class EnterpriseRolePermissionSeeder extends Seeder
             ['module' => 'billing', 'key' => 'billing.manage', 'description' => 'Manage SaaS billing settings'],
             ['module' => 'portal', 'key' => 'student.portal.view', 'description' => 'View student portal data'],
             ['module' => 'portal', 'key' => 'parent.portal.view', 'description' => 'View parent portal data'],
+            ['module' => 'academics', 'key' => 'promotions.manage', 'description' => 'Manage student promotions and academic year transitions'],
         ];
 
         $permissionModels = collect($permissions)
@@ -76,6 +77,7 @@ class EnterpriseRolePermissionSeeder extends Seeder
                     'roles.manage',
                     'academic_years.manage',
                     'academic_classes.manage',
+                    'promotions.manage',
                     'sections.manage',
                     'subjects.manage',
                     'class_subjects.manage',
@@ -107,6 +109,7 @@ class EnterpriseRolePermissionSeeder extends Seeder
                 'permissions' => [
                     'academic_years.manage',
                     'academic_classes.manage',
+                    'promotions.manage',
                     'sections.manage',
                     'subjects.manage',
                     'class_subjects.manage',

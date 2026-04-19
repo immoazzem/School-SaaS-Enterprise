@@ -86,6 +86,14 @@ class School extends Model
     }
 
     /**
+     * @return HasMany<PromotionBatch, $this>
+     */
+    public function promotionBatches(): HasMany
+    {
+        return $this->hasMany(PromotionBatch::class);
+    }
+
+    /**
      * @return HasMany<AcademicClass, $this>
      */
     public function academicClasses(): HasMany

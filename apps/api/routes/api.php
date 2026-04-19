@@ -32,6 +32,7 @@ use App\Http\Controllers\Api\LeaveTypeController;
 use App\Http\Controllers\Api\MarksEntryController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PortalController;
+use App\Http\Controllers\Api\PromotionController;
 use App\Http\Controllers\Api\ReportExportController;
 use App\Http\Controllers\Api\ResultSummaryController;
 use App\Http\Controllers\Api\SalaryRecordController;
@@ -171,6 +172,16 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
     Route::get('schools/{school}/portal/parent/children/{enrollment}/invoices', [PortalController::class, 'parentChildInvoices'])
         ->middleware('school.member');
     Route::get('schools/{school}/portal/parent/notifications', [PortalController::class, 'parentNotifications'])
+        ->middleware('school.member');
+    Route::post('schools/{school}/promotions/preview', [PromotionController::class, 'preview'])
+        ->middleware('school.member');
+    Route::post('schools/{school}/promotions', [PromotionController::class, 'store'])
+        ->middleware('school.member');
+    Route::patch('schools/{school}/promotions/{batch}/records/{record}', [PromotionController::class, 'updateRecord'])
+        ->middleware('school.member');
+    Route::post('schools/{school}/promotions/{batch}/execute', [PromotionController::class, 'execute'])
+        ->middleware('school.member');
+    Route::post('schools/{school}/promotions/{batch}/rollback', [PromotionController::class, 'rollback'])
         ->middleware('school.member');
     Route::apiResource('schools.invoice-payments', InvoicePaymentController::class)
         ->parameters(['invoice-payments' => 'invoicePayment'])
