@@ -33,7 +33,16 @@ Current page/module complete: Production Stabilization Checkpoint B, Frontend Fo
   - `apps/api/.env.example` uses the product app name and keeps the current database-backed local drivers.
   - `docs/local-development.md` is rewritten with copy-paste setup for Herd, MySQL, API v1, fallback PHP server, Nuxt, seeded login, and quality gates.
 
-Next page/module: Production Stabilization Checkpoint E, Pinia State Migration.
+- Checkpoint E Pinia State Migration is complete locally and ready for checkpoint commit:
+  - added `apps/web/app/stores/auth.ts`.
+  - added `apps/web/app/stores/school.ts`.
+  - added `apps/web/app/stores/index.ts`.
+  - migrated `useAuth()` to delegate to the Pinia auth store while preserving the existing `auth.token.value`/`auth.schools.value` page contract.
+  - auth, school selection, permissions, and localStorage token persistence still use the same Nuxt state keys.
+- `npm run build` from `apps/web` passes after the Pinia migration.
+- An app-caused duplicate store auto-import warning was fixed before commit; remaining frontend warnings are the classified Nuxt/Nitro/Node warnings in `docs/KNOWN-BUILD-WARNINGS.md`.
+
+Next page/module: Production Stabilization Checkpoint F, Permission and Tenant Isolation Tests.
 
 ## Completed
 

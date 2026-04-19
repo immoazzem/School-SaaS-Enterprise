@@ -704,3 +704,18 @@ Scope: made local setup clearer for the current Herd/MySQL/Nuxt shape:
 Verification: documentation and env-template checkpoint. Previous Checkpoint C verification remains current: `php artisan test` passed with 79 tests / 547 assertions and `npm run build` passed.
 
 Next: commit and push this checkpoint, then continue with Production Stabilization Checkpoint E: Pinia state migration.
+
+### Production Stabilization Pinia State Migration
+
+Current page/module complete: Production Stabilization Checkpoint E, Pinia State Migration.
+
+Scope: introduced Pinia as the frontend state layer without breaking existing page contracts:
+- added `apps/web/app/stores/auth.ts` with token, user, schools, selected school, selected school computed state, permissions, `can()`, login, profile refresh, school refresh/create, school selection, and logout.
+- added `apps/web/app/stores/school.ts` as a small shared school list/loading/error store.
+- added `apps/web/app/stores/index.ts` as a store directory marker without duplicate auto-import exports.
+- migrated `useAuth()` to delegate to `useAuthStore()` and return the same refs/actions existing pages use.
+- kept the same Nuxt `useState` keys so `useApi()` still reads the active bearer token correctly.
+
+Verification: `npm run build` from `apps/web` passed. A new app-caused duplicated store auto-import warning was found and fixed by importing the auth store directly from `~/stores/auth` and keeping `stores/index.ts` free of duplicate `use*Store` exports. Remaining frontend warnings match `docs/KNOWN-BUILD-WARNINGS.md`.
+
+Next: commit and push this checkpoint, then continue with Production Stabilization Checkpoint F: permission and tenant isolation tests.

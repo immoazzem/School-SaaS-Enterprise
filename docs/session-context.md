@@ -566,7 +566,7 @@ npm run lint
 
 ## Latest Checkpoint
 
-Current page/module complete: Production Stabilization Checkpoint D, Environment and Local Development cleanup.
+Current page/module complete: Production Stabilization Checkpoint E, Pinia State Migration.
 
 Production stabilization status:
 
@@ -591,14 +591,19 @@ Production stabilization status:
 - `php artisan route:list --path=api/v1 --except-vendor` showed 228 versioned routes.
 - `php artisan test` passed with 79 tests / 547 assertions.
 - `npm run build` passed after the API client change.
-- Checkpoint D is complete locally and ready to commit/push.
+- Checkpoint D environment docs were committed and pushed as `c1b5f44 docs: refresh local development setup`.
 - `apps/web/.env.example` includes `NUXT_PUBLIC_API_BASE` and `NUXT_PUBLIC_APP_NAME`.
 - `apps/api/.env.example` uses the product app name and keeps database-backed local queue/cache/session defaults.
 - `docs/local-development.md` is copy-paste ready for Herd, MySQL, API v1, fallback PHP server, Nuxt, seeded login, and quality gates.
+- Checkpoint E is complete locally and ready to commit/push.
+- Pinia stores exist at `apps/web/app/stores/auth.ts` and `apps/web/app/stores/school.ts`.
+- `useAuth()` delegates to the Pinia auth store while preserving the old page contract (`auth.token.value`, `auth.schools.value`, etc.).
+- The auth store uses the same Nuxt `useState` keys as before, so `useApi()` still reads the bearer token correctly.
+- `npm run build` passed after Pinia migration.
 
 Next page/module:
 
-- Production Stabilization Checkpoint E: Pinia state migration.
+- Production Stabilization Checkpoint F: permission and tenant isolation tests.
 
 Previous product checkpoint:
 
