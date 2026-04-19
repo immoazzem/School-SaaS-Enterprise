@@ -20,6 +20,8 @@ interface StudentResponse {
 const api = useApi()
 const route = useRoute()
 const auth = useAuth()
+const { t, locale } = useI18n()
+useSchoolLocale()
 
 const guardians = ref<Guardian[]>([])
 const students = ref<Student[]>([])
@@ -49,6 +51,7 @@ const studentForm = reactive({
   guardian_id: '',
   admission_no: '',
   full_name: '',
+  name_bn: '',
   father_name: '',
   mother_name: '',
   email: '',
@@ -131,6 +134,7 @@ function resetStudentForm() {
   studentForm.guardian_id = ''
   studentForm.admission_no = ''
   studentForm.full_name = ''
+  studentForm.name_bn = ''
   studentForm.father_name = ''
   studentForm.mother_name = ''
   studentForm.email = ''
@@ -160,6 +164,7 @@ function editStudent(student: Student) {
   studentForm.guardian_id = student.guardian_id ? String(student.guardian_id) : ''
   studentForm.admission_no = student.admission_no
   studentForm.full_name = student.full_name
+  studentForm.name_bn = student.name_bn || ''
   studentForm.father_name = student.father_name || ''
   studentForm.mother_name = student.mother_name || ''
   studentForm.email = student.email || ''
@@ -221,6 +226,7 @@ async function saveStudent() {
     guardian_id: studentForm.guardian_id ? Number(studentForm.guardian_id) : null,
     admission_no: studentForm.admission_no,
     full_name: studentForm.full_name,
+    name_bn: studentForm.name_bn || null,
     father_name: studentForm.father_name || null,
     mother_name: studentForm.mother_name || null,
     email: studentForm.email || null,
@@ -240,13 +246,13 @@ async function saveStudent() {
         method: 'PATCH',
         body: payload,
       })
-      success.value = 'Student updated.'
+      success.value = t('students.updated')
     } else {
       await api.request<StudentResponse>(`/schools/${schoolId.value}/students`, {
         method: 'POST',
         body: payload,
       })
-      success.value = 'Student saved.'
+      success.value = t('students.saved')
     }
 
     resetStudentForm()
@@ -281,17 +287,22 @@ onMounted(async () => {
   await auth.refreshProfile()
   await loadWorkspace()
 })
+
+watch(locale, async () => {
+  await loadStudents()
+})
 </script>
 
 <template>
   <main class="people-page">
     <header class="page-header">
       <div>
-        <NuxtLink class="back-link" to="/dashboard">Dashboard</NuxtLink>
-        <h1>Students</h1>
+        <NuxtLink class="back-link" to="/dashboard">{{ $t('common.dashboard') }}</NuxtLink>
+        <h1>{{ $t('students.title') }}</h1>
         <p>Register guardians and students before enrollments, attendance, exams, and fees begin.</p>
       </div>
       <div class="header-actions">
+        <LocaleSwitcher />
         <NuxtLink class="button secondary" :to="`/schools/${schoolId}/employees`">Employees</NuxtLink>
         <NuxtLink class="button secondary" :to="`/schools/${schoolId}/academic-classes`">Classes</NuxtLink>
       </div>
@@ -303,7 +314,7 @@ onMounted(async () => {
         <strong>{{ students.length }}</strong>
       </article>
       <article class="surface summary-item">
-        <span>Active</span>
+        <span>{{ $t('common.active') }}</span>
         <strong>{{ activeStudents }}</strong>
       </article>
       <article class="surface summary-item">
@@ -314,7 +325,7 @@ onMounted(async () => {
 
     <p v-if="error" class="error">{{ error }}</p>
     <p v-if="success" class="success">{{ success }}</p>
-    <p v-if="loading" class="muted">Loading students</p>
+    <p v-if="loading" class="muted">{{ $t('common.loading') }}</p>
 
     <section class="form-grid">
       <form class="surface record-form" @submit.prevent="saveGuardian">
@@ -354,7 +365,7 @@ onMounted(async () => {
 
       <form class="surface record-form" @submit.prevent="saveStudent">
         <p class="muted">{{ editingStudentId ? 'Edit student' : 'New student' }}</p>
-        <h2>{{ editingStudentId ? 'Update student' : 'Add student' }}</h2>
+        <h2>{{ editingStudentId ? 'Update student' : $t('students.add') }}</h2>
 
         <div class="form-row">
           <div>
@@ -372,8 +383,11 @@ onMounted(async () => {
           </div>
         </div>
 
-        <label for="student-name">Name</label>
+        <label for="student-name">{{ $t('students.fullName') }}</label>
         <input id="student-name" v-model="studentForm.full_name" required placeholder="Nadia Rahman" />
+
+        <label for="student-name-bn">{{ $t('students.bengaliName') }}</label>
+        <input id="student-name-bn" v-model="studentForm.name_bn" placeholder="নাদিয়া রহমান" />
 
         <div class="form-row">
           <div>
@@ -472,11 +486,11 @@ onMounted(async () => {
         <div class="list-heading">
           <div>
             <p class="muted">Admissions</p>
-            <h2>Students</h2>
+            <h2>{{ $t('students.title') }}</h2>
           </div>
           <form class="filters" @submit.prevent="loadStudents">
             <input v-model="studentSearch" aria-label="Search students" placeholder="Search" />
-            <button class="button secondary" type="submit">Search</button>
+            <button class="button secondary" type="submit">{{ $t('actions.search') }}</button>
           </form>
         </div>
 
@@ -494,19 +508,20 @@ onMounted(async () => {
             <tbody>
               <tr v-for="student in students" :key="student.id">
                 <td>
-                  <strong>{{ student.full_name }}</strong>
+                  <strong>{{ student.display_name }}</strong>
+                  <small v-if="student.display_name !== student.full_name">{{ student.full_name }}</small>
                   <small>{{ student.admission_no }}</small>
                 </td>
                 <td>{{ student.guardian?.full_name || 'Unassigned' }}</td>
                 <td>{{ toDateInput(student.admitted_on) }}</td>
                 <td>{{ student.status }}</td>
                 <td>
-                  <button class="text-button" type="button" @click="editStudent(student)">Edit</button>
-                  <button class="text-button" type="button" @click="archiveStudent(student)">Archive</button>
+                  <button class="text-button" type="button" @click="editStudent(student)">{{ $t('actions.edit') }}</button>
+                  <button class="text-button" type="button" @click="archiveStudent(student)">{{ $t('actions.archive') }}</button>
                 </td>
               </tr>
               <tr v-if="students.length === 0">
-                <td colspan="5">No students yet.</td>
+                <td colspan="5">{{ $t('students.empty') }}</td>
               </tr>
             </tbody>
           </table>

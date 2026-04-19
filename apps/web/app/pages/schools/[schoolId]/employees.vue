@@ -16,6 +16,8 @@ interface DesignationsResponse {
 const api = useApi()
 const route = useRoute()
 const auth = useAuth()
+const { t, locale } = useI18n()
+useSchoolLocale()
 
 const employees = ref<Employee[]>([])
 const designations = ref<Designation[]>([])
@@ -33,6 +35,7 @@ const form = reactive({
   designation_id: '',
   employee_no: '',
   full_name: '',
+  name_bn: '',
   father_name: '',
   mother_name: '',
   email: '',
@@ -100,6 +103,7 @@ function resetForm() {
   form.designation_id = ''
   form.employee_no = ''
   form.full_name = ''
+  form.name_bn = ''
   form.father_name = ''
   form.mother_name = ''
   form.email = ''
@@ -120,6 +124,7 @@ function editEmployee(employee: Employee) {
   form.designation_id = employee.designation_id ? String(employee.designation_id) : ''
   form.employee_no = employee.employee_no
   form.full_name = employee.full_name
+  form.name_bn = employee.name_bn || ''
   form.father_name = employee.father_name || ''
   form.mother_name = employee.mother_name || ''
   form.email = employee.email || ''
@@ -144,6 +149,7 @@ async function saveEmployee() {
     designation_id: form.designation_id ? Number(form.designation_id) : null,
     employee_no: form.employee_no,
     full_name: form.full_name,
+    name_bn: form.name_bn || null,
     father_name: form.father_name || null,
     mother_name: form.mother_name || null,
     email: form.email || null,
@@ -165,13 +171,13 @@ async function saveEmployee() {
         method: 'PATCH',
         body: payload,
       })
-      success.value = 'Employee updated.'
+      success.value = t('employees.updated')
     } else {
       await api.request<EmployeeResponse>(`/schools/${schoolId.value}/employees`, {
         method: 'POST',
         body: payload,
       })
-      success.value = 'Employee saved.'
+      success.value = t('employees.saved')
     }
 
     resetForm()
@@ -229,18 +235,23 @@ onMounted(async () => {
   await loadDesignations()
   await loadEmployees()
 })
+
+watch(locale, async () => {
+  await loadEmployees()
+})
 </script>
 
 <template>
   <main class="catalog-page">
     <header class="catalog-header">
       <div>
-        <NuxtLink class="back-link" to="/dashboard">Dashboard</NuxtLink>
-        <h1>Employees</h1>
+        <NuxtLink class="back-link" to="/dashboard">{{ $t('common.dashboard') }}</NuxtLink>
+        <h1>{{ $t('employees.title') }}</h1>
         <p>Keep staff profiles, teacher records, contact details, salary baselines, and designation links ready.</p>
       </div>
 
       <div class="header-actions">
+        <LocaleSwitcher />
         <NuxtLink class="button secondary" :to="`/schools/${schoolId}/designations`">Designations</NuxtLink>
         <NuxtLink class="button secondary" :to="`/schools/${schoolId}/shifts`">Shifts</NuxtLink>
       </div>
@@ -252,7 +263,7 @@ onMounted(async () => {
         <strong>{{ employees.length }}</strong>
       </article>
       <article class="surface summary-item">
-        <span>Active staff</span>
+        <span>{{ $t('common.active') }} staff</span>
         <strong>{{ activeCount }}</strong>
       </article>
       <article class="surface summary-item">
@@ -265,7 +276,7 @@ onMounted(async () => {
       <form class="surface catalog-form" @submit.prevent="saveEmployee">
         <div>
           <p class="muted">{{ editingEmployeeId ? 'Edit employee' : 'New employee' }}</p>
-          <h2>{{ editingEmployeeId ? 'Update employee' : 'Add employee' }}</h2>
+          <h2>{{ editingEmployeeId ? 'Update employee' : $t('employees.add') }}</h2>
         </div>
 
         <div class="form-row">
@@ -286,8 +297,13 @@ onMounted(async () => {
         </div>
 
         <div class="field">
-          <label for="employee-name">Full name</label>
+          <label for="employee-name">{{ $t('employees.fullName') }}</label>
           <input id="employee-name" v-model="form.full_name" required placeholder="Amina Rahman" />
+        </div>
+
+        <div class="field">
+          <label for="employee-name-bn">{{ $t('employees.bengaliName') }}</label>
+          <input id="employee-name-bn" v-model="form.name_bn" placeholder="আমিনা রহমান" />
         </div>
 
         <div class="form-row">
@@ -383,7 +399,7 @@ onMounted(async () => {
         <div class="list-heading">
           <div>
             <p class="muted">People records</p>
-            <h2>Employee roster</h2>
+            <h2>{{ $t('employees.roster') }}</h2>
           </div>
 
           <form class="filters" @submit.prevent="searchEmployees">
@@ -407,11 +423,11 @@ onMounted(async () => {
                 {{ designation.name }}
               </option>
             </select>
-            <button class="button secondary" type="submit">Search</button>
+            <button class="button secondary" type="submit">{{ $t('actions.search') }}</button>
           </form>
         </div>
 
-        <p v-if="loading" class="muted">Loading employees</p>
+        <p v-if="loading" class="muted">{{ $t('common.loading') }}</p>
 
         <div v-else class="table-wrap">
           <table>
@@ -428,7 +444,8 @@ onMounted(async () => {
             <tbody>
               <tr v-for="employee in employees" :key="employee.id">
                 <td>
-                  <strong>{{ employee.full_name }}</strong>
+                  <strong>{{ employee.display_name }}</strong>
+                  <small v-if="employee.display_name !== employee.full_name">{{ employee.full_name }}</small>
                   <small>{{ employee.employee_no }} · {{ employee.phone || employee.email || 'No contact' }}</small>
                 </td>
                 <td>{{ employee.designation?.name || 'Unassigned' }}</td>
@@ -437,20 +454,20 @@ onMounted(async () => {
                 <td>{{ employee.status }}</td>
                 <td>
                   <div class="row-actions">
-                    <button class="text-button" type="button" @click="editEmployee(employee)">Edit</button>
+                    <button class="text-button" type="button" @click="editEmployee(employee)">{{ $t('actions.edit') }}</button>
                     <button
                       class="text-button"
                       type="button"
                       :disabled="employee.status === 'archived' || archivingEmployeeId === employee.id"
                       @click="archiveEmployee(employee)"
                     >
-                      Archive
+                      {{ $t('actions.archive') }}
                     </button>
                   </div>
                 </td>
               </tr>
               <tr v-if="employees.length === 0">
-                <td colspan="6">No employees yet.</td>
+                <td colspan="6">{{ $t('employees.empty') }}</td>
               </tr>
             </tbody>
           </table>

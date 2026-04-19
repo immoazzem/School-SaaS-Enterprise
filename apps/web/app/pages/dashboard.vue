@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const auth = useAuth()
 const router = useRouter()
+useSchoolLocale()
 
 const loading = ref(false)
 const creatingSchool = ref(false)
@@ -469,6 +470,7 @@ onMounted(loadDashboard)
         </div>
 
         <div class="topbar-actions">
+          <LocaleSwitcher />
           <select
             v-if="auth.schools.value.length"
             class="school-select"
@@ -479,7 +481,7 @@ onMounted(loadDashboard)
               {{ school.name }}
             </option>
           </select>
-          <button class="button secondary" type="button" @click="auth.logout()">Sign out</button>
+          <button class="button secondary" type="button" @click="auth.logout()">{{ $t('actions.signOut') }}</button>
         </div>
       </header>
 

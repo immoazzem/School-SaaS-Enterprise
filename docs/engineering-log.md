@@ -925,3 +925,23 @@ Verification: `php artisan test --filter=PhaseSevenLocalization` passed with 3 t
 Phase 7D status: backend localization foundation is complete for student and employee display names. Remaining Phase 7D work is the Nuxt i18n frontend integration and visible language switching.
 
 Next: commit and push this Phase 7D backend checkpoint, then continue with the Nuxt i18n frontend slice.
+
+### Phase 7D Nuxt i18n Frontend Integration
+
+Current page/module complete: Phase 7D Nuxt i18n frontend integration, route verified at `/schools/{schoolId}/students`.
+
+Scope: wired the frontend multi-language foundation:
+- installed `@nuxtjs/i18n`.
+- configured Nuxt i18n for English and Bengali with no route prefix.
+- added `apps/web/i18n.config.ts` with the first English/Bengali message catalog.
+- added `LocaleSwitcher`.
+- added `useSchoolLocale()` to sync the selected school locale into Nuxt i18n and API locale state.
+- updated `useApi()` to send `Accept-Language`.
+- added language switching to the dashboard.
+- updated Students and Employees workspaces to collect `name_bn`, submit it to the API, and display localized `display_name`.
+
+Verification: `npm run build` from `apps/web` passed with the existing classified Nuxt/Nitro/Node warnings. Browser smoke used API `http://127.0.0.1:8030/api` and web `http://127.0.0.1:3000`; agent-browser opened `/schools/1/students`, switched to Bengali, verified translated labels, and confirmed `ব্রাউজার বাংলা শিক্ষার্থী` displayed for a Bengali-name student. Screenshot saved at `docs/browser-checks/localization-students-bn.png`.
+
+Phase 7D status: backend and Nuxt frontend foundations are complete for multi-language support. Translation coverage is intentionally partial; the foundation is now in place for expanding strings screen by screen.
+
+Next: commit and push this Phase 7D frontend checkpoint, then continue with Phase 7E Offline Support / PWA planning or the next v3 priority.

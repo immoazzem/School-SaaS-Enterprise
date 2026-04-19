@@ -11,6 +11,7 @@ export interface ApiSchool {
   name: string
   slug: string
   status: string
+  locale?: string
   roles?: {
     key: string
     name: string
@@ -230,6 +231,8 @@ export interface Employee {
   designation_id: number | null
   employee_no: string
   full_name: string
+  name_bn: string | null
+  display_name: string
   father_name: string | null
   mother_name: string | null
   email: string | null
@@ -265,6 +268,8 @@ export interface Student {
   guardian_id: number | null
   admission_no: string
   full_name: string
+  name_bn: string | null
+  display_name: string
   father_name: string | null
   mother_name: string | null
   email: string | null
@@ -661,10 +666,12 @@ type RequestOptions = {
 export function useApi() {
   const config = useRuntimeConfig()
   const token = useState<string | null>('auth.token', () => null)
+  const apiLocale = useState<string>('app.locale', () => 'en')
 
   async function request<T>(path: string, options: RequestOptions = {}) {
     const headers: Record<string, string> = {
       Accept: 'application/json',
+      'Accept-Language': apiLocale.value,
     }
 
     if (token.value) {

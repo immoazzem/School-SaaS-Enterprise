@@ -566,6 +566,35 @@ npm run lint
 
 ## Latest Checkpoint
 
+Current page/module complete: Phase 7D Nuxt i18n frontend integration.
+
+Latest Phase 7D frontend status:
+
+- Installed and configured `@nuxtjs/i18n`.
+- Added English/Bengali messages in `apps/web/i18n.config.ts`.
+- Added reusable `LocaleSwitcher`.
+- Added `useSchoolLocale()` to sync selected-school locale with Nuxt i18n and shared API locale state.
+- Updated `useApi()` to send `Accept-Language`.
+- Dashboard includes the language switcher.
+- Students and Employees pages now collect `name_bn`, submit it to the API, and display localized `display_name`.
+- People lists reload when the UI locale changes.
+
+Latest Phase 7D frontend verification:
+
+- `npm run build` from `apps/web`: passed with existing classified Nuxt/Nitro/Node warnings.
+- Local web server: `http://127.0.0.1:3000`.
+- Local API server for smoke check: `http://127.0.0.1:8030/api`.
+- Browser smoke opened `http://127.0.0.1:3000/schools/1/students`.
+- Browser switched to Bengali and confirmed translated labels.
+- Browser confirmed a Bengali-name student renders as `ব্রাউজার বাংলা শিক্ষার্থী`, with English fallback shown underneath.
+- Screenshot saved at `docs/browser-checks/localization-students-bn.png`.
+
+Next page/module:
+
+- Phase 7E Offline Support / PWA planning or the next v3 priority.
+
+Previous checkpoint:
+
 Current page/module complete: Phase 7D Multi-Language Support backend foundation.
 
 Latest Phase 7D backend status:

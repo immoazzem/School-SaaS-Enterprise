@@ -204,7 +204,27 @@ Current page/module complete: Phase 7D Multi-Language Support backend foundation
 - `php artisan migrate --force` applied the multilingual-name migration locally.
 - `php artisan test` passed with 117 tests / 702 assertions.
 
-Next page/module: Phase 7D Nuxt i18n frontend integration.
+Current page/module complete: Phase 7D Nuxt i18n frontend integration.
+
+- Installed and configured `@nuxtjs/i18n`.
+- Added English and Bengali message catalogs through `apps/web/i18n.config.ts`.
+- Added a reusable `LocaleSwitcher` component.
+- Added school-locale sync through `useSchoolLocale()`.
+- Nuxt API requests now send `Accept-Language` from shared locale state.
+- Dashboard now exposes the language switcher.
+- Students and Employees workspaces now:
+  - include Bengali-name inputs.
+  - submit `name_bn` to the API.
+  - display localized `display_name`, with English fallback underneath when different.
+  - reload people lists when the UI locale changes.
+- `npm run build` from `apps/web` passed with the existing classified Nuxt/Nitro/Node warnings.
+- Browser verification passed at `http://127.0.0.1:3000/schools/1/students`.
+- Browser created/loaded a Bengali-name student and showed `ব্রাউজার বাংলা শিক্ষার্থী` after switching to Bengali.
+- Screenshot saved at `docs/browser-checks/localization-students-bn.png`.
+
+Local site link: `http://127.0.0.1:3000/schools/1/students`.
+
+Next page/module: Phase 7E Offline Support / PWA planning or the next v3 priority.
 
 ## Completed
 
