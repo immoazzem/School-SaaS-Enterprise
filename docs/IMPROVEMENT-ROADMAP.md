@@ -25,7 +25,7 @@ This roadmap replaces generic Copilot/Claude output with repo-specific decisions
 
 ## Checkpoint A: Roadmap
 
-**Status:** In progress
+**Status:** Complete
 
 Deliverables:
 
@@ -39,7 +39,7 @@ Acceptance:
 
 ## Checkpoint B: Frontend Foundation And Build Warnings
 
-**Status:** Pending
+**Status:** Complete
 
 Deliverables:
 
@@ -239,4 +239,3 @@ Phase 7 candidates after stabilization:
 - Payment gateway integration
 - SMS and push notification delivery
 - Mobile-responsive UI pass
-

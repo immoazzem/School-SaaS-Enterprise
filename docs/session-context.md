@@ -566,6 +566,30 @@ npm run lint
 
 ## Latest Checkpoint
 
+Current page/module complete: Production Stabilization Checkpoint B, Frontend Foundation and Build Warning Classification.
+
+Production stabilization status:
+
+- `docs/IMPROVEMENT-ROADMAP.md` is the active pre-Phase 7 stabilization roadmap.
+- Checkpoint A roadmap was committed and pushed as `933a920 docs: add production stabilization roadmap`.
+- Checkpoint B is complete locally and ready to commit/push.
+- Nuxt frontend dependencies now include Tailwind CSS module, Tailwind v3, Pinia, VueUse, Zod, PostCSS, and Autoprefixer.
+- Pinia is intentionally `^3.0.4` with `@pinia/nuxt ^0.11.3` because Vue Router 5 declares optional Pinia 3 peer compatibility.
+- `apps/web/.nvmrc` locks Node to `20.11.0`.
+- `apps/web/nuxt.config.ts` is SPA mode and loads `@nuxtjs/tailwindcss` plus `@pinia/nuxt`.
+- Tailwind module uses `cssPath: '~/assets/css/main.css'`, so the existing Radiant-inspired CSS file is the Tailwind entry.
+- `apps/web/tailwind.config.ts` exists.
+- `docs/KNOWN-BUILD-WARNINGS.md` classifies the remaining frontend build warnings.
+- `npm install` passed.
+- `npm run build` from `apps/web` passed with exit code `0`.
+- Current Codex shell reports Node `v25.0.0`; project target is Node `20.11.0`.
+
+Next page/module:
+
+- Production Stabilization Checkpoint C: version the API under `/api/v1`, update the frontend API composable, update tests, and document API versioning.
+
+Previous product checkpoint:
+
 Current page/module complete: Phase 6 Student Promotion workflow UI.
 
 Latest Phase 6 status:

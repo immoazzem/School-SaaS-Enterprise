@@ -641,3 +641,34 @@ Local smoke-test note: Herd Desktop was not running in this shell, so browser ve
 Phase 6 status: backend foundation and Nuxt promotion workflow UI are complete. Remaining Phase 6 work is deeper production hardening for large batches/job dispatch, stronger lifecycle guards, and richer seeded demo data for full browser execution tests.
 
 Next: commit and push this Phase 6 UI checkpoint, then continue with Phase 6 hardening or the next v3 phase.
+
+## 2026-04-19
+
+### `933a920` - Production Stabilization Roadmap
+
+Current page/module complete: Production Stabilization Checkpoint A.
+
+Scope: added `docs/IMPROVEMENT-ROADMAP.md` as the repo-specific stabilization plan before Phase 7. The roadmap keeps `docs/enterprise-plan-v3.md` as active, treats `docs/enterprise-plan-v2.md` as the v2 reference when v3 mentions v2, and orders the work through frontend foundation, API versioning, env docs, Pinia migration, permission tests, PDF reliability, queue observability, and final review.
+
+Verification: documentation-only checkpoint.
+
+Next: complete frontend dependency and warning stabilization.
+
+### Production Stabilization Frontend Foundation
+
+Current page/module complete: Production Stabilization Checkpoint B, Frontend Foundation and Build Warning Classification.
+
+Scope: updated the Nuxt frontend foundation before Phase 7:
+- added Tailwind CSS module, Tailwind v3, Pinia, VueUse, Zod, PostCSS, and Autoprefixer dependencies.
+- aligned Pinia to `^3.0.4` and `@pinia/nuxt` to `^0.11.3` after npm exposed Vue Router 5's optional Pinia 3 peer requirement.
+- added Node engine metadata and `apps/web/.nvmrc` with `20.11.0`.
+- configured Nuxt for SPA mode, Pinia, Tailwind module loading from `~/assets/css/main.css`, and the existing runtime API base.
+- added `apps/web/tailwind.config.ts`.
+- added Tailwind directives to the existing Radiant-inspired `main.css`.
+- added `docs/KNOWN-BUILD-WARNINGS.md` with classifications for Nuxt/Nitro duplicated `useAppConfig`, Nuxt module-preload sourcemap, Node `DEP0155`, and transitive npm install deprecations.
+
+Verification: `npm install` passed; `npm run build` from `apps/web` passed with exit code `0`. Tailwind now reports `Using Tailwind CSS from ~/assets/css/main.css`.
+
+Local notes: the Codex shell currently reports Node `v25.0.0` and npm `11.11.0`; the project target is locked to Node `20.11.0` and npm `>=10.2.0`.
+
+Next: commit and push this checkpoint, then continue with Production Stabilization Checkpoint C: API versioning to `/api/v1`.

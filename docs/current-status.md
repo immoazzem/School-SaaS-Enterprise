@@ -2,6 +2,24 @@
 
 Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 mentions v2, it means `docs/enterprise-plan-v2.md`. All v2 baseline rules remain primary, and v3 adds to and extends them unless a section explicitly says otherwise.
 
+## Latest Production Stabilization Status
+
+Current page/module complete: Production Stabilization Checkpoint B, Frontend Foundation and Build Warning Classification.
+
+- Checkpoint A roadmap is complete and pushed as `933a920 docs: add production stabilization roadmap`.
+- Checkpoint B frontend foundation is complete locally and ready for checkpoint commit:
+  - added Tailwind CSS module, Tailwind v3, Pinia, VueUse, Zod, PostCSS, and Autoprefixer dependencies.
+  - added `apps/web/.nvmrc` with Node `20.11.0`.
+  - updated Nuxt config for SPA mode, Pinia, Tailwind module, runtime API base, and project CSS entry.
+  - added `apps/web/tailwind.config.ts`.
+  - added Tailwind directives to `apps/web/app/assets/css/main.css` while preserving the Radiant-inspired custom UI layer.
+  - documented all current frontend build warnings in `docs/KNOWN-BUILD-WARNINGS.md`.
+- `npm install` initially exposed a Pinia peer conflict; it was resolved by using Pinia `^3.0.4` with `@pinia/nuxt ^0.11.3`, matching Vue Router 5.
+- `npm run build` from `apps/web` passes with exit code `0`.
+- Current Codex shell uses Node `v25.0.0`; the project target is locked to Node `20.11.0`.
+
+Next page/module: Production Stabilization Checkpoint C, API Versioning to `/api/v1`.
+
 ## Completed
 
 - Created new workspace at `D:\Development\School-SaaS-Enterprise`.
