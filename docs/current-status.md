@@ -316,6 +316,13 @@ Latest Phase 6 verification: `php artisan migrate --force` applied the promotion
 Git status: Phase 6 Promotion backend foundation is ready to commit and push.
 Next page/module: Phase 6 Nuxt promotion workflow UI.
 
+Current page/module complete: Phase 6 Student Promotion workflow UI.
+Latest Phase 6 frontend implementation: added typed promotion API shapes, dashboard Promotions navigation/action, and `/schools/1/promotions` workflow UI for previewing candidates, creating draft batches, overriding promotion actions/notes, executing batches, and rolling back completed batches.
+Latest Phase 6 frontend verification: `npm run build` from `apps/web` passed with existing Nuxt/Nitro warnings; `php artisan db:seed --class=EnterpriseRolePermissionSeeder` refreshed local RBAC permissions; agent-browser logged in locally, opened `http://127.0.0.1:3000/schools/1/promotions`, confirmed nonblank content and no Vite/Nuxt error overlay, and saved `docs/browser-checks/promotions-workflow.png`.
+Local server note: Herd Desktop was not running in this Codex shell, so the browser smoke used Nuxt at `http://127.0.0.1:3000` and PHP 8.5's built-in server at `http://127.0.0.1:8010/api`.
+Git status: Phase 6 Promotion workflow UI checkpoint is ready to commit and push.
+Next page/module: Phase 6 promotion hardening for large batches/job dispatch, lifecycle guardrails, and fuller browser execution demo data.
+
 ## New Session Startup Prompt
 
 ```text

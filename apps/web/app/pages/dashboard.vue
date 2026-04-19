@@ -112,6 +112,11 @@ const navItems = computed(() => [
     enabled: selectedSchool.value?.permissions?.includes('reports.view') ?? false,
   },
   {
+    label: 'Promotions',
+    active: false,
+    enabled: selectedSchool.value?.permissions?.includes('promotions.manage') ?? false,
+  },
+  {
     label: 'Calendar',
     active: false,
     enabled:
@@ -331,6 +336,15 @@ async function openReports() {
   await router.push(`/schools/${auth.selectedSchoolId.value}/reports`)
 }
 
+async function openPromotions() {
+  if (!auth.selectedSchoolId.value) {
+    error.value = 'Create or select a school first.'
+    return
+  }
+
+  await router.push(`/schools/${auth.selectedSchoolId.value}/promotions`)
+}
+
 async function openCalendar() {
   if (!auth.selectedSchoolId.value) {
     error.value = 'Create or select a school first.'
@@ -347,6 +361,33 @@ async function openDocuments() {
   }
 
   await router.push(`/schools/${auth.selectedSchoolId.value}/documents`)
+}
+
+const navActions: Record<string, () => Promise<void>> = {
+  'Academic Classes': openClasses,
+  Sections: openSections,
+  'Academic Years': openAcademicYears,
+  Subjects: openSubjects,
+  'Class Subjects': openClassSubjects,
+  Groups: openStudentGroups,
+  Shifts: openShifts,
+  Designations: openDesignations,
+  People: openStudents,
+  Enrollments: openEnrollments,
+  Teachers: openTeachers,
+  Attendance: openAttendance,
+  Exams: openExams,
+  Marks: openMarks,
+  Finance: openFinance,
+  'Staff Ops': openStaffOperations,
+  Reports: openReports,
+  Promotions: openPromotions,
+  Calendar: openCalendar,
+  Documents: openDocuments,
+}
+
+async function openNavItem(label: string) {
+  await navActions[label]?.()
 }
 
 onMounted(loadDashboard)
@@ -367,47 +408,7 @@ onMounted(loadDashboard)
           :class="{ active: item.active }"
           type="button"
           :disabled="!item.enabled"
-          @click="
-            item.label === 'Academic Classes'
-              ? openClasses()
-              : item.label === 'Sections'
-                ? openSections()
-                : item.label === 'Academic Years'
-                  ? openAcademicYears()
-                  : item.label === 'Subjects'
-                    ? openSubjects()
-                    : item.label === 'Class Subjects'
-                      ? openClassSubjects()
-                      : item.label === 'Groups'
-                        ? openStudentGroups()
-                        : item.label === 'Shifts'
-                          ? openShifts()
-                          : item.label === 'Designations'
-                            ? openDesignations()
-                          : item.label === 'People'
-                            ? openStudents()
-                            : item.label === 'Enrollments'
-                              ? openEnrollments()
-                              : item.label === 'Teachers'
-                                ? openTeachers()
-                                : item.label === 'Attendance'
-                                  ? openAttendance()
-                                  : item.label === 'Exams'
-                                    ? openExams()
-                                    : item.label === 'Marks'
-                                      ? openMarks()
-                                      : item.label === 'Finance'
-                                        ? openFinance()
-                                        : item.label === 'Staff Ops'
-                                          ? openStaffOperations()
-                                          : item.label === 'Reports'
-                                            ? openReports()
-                                            : item.label === 'Calendar'
-                                              ? openCalendar()
-                                              : item.label === 'Documents'
-                                                ? openDocuments()
-                                                : undefined
-          "
+          @click="openNavItem(item.label)"
         >
           <span>{{ item.label }}</span>
           <small v-if="!item.enabled">Locked</small>
@@ -553,6 +554,7 @@ onMounted(loadDashboard)
           <button class="button secondary" type="button" @click="openFinance">Open finance</button>
           <button class="button secondary" type="button" @click="openStaffOperations">Open staff ops</button>
           <button class="button secondary" type="button" @click="openReports">Open reports</button>
+          <button class="button secondary" type="button" @click="openPromotions">Open promotions</button>
           <button class="button secondary" type="button" @click="openCalendar">Open calendar</button>
           <button class="button secondary" type="button" @click="openDocuments">Open documents</button>
         </div>

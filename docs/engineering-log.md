@@ -622,3 +622,22 @@ Verification: `php artisan migrate --force` applied the promotion migration to l
 Phase 6 status: backend foundation is complete for preview, draft creation, record override, execute, rollback, and duplicate-execute protection. Remaining Phase 6 work is the Nuxt promotion workflow UI and deeper production hardening for large batches/job dispatch.
 
 Next: commit and push this Phase 6 backend checkpoint, then build the Nuxt promotion workflow.
+
+### Phase 6 Nuxt Promotion Workflow UI
+
+Current page/module complete: Phase 6 Student Promotion workflow UI.
+
+Scope: added the Nuxt promotion workflow for `promotions.manage` users:
+- Added typed `PromotionAction`, `PromotionPreviewRow`, `PromotionRecord`, and `PromotionBatch` API shapes.
+- Added dashboard navigation/action access for Promotions.
+- Added `/schools/{schoolId}/promotions` using the existing Radiant-inspired operation shell.
+- The page loads active academic years/classes, previews promotion candidates, creates draft batches, edits record actions/notes, executes batches, and rolls back completed batches through the Phase 6 backend endpoints.
+- Added promotion summary metrics, source/target transition panel, draft controls, and preview/draft record tables.
+
+Verification: `npm run build` from `apps/web` passed with the existing Nuxt/Nitro warnings; `php artisan db:seed --class=EnterpriseRolePermissionSeeder` refreshed local RBAC permissions; agent-browser logged in locally, opened `http://127.0.0.1:3000/schools/1/promotions`, confirmed no Vite/Nuxt error overlay, confirmed nonblank content, and saved `docs/browser-checks/promotions-workflow.png`.
+
+Local smoke-test note: Herd Desktop was not running in this shell, so browser verification used PHP 8.5 directly with `php -S 127.0.0.1:8010 -t public public\index.php` and Nuxt pointed at `http://127.0.0.1:8010/api` through the ignored local `apps/web/.env`.
+
+Phase 6 status: backend foundation and Nuxt promotion workflow UI are complete. Remaining Phase 6 work is deeper production hardening for large batches/job dispatch, stronger lifecycle guards, and richer seeded demo data for full browser execution tests.
+
+Next: commit and push this Phase 6 UI checkpoint, then continue with Phase 6 hardening or the next v3 phase.

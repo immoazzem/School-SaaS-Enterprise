@@ -445,6 +445,43 @@ export interface ResultSummary {
   }
 }
 
+export type PromotionAction = 'promoted' | 'retained' | 'transferred_out' | 'graduated' | 'dropped'
+
+export interface PromotionPreviewRow {
+  student_enrollment_id: number
+  student?: Pick<Student, 'id' | 'admission_no' | 'full_name'>
+  suggested_action: PromotionAction
+}
+
+export interface PromotionRecord {
+  id: number
+  school_id: number
+  promotion_batch_id: number
+  student_enrollment_id: number
+  action: PromotionAction
+  new_enrollment_id: number | null
+  notes: string | null
+  processed_by: number | null
+  student_enrollment?: Pick<StudentEnrollment, 'id' | 'student_id' | 'roll_no' | 'status'> & {
+    student?: Pick<Student, 'id' | 'admission_no' | 'full_name'>
+  }
+  new_enrollment?: StudentEnrollment | null
+}
+
+export interface PromotionBatch {
+  id: number
+  school_id: number
+  from_academic_year_id: number
+  to_academic_year_id: number
+  from_academic_class_id: number
+  to_academic_class_id: number
+  status: 'draft' | 'in_progress' | 'completed' | 'rolled_back'
+  processed_count: number
+  created_by: number | null
+  processed_at: string | null
+  records?: PromotionRecord[]
+}
+
 export interface CalendarEvent {
   id: number
   school_id: number

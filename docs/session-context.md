@@ -564,6 +564,36 @@ npm run lint
   - what the user should review in VS Code
   - next recommended phase
 
+## Latest Checkpoint
+
+Current page/module complete: Phase 6 Student Promotion workflow UI.
+
+Latest Phase 6 status:
+
+- Backend promotion foundation is complete for preview, draft creation, record override, execute, rollback, and duplicate-execute protection.
+- Nuxt promotion workflow UI is complete at `/schools/{schoolId}/promotions`.
+- Dashboard now includes Promotions navigation/action access for users with `promotions.manage`.
+- Typed promotion API shapes were added to the Nuxt API composable.
+- The promotion screen can load year/class options, preview promotion candidates, create draft batches, update record actions/notes, execute, and rollback.
+
+Latest verification:
+
+- `npm run build` from `apps/web` passed with existing Nuxt/Nitro warnings.
+- `php artisan db:seed --class=EnterpriseRolePermissionSeeder` refreshed local RBAC permissions.
+- Agent-browser logged in locally and opened `http://127.0.0.1:3000/schools/1/promotions`.
+- Browser check confirmed nonblank content and no Vite/Nuxt error overlay.
+- Screenshot saved at `docs/browser-checks/promotions-workflow.png`.
+
+Local server note:
+
+- Herd Desktop was not running in this Codex shell during the last smoke test.
+- Browser verification used Nuxt on `http://127.0.0.1:3000`.
+- API verification used direct PHP 8.5 built-in server on `http://127.0.0.1:8010/api`.
+
+Next page/module:
+
+- Phase 6 production hardening for large promotion batches/job dispatch, lifecycle guardrails, and richer seeded/demo data for full browser execution checks.
+
 ## Recommended First Prompt For A New Session
 
 ```text
