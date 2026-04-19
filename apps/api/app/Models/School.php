@@ -142,6 +142,14 @@ class School extends Model
     }
 
     /**
+     * @return HasMany<TimetablePeriod, $this>
+     */
+    public function timetablePeriods(): HasMany
+    {
+        return $this->hasMany(TimetablePeriod::class);
+    }
+
+    /**
      * @return HasMany<ClassSubject, $this>
      */
     public function classSubjects(): HasMany

@@ -53,6 +53,7 @@ use App\Http\Controllers\Api\StudentGroupController;
 use App\Http\Controllers\Api\StudentInvoiceController;
 use App\Http\Controllers\Api\SubjectController;
 use App\Http\Controllers\Api\TeacherProfileController;
+use App\Http\Controllers\Api\TimetablePeriodController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -237,6 +238,9 @@ Route::prefix('v1')->group(function (): void {
             ->parameters(['salary-records' => 'salaryRecord'])
             ->middleware('school.member');
         Route::apiResource('schools.shifts', ShiftController::class)
+            ->middleware('school.member');
+        Route::apiResource('schools.timetable-periods', TimetablePeriodController::class)
+            ->parameters(['timetable-periods' => 'timetablePeriod'])
             ->middleware('school.member');
         Route::apiResource('schools.students', StudentController::class)
             ->middleware('school.member');

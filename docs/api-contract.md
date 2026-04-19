@@ -110,6 +110,20 @@ Academic Years:
 
 Academic Years require `academic_years.manage`, include date bounds, and enforce one current year per school. Lists accept optional `status` and `is_current` filtering.
 
+## Phase 7A Endpoints
+
+Timetable Periods:
+
+- `GET /api/v1/schools/{school}/timetable-periods`
+- `POST /api/v1/schools/{school}/timetable-periods`
+- `GET /api/v1/schools/{school}/timetable-periods/{timetablePeriod}`
+- `PUT /api/v1/schools/{school}/timetable-periods/{timetablePeriod}`
+- `DELETE /api/v1/schools/{school}/timetable-periods/{timetablePeriod}`
+
+Timetable Periods require `timetable.manage`. Records are tenant-owned and include `academic_year_id`, `academic_class_id`, optional `shift_id`, `day_of_week` (`0` to `6`), `period_number`, `start_time`, `end_time`, optional `subject_id`, optional `teacher_user_id`, optional `room`, and `status`.
+
+Lists accept optional `academic_year_id`, `academic_class_id`, `shift_id`, `day_of_week`, and `status` filters. Mutations reject cross-school academic references, reject teacher assignments unless the teacher user is an active school member, block duplicate class slots, block overlapping class periods, and block overlapping teacher bookings.
+
 ## Future API Groups
 
 - `/api/v1/academic/subjects`

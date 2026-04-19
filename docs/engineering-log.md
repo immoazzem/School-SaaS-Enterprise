@@ -783,3 +783,23 @@ Scope: closed the pre-Phase 7 stabilization gate:
 Verification: `php artisan test` passed with 99 tests / 600 assertions; `php artisan route:list --path=api/v1 --except-vendor` showed 230 versioned routes; `npm run build` passed with exit code 0.
 
 Next: begin Phase 7 planning and implementation from `docs/enterprise-plan-v3.md`.
+
+### Phase 7A Timetable Backend Foundation
+
+Current page/module complete: Phase 7A Timetable / Routine backend foundation.
+
+Scope: started Phase 7 from `docs/enterprise-plan-v3.md` with the backend routine module:
+- added `timetable_periods` with school, academic year, class, optional shift, weekday, period number, start/end time, optional subject, optional teacher, room, status, timestamps, and soft deletes.
+- added `TimetablePeriod` model, policy, and relationships from School, AcademicYear, AcademicClass, Shift, and Subject.
+- added tenant-scoped timetable REST routes under `/api/v1/schools/{school}/timetable-periods`.
+- seeded `timetable.manage` and granted it to school-admin/principal flows; school-owner inherits it through the full non-billing permission set.
+- added audit logs for create, update, and delete events.
+- added same-school validation for academic year/class/shift/subject references and active school-member validation for assigned teachers.
+- added conflict checks for duplicate class period slots, overlapping class periods, and overlapping teacher bookings.
+- added focused feature coverage in `apps/api/tests/Feature/PhaseSevenTimetableApiTest.php`.
+
+Verification: `php artisan test --filter=PhaseSevenTimetable` passed with 5 tests / 24 assertions; `vendor\bin\pint --dirty` passed; `php artisan route:list --path=timetable-periods --except-vendor` showed 5 timetable routes; `php artisan migrate --force` applied the timetable migration to the local database; `php artisan db:seed --class=EnterpriseRolePermissionSeeder --force` refreshed local RBAC; full `php artisan test` passed with 104 tests / 624 assertions.
+
+Phase 7 status: timetable backend foundation is complete. Remaining Phase 7A work is the Nuxt timetable workspace and browser verification.
+
+Next: commit and push this Phase 7A backend checkpoint, then build the Nuxt timetable workspace.

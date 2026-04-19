@@ -51,4 +51,12 @@ class AcademicClass extends Model
     {
         return $this->hasMany(StudentEnrollment::class);
     }
+
+    /**
+     * @return HasMany<TimetablePeriod, $this>
+     */
+    public function timetablePeriods(): HasMany
+    {
+        return $this->hasMany(TimetablePeriod::class);
+    }
 }

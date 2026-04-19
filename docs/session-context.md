@@ -566,6 +566,43 @@ npm run lint
 
 ## Latest Checkpoint
 
+Current page/module complete: Phase 7A Timetable / Routine backend foundation.
+
+Latest Phase 7A backend status:
+
+- Added `timetable_periods`.
+- Added `App\Models\TimetablePeriod`.
+- Added `App\Policies\TimetablePeriodPolicy`.
+- Added `App\Http\Controllers\Api\TimetablePeriodController`.
+- Added relationships from School, AcademicYear, AcademicClass, Shift, and Subject.
+- Seeded `timetable.manage`; school-admin and principal receive it explicitly, school-owner receives it through the non-billing permission set.
+- Added routes:
+  - `GET /api/v1/schools/{school}/timetable-periods`
+  - `POST /api/v1/schools/{school}/timetable-periods`
+  - `GET /api/v1/schools/{school}/timetable-periods/{timetablePeriod}`
+  - `PATCH /api/v1/schools/{school}/timetable-periods/{timetablePeriod}`
+  - `DELETE /api/v1/schools/{school}/timetable-periods/{timetablePeriod}`
+- Controller validates same-school academic year/class/shift/subject references.
+- Teacher assignment requires an active school membership.
+- Conflict protection blocks duplicate class slots, overlapping class periods, and overlapping teacher bookings.
+- Audit events are `timetable_period.created`, `timetable_period.updated`, and `timetable_period.deleted`.
+- Added `apps/api/tests/Feature/PhaseSevenTimetableApiTest.php`.
+
+Latest verification:
+
+- `php artisan test --filter=PhaseSevenTimetable`: 5 tests / 24 assertions passed.
+- `vendor\bin\pint --dirty`: passed.
+- `php artisan route:list --path=timetable-periods --except-vendor`: 5 routes.
+- `php artisan migrate --force`: applied `2026_04_19_050000_create_timetable_periods_table`.
+- `php artisan db:seed --class=EnterpriseRolePermissionSeeder --force`: refreshed local RBAC.
+- `php artisan test`: 104 tests / 624 assertions passed.
+
+Next page/module:
+
+- Phase 7A Nuxt Timetable workspace.
+
+Previous checkpoint:
+
 Current page/module complete: Production Stabilization Checkpoint I, Final Stabilization Review.
 
 Production stabilization status:
