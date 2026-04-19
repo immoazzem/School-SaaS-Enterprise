@@ -9,8 +9,16 @@ interface AttendanceResponse {
   data: StudentAttendanceRecord
 }
 
+interface AttendanceDraft {
+  student_enrollment_id: string | number
+  attendance_date: string
+  status: StudentAttendanceRecord['status']
+  remarks: string
+}
+
 const api = useApi()
 const route = useRoute()
+const { isOnline } = useNetworkStatus()
 
 const records = ref<StudentAttendanceRecord[]>([])
 const enrollments = ref<StudentEnrollment[]>([])
@@ -50,6 +58,9 @@ const form = reactive({
 })
 
 const schoolId = computed(() => Number(route.params.schoolId))
+const attendanceDraft = useOfflineDraft<AttendanceDraft>(
+  computed(() => `school-saas:offline:attendance:${schoolId.value}`),
+)
 
 const attendanceSummary = computed(() => {
   const counts = {
@@ -124,6 +135,42 @@ function resetForm() {
   form.remarks = ''
 }
 
+function draftPayload(): AttendanceDraft {
+  return {
+    student_enrollment_id: form.student_enrollment_id,
+    attendance_date: form.attendance_date,
+    status: form.status,
+    remarks: form.remarks,
+  }
+}
+
+function restoreDraft() {
+  const draft = attendanceDraft.load()
+
+  if (!draft) {
+    return
+  }
+
+  form.student_enrollment_id = String(draft.student_enrollment_id)
+  form.attendance_date = draft.attendance_date
+  form.status = draft.status
+  form.remarks = draft.remarks
+  selectedDate.value = draft.attendance_date
+  success.value = 'Local attendance draft restored.'
+}
+
+function saveDraft() {
+  attendanceDraft.save(draftPayload())
+  success.value = isOnline.value
+    ? 'Attendance draft saved on this device.'
+    : 'Offline attendance draft saved on this device.'
+}
+
+function clearDraft() {
+  attendanceDraft.clear()
+  success.value = 'Local attendance draft cleared.'
+}
+
 function editRecord(record: StudentAttendanceRecord) {
   editingId.value = record.id
   form.student_enrollment_id = String(record.student_enrollment_id)
@@ -145,6 +192,13 @@ async function saveRecord() {
   }
 
   try {
+    if (!isOnline.value) {
+      attendanceDraft.save(draftPayload())
+      success.value = 'Offline attendance draft saved. Submit it when the connection returns.'
+
+      return
+    }
+
     if (editingId.value) {
       await api.request<AttendanceResponse>(
         `/schools/${schoolId.value}/student-attendance-records/${editingId.value}`,
@@ -163,6 +217,7 @@ async function saveRecord() {
     }
 
     selectedDate.value = form.attendance_date
+    attendanceDraft.clear()
     resetForm()
     await loadRecords()
   } catch (attendanceError) {
@@ -186,7 +241,10 @@ watch(selectedDate, (value) => {
   }
 })
 
-onMounted(loadWorkspace)
+onMounted(() => {
+  restoreDraft()
+  loadWorkspace()
+})
 </script>
 
 <template>
@@ -215,6 +273,19 @@ onMounted(loadWorkspace)
 
       <div v-if="error" class="alert error">{{ error }}</div>
       <div v-if="success" class="alert success">{{ success }}</div>
+
+      <OfflineNotice
+        context="Attendance offline draft"
+        :has-draft="attendanceDraft.hasDraft.value"
+        :saved-at="attendanceDraft.savedAt.value"
+      >
+        <button v-if="attendanceDraft.hasDraft.value" class="button secondary compact" type="button" @click="restoreDraft">
+          Restore draft
+        </button>
+        <button v-if="attendanceDraft.hasDraft.value" class="button secondary compact" type="button" @click="clearDraft">
+          Clear draft
+        </button>
+      </OfflineNotice>
 
       <section class="summary-grid">
         <article>
@@ -269,6 +340,7 @@ onMounted(loadWorkspace)
 
           <div class="form-actions">
             <button class="button" type="submit" :disabled="saving">{{ saving ? 'Saving...' : 'Save attendance' }}</button>
+            <button class="button secondary" type="button" @click="saveDraft">Save offline draft</button>
             <button v-if="editingId" class="button secondary" type="button" @click="resetForm">Cancel</button>
           </div>
         </form>
@@ -525,6 +597,11 @@ textarea {
   border: 1px solid rgba(17, 24, 39, 0.1);
   background: #fff;
   color: #be3455;
+}
+
+.button.compact {
+  min-height: 36px;
+  padding: 0 12px;
 }
 
 table {

@@ -224,7 +224,32 @@ Current page/module complete: Phase 7D Nuxt i18n frontend integration.
 
 Local site link: `http://127.0.0.1:3000/schools/1/students`.
 
-Next page/module: Phase 7E Offline Support / PWA planning or the next v3 priority.
+Current page/module complete: Phase 7E Offline Support / PWA foundation.
+
+- Installed and configured `@vite-pwa/nuxt`.
+- Added PWA manifest metadata and `apps/web/public/pwa-icon.svg`.
+- Generated a service worker during `npm run build`.
+- Added network-first runtime caching for attendance and marks workspace routes.
+- Added shared `useNetworkStatus()` and `useOfflineDraft()` composables.
+- Added reusable `OfflineNotice`.
+- Attendance workspace now supports local draft save/restore/clear and saves a draft instead of attempting API writes while offline.
+- Marks workspace now supports local draft save/restore/clear and saves a draft instead of attempting API writes while offline.
+- Added `docs/phase-7e-offline-pwa-plan.md` for the remaining production-grade queue/replay/conflict design.
+- Added an npm override for `serialize-javascript` so the PWA/Workbox dependency tree uses the patched `7.0.5` release.
+- `npm run build` from `apps/web` passed with the existing classified Nuxt/Nitro/Node warnings.
+- `npm audit --audit-level=high` from `apps/web` reports `found 0 vulnerabilities`.
+- Browser verification passed at:
+  - `http://127.0.0.1:3000/schools/1/attendance`
+  - `http://127.0.0.1:3000/schools/1/marks`
+- Screenshots saved:
+  - `docs/browser-checks/offline-attendance-draft.png`
+  - `docs/browser-checks/offline-marks-draft.png`
+
+Phase 7E status: PWA and offline draft foundation is complete. Full queued write replay remains the next dedicated offline slice.
+
+Local site link: `http://127.0.0.1:3000/schools/1/attendance`.
+
+Next page/module: Phase 7E queued offline sync implementation or the next v3 priority.
 
 ## Completed
 

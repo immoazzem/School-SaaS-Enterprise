@@ -591,7 +591,14 @@ Latest Phase 7D frontend verification:
 
 Next page/module:
 
-- Phase 7E Offline Support / PWA planning or the next v3 priority.
+- Phase 7E Offline Support / PWA foundation is complete:
+  - `@vite-pwa/nuxt` is installed and configured.
+  - PWA manifest and `pwa-icon.svg` exist.
+  - service worker generation passes in `npm run build`.
+  - npm audit high-severity gate passes after forcing patched `serialize-javascript@7.0.5`.
+  - Attendance and Marks routes use local offline drafts via `useOfflineDraft()`.
+  - Browser screenshots: `docs/browser-checks/offline-attendance-draft.png`, `docs/browser-checks/offline-marks-draft.png`.
+  - Full queued write replay is not implemented yet; follow `docs/phase-7e-offline-pwa-plan.md`.
 
 Previous checkpoint:
 

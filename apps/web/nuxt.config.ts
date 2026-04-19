@@ -11,6 +11,7 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
     '@nuxtjs/i18n',
+    '@vite-pwa/nuxt',
   ],
   runtimeConfig: {
     public: {
@@ -30,5 +31,48 @@ export default defineNuxtConfig({
     ],
     strategy: 'no_prefix',
     vueI18n: i18nConfigPath,
+  },
+  pwa: {
+    registerType: 'autoUpdate',
+    manifest: {
+      name: 'School SaaS Enterprise',
+      short_name: 'School SaaS',
+      description: 'School operations workspace for attendance, marks, finance, and academic workflows.',
+      theme_color: '#be3455',
+      background_color: '#f7f3ef',
+      display: 'standalone',
+      start_url: '/',
+      icons: [
+        {
+          src: '/pwa-icon.svg',
+          sizes: 'any',
+          type: 'image/svg+xml',
+          purpose: 'any maskable',
+        },
+      ],
+    },
+    workbox: {
+      navigateFallback: '/',
+      runtimeCaching: [
+        {
+          urlPattern: /\/schools\/.+\/(attendance|marks)/,
+          handler: 'NetworkFirst',
+          options: {
+            cacheName: 'school-saas-critical-workspaces',
+            cacheableResponse: {
+              statuses: [0, 200],
+            },
+            expiration: {
+              maxAgeSeconds: 60 * 60 * 24 * 7,
+              maxEntries: 30,
+            },
+          },
+        },
+      ],
+    },
+    devOptions: {
+      enabled: true,
+      type: 'module',
+    },
   },
 })

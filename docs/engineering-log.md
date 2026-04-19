@@ -945,3 +945,25 @@ Verification: `npm run build` from `apps/web` passed with the existing classifie
 Phase 7D status: backend and Nuxt frontend foundations are complete for multi-language support. Translation coverage is intentionally partial; the foundation is now in place for expanding strings screen by screen.
 
 Next: commit and push this Phase 7D frontend checkpoint, then continue with Phase 7E Offline Support / PWA planning or the next v3 priority.
+
+### Phase 7E Offline Support / PWA Foundation
+
+Current page/module complete: Phase 7E Offline Support / PWA foundation, routes `/schools/{schoolId}/attendance` and `/schools/{schoolId}/marks`.
+
+Scope: added the first production-safe offline support slice from `docs/enterprise-plan-v3.md`:
+- installed `@vite-pwa/nuxt`.
+- configured Nuxt PWA manifest metadata, app icon, service worker generation, and network-first caching for Attendance and Marks routes.
+- added `useNetworkStatus()` for online/offline state.
+- added `useOfflineDraft()` for local device draft persistence.
+- added `OfflineNotice` for visible offline/draft state.
+- wired Attendance to save, restore, and clear local drafts.
+- wired Marks to save, restore, and clear local drafts.
+- guarded Attendance and Marks saves so offline submissions are kept as drafts instead of failing against the API.
+- added an npm override for `serialize-javascript` to keep the PWA/Workbox tree on the patched `7.0.5` release.
+- documented the remaining IndexedDB queue/replay/conflict design in `docs/phase-7e-offline-pwa-plan.md`.
+
+Verification: `npm run build` from `apps/web` passed and generated `sw.js`; `npm audit --audit-level=high` reported `found 0 vulnerabilities`. Browser smoke used API `http://127.0.0.1:8030/api` and web `http://127.0.0.1:3000`; agent-browser verified offline draft notices on Attendance and Marks and saved `docs/browser-checks/offline-attendance-draft.png` plus `docs/browser-checks/offline-marks-draft.png`.
+
+Phase 7E status: PWA and offline draft foundation is complete. Full automatic queued write replay remains planned because it needs conflict handling, auth expiry behavior, and user-visible sync recovery before it is safe.
+
+Next: commit and push this Phase 7E foundation checkpoint, then continue with queued sync or the next v3 priority.

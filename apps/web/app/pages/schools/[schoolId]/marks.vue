@@ -9,8 +9,19 @@ interface ItemResponse<T> {
   data: T
 }
 
+interface MarksDraft {
+  exam_id: string | number
+  class_subject_id: string | number
+  student_enrollment_id: string | number
+  marks_obtained: string | number
+  is_absent: boolean
+  absent_reason: string
+  remarks: string
+}
+
 const api = useApi()
 const route = useRoute()
+const { isOnline } = useNetworkStatus()
 const schoolId = computed(() => Number(route.params.schoolId))
 
 const exams = ref<Exam[]>([])
@@ -24,6 +35,9 @@ const savingGrade = ref(false)
 const verifyingId = ref<number | null>(null)
 const error = ref('')
 const success = ref('')
+const marksDraft = useOfflineDraft<MarksDraft>(
+  computed(() => `school-saas:offline:marks:${schoolId.value}`),
+)
 
 const markForm = reactive({
   exam_id: '',
@@ -95,12 +109,60 @@ function resetMarkForm() {
   markForm.remarks = ''
 }
 
+function marksDraftPayload(): MarksDraft {
+  return {
+    exam_id: markForm.exam_id,
+    class_subject_id: markForm.class_subject_id,
+    student_enrollment_id: markForm.student_enrollment_id,
+    marks_obtained: markForm.marks_obtained,
+    is_absent: markForm.is_absent,
+    absent_reason: markForm.absent_reason,
+    remarks: markForm.remarks,
+  }
+}
+
+function restoreMarksDraft() {
+  const draft = marksDraft.load()
+
+  if (!draft) {
+    return
+  }
+
+  markForm.exam_id = String(draft.exam_id)
+  markForm.class_subject_id = String(draft.class_subject_id)
+  markForm.student_enrollment_id = String(draft.student_enrollment_id)
+  markForm.marks_obtained = String(draft.marks_obtained)
+  markForm.is_absent = draft.is_absent
+  markForm.absent_reason = draft.absent_reason
+  markForm.remarks = draft.remarks
+  success.value = 'Local marks draft restored.'
+}
+
+function saveMarksDraft() {
+  marksDraft.save(marksDraftPayload())
+  success.value = isOnline.value
+    ? 'Marks draft saved on this device.'
+    : 'Offline marks draft saved on this device.'
+}
+
+function clearMarksDraft() {
+  marksDraft.clear()
+  success.value = 'Local marks draft cleared.'
+}
+
 async function saveMark() {
   savingMark.value = true
   error.value = ''
   success.value = ''
 
   try {
+    if (!isOnline.value) {
+      marksDraft.save(marksDraftPayload())
+      success.value = 'Offline marks draft saved. Submit it when the connection returns.'
+
+      return
+    }
+
     await api.request<ItemResponse<MarksEntry>>(`/schools/${schoolId.value}/marks-entries`, {
       method: 'POST',
       body: {
@@ -114,6 +176,7 @@ async function saveMark() {
       },
     })
     success.value = 'Marks entry saved.'
+    marksDraft.clear()
     resetMarkForm()
     await loadWorkspace()
   } catch (markError) {
@@ -171,7 +234,10 @@ async function verifyEntry(entry: MarksEntry, status: 'verified' | 'rejected') {
   }
 }
 
-onMounted(loadWorkspace)
+onMounted(() => {
+  restoreMarksDraft()
+  loadWorkspace()
+})
 </script>
 
 <template>
@@ -200,6 +266,19 @@ onMounted(loadWorkspace)
       <p v-if="error" class="error">{{ error }}</p>
       <p v-if="success" class="success">{{ success }}</p>
       <p v-if="loading" class="muted">Loading marks workspace</p>
+
+      <OfflineNotice
+        context="Marks offline draft"
+        :has-draft="marksDraft.hasDraft.value"
+        :saved-at="marksDraft.savedAt.value"
+      >
+        <button v-if="marksDraft.hasDraft.value" class="button secondary compact" type="button" @click="restoreMarksDraft">
+          Restore draft
+        </button>
+        <button v-if="marksDraft.hasDraft.value" class="button secondary compact" type="button" @click="clearMarksDraft">
+          Clear draft
+        </button>
+      </OfflineNotice>
 
       <section class="summary-grid">
         <article class="surface summary-item">
@@ -262,7 +341,10 @@ onMounted(loadWorkspace)
             <label for="absent-reason">Absent reason</label>
             <input id="absent-reason" v-model="markForm.absent_reason" :disabled="!markForm.is_absent" type="text" />
           </div>
-          <button class="button" type="submit" :disabled="savingMark">{{ savingMark ? 'Saving marks' : 'Save marks' }}</button>
+          <div class="form-actions">
+            <button class="button" type="submit" :disabled="savingMark">{{ savingMark ? 'Saving marks' : 'Save marks' }}</button>
+            <button class="button secondary" type="button" @click="saveMarksDraft">Save offline draft</button>
+          </div>
         </form>
 
         <form class="surface record-form" @submit.prevent="saveGradeScale">
@@ -507,6 +589,12 @@ nav a:hover {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .check-field {
