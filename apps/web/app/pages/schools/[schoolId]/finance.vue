@@ -200,6 +200,7 @@ onMounted(loadWorkspace)
         <strong>School SaaS</strong>
       </NuxtLink>
       <nav aria-label="Finance navigation">
+        <NuxtLink :to="`/schools/${schoolId}/payment-gateways`">Payment Gateways</NuxtLink>
         <NuxtLink :to="`/schools/${schoolId}/marks`">Marks</NuxtLink>
         <NuxtLink :to="`/schools/${schoolId}/staff-operations`">Staff Operations</NuxtLink>
         <NuxtLink :to="`/schools/${schoolId}/students`">Students</NuxtLink>

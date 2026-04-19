@@ -169,7 +169,24 @@ Current page/module complete: Phase 7C Payment Gateway Integration backend found
 - `php artisan db:seed --class=EnterpriseRolePermissionSeeder --force` refreshed local RBAC.
 - `php artisan test` passed with 114 tests / 682 assertions.
 
-Next page/module: Phase 7C Nuxt Payment Gateway Config workspace.
+Current page/module complete: Phase 7C Nuxt Payment Gateway Config workspace.
+
+- Added typed Nuxt `PaymentGatewayConfig` API shape.
+- Added `/schools/{schoolId}/payment-gateways`.
+- Added dashboard navigation and action access for users with `payment_gateways.manage`.
+- Added Finance workspace link to Payment Gateways.
+- Added gateway setup form for bKash, Nagad, SSLCommerz, and Stripe.
+- Kept credentials write-only in the UI; saved configs show only configured key names and encrypted status.
+- Added active/test-mode controls plus configured/active/live/test summary cards.
+- Added gateway register with edit and remove actions.
+- `npm run build` from `apps/web` passed with the existing classified Nuxt/Nitro/Node warnings.
+- Local browser verification passed at `http://127.0.0.1:3000/schools/1/payment-gateways`.
+- Browser created a real bKash test-mode config and confirmed only credential keys were displayed.
+- Screenshot saved at `docs/browser-checks/payment-gateways-workspace.png`.
+
+Local site link: `http://127.0.0.1:3000/schools/1/payment-gateways`.
+
+Next page/module: Phase 7D Multi-Language Support planning/backend foundation.
 
 ## Completed
 

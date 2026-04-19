@@ -108,6 +108,11 @@ const navItems = computed(() => [
     enabled: selectedSchool.value?.permissions?.includes('finance.manage') ?? false,
   },
   {
+    label: 'Payment Gateways',
+    active: false,
+    enabled: selectedSchool.value?.permissions?.includes('payment_gateways.manage') ?? false,
+  },
+  {
     label: 'Staff Ops',
     active: false,
     enabled:
@@ -346,6 +351,15 @@ async function openFinance() {
   await router.push(`/schools/${auth.selectedSchoolId.value}/finance`)
 }
 
+async function openPaymentGateways() {
+  if (!auth.selectedSchoolId.value) {
+    error.value = 'Create or select a school first.'
+    return
+  }
+
+  await router.push(`/schools/${auth.selectedSchoolId.value}/payment-gateways`)
+}
+
 async function openStaffOperations() {
   if (!auth.selectedSchoolId.value) {
     error.value = 'Create or select a school first.'
@@ -409,6 +423,7 @@ const navActions: Record<string, () => Promise<void>> = {
   Exams: openExams,
   Marks: openMarks,
   Finance: openFinance,
+  'Payment Gateways': openPaymentGateways,
   'Staff Ops': openStaffOperations,
   Reports: openReports,
   Promotions: openPromotions,
@@ -584,6 +599,7 @@ onMounted(loadDashboard)
           <button class="button secondary" type="button" @click="openExams">Open exams</button>
           <button class="button secondary" type="button" @click="openMarks">Open marks</button>
           <button class="button secondary" type="button" @click="openFinance">Open finance</button>
+          <button class="button secondary" type="button" @click="openPaymentGateways">Open payment gateways</button>
           <button class="button secondary" type="button" @click="openStaffOperations">Open staff ops</button>
           <button class="button secondary" type="button" @click="openReports">Open reports</button>
           <button class="button secondary" type="button" @click="openPromotions">Open promotions</button>

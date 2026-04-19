@@ -566,6 +566,35 @@ npm run lint
 
 ## Latest Checkpoint
 
+Current page/module complete: Phase 7C Nuxt Payment Gateway Config workspace.
+
+Latest Phase 7C frontend status:
+
+- Added `PaymentGatewayConfig` type to `apps/web/app/composables/useApi.ts`.
+- Added `/schools/{schoolId}/payment-gateways`.
+- Dashboard now includes Payment Gateways navigation/action for `payment_gateways.manage`.
+- Finance workspace links to Payment Gateways.
+- Payment gateway UI supports bKash, Nagad, SSLCommerz, and Stripe config creation.
+- Credentials are write-only in the UI; saved configs display only credential key names and encrypted status.
+- UI supports active/test-mode controls plus edit/remove actions.
+
+Latest Phase 7C frontend verification:
+
+- `npm run build` from `apps/web`: passed with existing classified Nuxt/Nitro/Node warnings.
+- Local web server: `http://127.0.0.1:3000`.
+- Local API server: `http://127.0.0.1:8010/api`.
+- Browser smoke opened `http://127.0.0.1:3000/schools/1/payment-gateways`.
+- Browser confirmed no Vite/Nuxt error overlay.
+- Browser created a bKash test-mode config.
+- Browser confirmed only credential key names were displayed; secret values were not displayed after save.
+- Screenshot saved at `docs/browser-checks/payment-gateways-workspace.png`.
+
+Next page/module:
+
+- Phase 7D Multi-Language Support planning/backend foundation.
+
+Previous checkpoint:
+
 Current page/module complete: Phase 7C Payment Gateway Integration backend foundation.
 
 Latest Phase 7C backend status:

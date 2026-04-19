@@ -887,3 +887,23 @@ Verification: `php artisan test --filter=PhaseSevenPaymentGatewayConfig` passed 
 Phase 7C status: backend gateway-config foundation is complete. The next slice is the Nuxt payment gateway configuration workspace; actual provider checkout/webhook handshakes remain future work after credentials and operational UI are in place.
 
 Next: commit and push this Phase 7C backend checkpoint, then build the Nuxt gateway config workspace.
+
+### Phase 7C Nuxt Payment Gateway Config Workspace
+
+Current page/module complete: Phase 7C Nuxt Payment Gateway Config workspace, route `/schools/{schoolId}/payment-gateways`.
+
+Scope: completed the school-facing gateway configuration UI:
+- added typed `PaymentGatewayConfig` API shape.
+- added dashboard navigation/action access for `payment_gateways.manage`.
+- added `/schools/{schoolId}/payment-gateways` with the shared Radiant-inspired operation shell.
+- added gateway setup for bKash, Nagad, SSLCommerz, and Stripe.
+- kept credentials write-only; saved configs display only `credential_keys` and encrypted status.
+- added active/test-mode controls and summary counters.
+- added gateway register with edit/remove actions.
+- linked Payment Gateways from the Finance workspace.
+
+Verification: `npm run build` from `apps/web` passed with existing classified Nuxt/Nitro/Node warnings. Local browser smoke used API `http://127.0.0.1:8010/api` and web `http://127.0.0.1:3000`; agent-browser opened `/schools/1/payment-gateways`, confirmed no Vite/Nuxt error overlay, created a bKash test-mode config, confirmed only credential key names were displayed, and saved `docs/browser-checks/payment-gateways-workspace.png`.
+
+Phase 7C status: backend and Nuxt workspace are complete for gateway configuration. Provider checkout/webhook execution remains future work.
+
+Next: commit and push this Phase 7C UI checkpoint, then continue with Phase 7D Multi-Language Support planning/backend foundation.

@@ -143,6 +143,16 @@ export interface AssignmentSubmission {
   }
 }
 
+export interface PaymentGatewayConfig {
+  id: number
+  school_id: number
+  gateway: 'bkash' | 'nagad' | 'sslcommerz' | 'stripe'
+  is_active: boolean
+  test_mode: boolean
+  credentials_configured: boolean
+  credential_keys: string[]
+}
+
 export interface ClassSubject {
   id: number
   school_id: number
