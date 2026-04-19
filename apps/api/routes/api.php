@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AcademicYearController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CalendarEventController;
 use App\Http\Controllers\Api\ClassSubjectController;
+use App\Http\Controllers\Api\DashboardSummaryController;
 use App\Http\Controllers\Api\DesignationController;
 use App\Http\Controllers\Api\DiscountPolicyController;
 use App\Http\Controllers\Api\EmployeeAttendanceRecordController;
@@ -25,12 +26,14 @@ use App\Http\Controllers\Api\LeaveBalanceController;
 use App\Http\Controllers\Api\LeaveTypeController;
 use App\Http\Controllers\Api\MarksEntryController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\ReportExportController;
 use App\Http\Controllers\Api\ResultSummaryController;
 use App\Http\Controllers\Api\SalaryRecordController;
 use App\Http\Controllers\Api\SchoolController;
 use App\Http\Controllers\Api\SchoolDocumentController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\StudentAttendanceRecordController;
+use App\Http\Controllers\Api\StudentAttendanceSummaryController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\StudentDiscountController;
 use App\Http\Controllers\Api\StudentEnrollmentController;
@@ -64,6 +67,8 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
     Route::apiResource('schools.class-subjects', ClassSubjectController::class)
         ->parameters(['class-subjects' => 'classSubject'])
         ->middleware('school.member');
+    Route::get('schools/{school}/dashboard/summary', DashboardSummaryController::class)
+        ->middleware('school.member');
     Route::apiResource('schools.designations', DesignationController::class)
         ->middleware('school.member');
     Route::get('schools/{school}/documents/{document}/download', [SchoolDocumentController::class, 'download'])
@@ -86,6 +91,12 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
     Route::post('schools/{school}/exams/{exam}/publish', ExamPublicationController::class)
         ->middleware('school.member');
     Route::get('schools/{school}/exams/{exam}/result-summaries', [ResultSummaryController::class, 'index'])
+        ->middleware('school.member');
+    Route::get('schools/{school}/exams/{exam}/results', [ResultSummaryController::class, 'results'])
+        ->middleware('school.member');
+    Route::get('schools/{school}/exams/{exam}/results/{enrollment}', [ResultSummaryController::class, 'result'])
+        ->middleware('school.member');
+    Route::get('schools/{school}/exams/{exam}/marksheets', [ResultSummaryController::class, 'marksheets'])
         ->middleware('school.member');
     Route::apiResource('schools.discount-policies', DiscountPolicyController::class)
         ->parameters(['discount-policies' => 'discountPolicy'])
@@ -137,6 +148,21 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
         ->middleware('school.member');
     Route::post('schools/{school}/notifications/mark-read', [NotificationController::class, 'markRead'])
         ->middleware('school.member');
+    Route::post('schools/{school}/reports/marksheet', [ReportExportController::class, 'marksheet'])
+        ->middleware('school.member');
+    Route::post('schools/{school}/reports/result-sheet', [ReportExportController::class, 'resultSheet'])
+        ->middleware('school.member');
+    Route::post('schools/{school}/reports/id-card', [ReportExportController::class, 'idCard'])
+        ->middleware('school.member');
+    Route::post('schools/{school}/reports/invoice/{invoice}', [ReportExportController::class, 'invoice'])
+        ->middleware('school.member');
+    Route::post('schools/{school}/reports/salary/{record}', [ReportExportController::class, 'salary'])
+        ->middleware('school.member');
+    Route::get('schools/{school}/reports/{jobId}/download', [ReportExportController::class, 'download'])
+        ->middleware('school.member');
+    Route::get('schools/{school}/reports/{export}/file', [ReportExportController::class, 'file'])
+        ->middleware(['school.member', 'signed'])
+        ->name('schools.reports.file');
     Route::apiResource('schools.salary-records', SalaryRecordController::class)
         ->parameters(['salary-records' => 'salaryRecord'])
         ->middleware('school.member');
@@ -145,6 +171,8 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
     Route::apiResource('schools.students', StudentController::class)
         ->middleware('school.member');
     Route::post('schools/{school}/student-attendance/bulk', [StudentAttendanceRecordController::class, 'bulk'])
+        ->middleware('school.member');
+    Route::get('schools/{school}/attendance/summary', StudentAttendanceSummaryController::class)
         ->middleware('school.member');
     Route::apiResource('schools.student-attendance-records', StudentAttendanceRecordController::class)
         ->parameters(['student-attendance-records' => 'studentAttendanceRecord'])

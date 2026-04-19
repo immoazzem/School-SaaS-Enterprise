@@ -260,12 +260,21 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
   - signed download URL route
   - storage plan-limit check through `PlanLimitService`
   - `documents.manage` permission
-- Latest backend verification after Phase 4 document management:
+- Phase 4 Reports, PDFs, and Dashboard Analytics backend is complete:
+  - `report_exports`
+  - queued PDF generation through `GenerateReportJob` and `barryvdh/laravel-dompdf`
+  - signed report download polling and file routes
+  - marksheet, result sheet, ID card, invoice, and salary report export endpoints
+  - V2-compatible result and marksheet aliases
+  - student attendance monthly summary endpoint
+  - dashboard summary endpoint for admin, accountant, teacher, and auditor aggregates
+- Latest backend verification after Phase 4 Reports/PDFs/Dashboard Analytics:
   - `php artisan migrate:fresh --seed` passed against MySQL
-  - `php artisan test` passed with 62 tests / 425 assertions
+  - `php artisan test` passed with 65 tests / 445 assertions
   - `vendor\bin\pint --test` passed
-  - `php artisan route:list --path=api/schools --except-vendor` passed with 178 routes
-- Git note: Phase 3, Phase 4 reporting foundation, and Phase 4 calendar/notification hooks are pushed to GitHub. Phase 4 document management is ready to commit and push.
+  - `composer audit` passed with no advisories
+  - `php artisan route:list --path=api/schools --except-vendor` passed with 190 routes
+- Git note: Phase 3, Phase 4 reporting foundation, Phase 4 calendar/notification hooks, and Phase 4 document management are pushed to GitHub. Phase 4 Reports/PDFs/Dashboard Analytics is ready to commit and push.
 - API index endpoints now return paginated envelopes with top-level `data`, `meta`, and `links`; frontend list code can continue reading `data` as the record array.
 - Shared audit logging lives in `App\Services\AuditLogger` and `App\Http\Controllers\Controller::recordAudit()`.
 - School show/update endpoints exist at `GET/PATCH /api/schools/{school}` with `school.member` and `schools.manage` enforcement for update.

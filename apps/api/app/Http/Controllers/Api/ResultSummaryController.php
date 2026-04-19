@@ -10,6 +10,37 @@ use Illuminate\Http\Request;
 
 class ResultSummaryController extends Controller
 {
+    public function results(Request $request, School $school, Exam $exam): JsonResponse
+    {
+        return $this->index($request, $school, $exam);
+    }
+
+    public function result(Request $request, School $school, Exam $exam, int $enrollment): JsonResponse
+    {
+        abort_unless($exam->school_id === $school->id, 404);
+
+        if (! $exam->is_published) {
+            abort_unless($request->user()->hasSchoolPermission($school, 'exams.manage'), 403);
+        }
+
+        $summary = $school->resultSummaries()
+            ->where('exam_id', $exam->id)
+            ->where('student_enrollment_id', $enrollment)
+            ->with([
+                'studentEnrollment:id,student_id,academic_class_id,roll_no',
+                'studentEnrollment.student:id,admission_no,full_name',
+                'studentEnrollment.academicClass:id,name,code',
+            ])
+            ->firstOrFail();
+
+        return response()->json(['data' => $summary]);
+    }
+
+    public function marksheets(Request $request, School $school, Exam $exam): JsonResponse
+    {
+        return $this->index($request, $school, $exam);
+    }
+
     public function index(Request $request, School $school, Exam $exam): JsonResponse
     {
         abort_unless($exam->school_id === $school->id, 404);

@@ -422,3 +422,26 @@ Verification: targeted `php artisan test --filter=PhaseFourReportingApiTest` pas
 Phase 4 status: result publication, cached summaries, employee attendance summary, in-app notification inbox, school calendar backend, holiday import, payment/leave notification hooks, and document management backend are implemented. Remaining Phase 4 work includes PDFs, dashboard analytics, Nuxt report/calendar/publication/document workspaces, browser checks, and richer recipient mapping once account ownership models are introduced.
 
 Next: commit and push this Phase 4 document checkpoint, then continue with PDFs, dashboard analytics, or the Nuxt Phase 4 workspace.
+
+### Phase 4 Reports, PDFs, and Dashboard Analytics Backend
+
+Current page/module complete: Phase 4 Reports, PDFs, and Dashboard Analytics backend.
+
+Scope: continued `docs/enterprise-plan-v3.md` with `docs/enterprise-plan-v2.md` as the v2 baseline. Added:
+- `report_exports` with job id, requester, school, report type, target morph, parameters, status, signed file metadata, completion timestamp, and failure details.
+- `ReportExport` model and `School::reportExports()` relationship.
+- `GenerateReportJob` using `barryvdh/laravel-dompdf` to render queued PDF exports into local storage.
+- Generic Blade PDF view for official school report exports.
+- Report export endpoints for marksheets, result sheets, ID cards, invoices, and salary records.
+- Report download polling endpoint that returns status plus a signed download URL once the export is complete.
+- Signed report file endpoint that keeps storage paths hidden.
+- V2-compatible result aliases for exam results and marksheets.
+- Student attendance summary endpoint with monthly present/absent/late/half-day counts and attendance percentage.
+- Dashboard summary endpoint with admin, accountant, teacher, and auditor aggregates.
+- Composer security maintenance by updating `phpunit/phpunit` from `12.5.21` to `12.5.23` after `composer audit` reported the advisory on the dev dependency.
+
+Verification: `php artisan test` passed with 65 tests / 445 assertions; `vendor\bin\pint --test` passed; `composer audit` passed with no advisories; `php artisan route:list --path=api/schools --except-vendor` passed and showed 190 school routes; `php artisan migrate:fresh --seed` passed against MySQL.
+
+Phase 4 status: backend is implemented for result publication, cached result summaries, employee/student attendance summaries, in-app notification inbox, school calendar and holidays, payment/leave notification hooks, document management, queued PDF report exports, signed report downloads, and dashboard analytics. Remaining Phase 4 work is the Nuxt Reports, Calendar, Documents, and Publication workspace plus build/browser verification.
+
+Next: commit and push this backend checkpoint, then finish the Phase 4 Nuxt workspace.

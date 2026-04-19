@@ -312,6 +312,14 @@ class School extends Model
     }
 
     /**
+     * @return HasMany<ReportExport, $this>
+     */
+    public function reportExports(): HasMany
+    {
+        return $this->hasMany(ReportExport::class);
+    }
+
+    /**
      * @return HasMany<ResultSummary, $this>
      */
     public function resultSummaries(): HasMany

@@ -281,15 +281,16 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 Continue with Phase 4 implementation:
 
-1. Continue from the Phase 4 document management backend checkpoint.
-2. Add the remaining Phase 4 PDFs, dashboard analytics, Nuxt report/calendar/publication/document workspace, and browser checks.
+1. Commit and push the Phase 4 Reports/PDFs/Dashboard Analytics backend checkpoint.
+2. Add the Phase 4 Nuxt Reports, Calendar, Documents, and Publication workspace, then run build and browser checks.
 
-Current page/module complete: Phase 4 Document Management backend.
+Current page/module complete: Phase 4 Reports, PDFs, and Dashboard Analytics backend.
 Phase 2 status: complete for the current academic setup and people foundation.
 Phase 3 status: complete for backend APIs, Nuxt workspaces, build, and browser smoke checks.
-Phase 4 status: backend implemented for result publication, cached summaries, employee attendance summary, in-app notification inbox, school calendar, holiday import, payment/leave notification hooks, and document management.
-Git status: Phase 4 document management checkpoint is ready to commit and push.
-Next page/module: Phase 4 PDFs, Dashboard Analytics, or Nuxt Reports/Calendar/Documents workspace.
+Phase 4 status: backend implemented for result publication, cached summaries, employee/student attendance summaries, in-app notification inbox, school calendar, holiday import, payment/leave notification hooks, document management, queued PDF exports, signed report downloads, V2-compatible result aliases, and dashboard analytics.
+Latest Phase 4 backend verification: `php artisan test` passed with 65 tests / 445 assertions; `vendor\bin\pint --test` passed; `composer audit` passed with no advisories; `php artisan route:list --path=api/schools --except-vendor` passed with 190 routes; `php artisan migrate:fresh --seed` passed against MySQL.
+Git status: Phase 4 Reports/PDFs/Dashboard Analytics backend checkpoint is ready to commit and push.
+Next page/module: Phase 4 Nuxt Reports, Calendar, Documents, and Publication workspace.
 
 ## New Session Startup Prompt
 

@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\GenerateReportJob;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\School;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
@@ -358,6 +360,108 @@ class PhaseFourReportingApiTest extends TestCase
         $this->assertStringContainsString('signature=', $downloadUrl);
         $this->assertStringNotContainsString($document->file_path, $downloadUrl);
         $this->assertStringNotContainsString($document->file_path, $response->getContent());
+    }
+
+    public function test_phase_four_report_export_dispatches_pdf_job_and_writes_audit_log(): void
+    {
+        Bus::fake();
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Report School', 'slug' => 'report-school']);
+        $this->addActiveMember($user, $school);
+        $this->grantSchoolPermission($user, $school, 'reports.view', 'reports');
+        $academicYear = $school->academicYears()->create(['name' => 'Academic Year 2026', 'code' => 'AY-2026', 'starts_on' => '2026-01-01', 'ends_on' => '2026-12-31']);
+        $academicClass = $school->academicClasses()->create(['name' => 'Class Seven', 'code' => 'C7']);
+        $student = $school->students()->create(['admission_no' => 'ADM-RPT-01', 'full_name' => 'Report Student', 'admitted_on' => '2026-01-05']);
+        $enrollment = $school->studentEnrollments()->create(['student_id' => $student->id, 'academic_year_id' => $academicYear->id, 'academic_class_id' => $academicClass->id, 'enrolled_on' => '2026-01-10']);
+        $examType = $school->examTypes()->create(['name' => 'Final', 'code' => 'FIN']);
+        $exam = $school->exams()->create(['exam_type_id' => $examType->id, 'academic_year_id' => $academicYear->id, 'name' => 'Final 2026', 'code' => 'FIN-RPT', 'starts_on' => '2026-11-01', 'ends_on' => '2026-11-10']);
+
+        Sanctum::actingAs($user);
+
+        $jobId = $this->postJson("/api/schools/{$school->id}/reports/marksheet", [
+            'exam_id' => $exam->id,
+            'student_enrollment_id' => $enrollment->id,
+        ])->assertAccepted()
+            ->assertJsonPath('data.type', 'marksheet')
+            ->assertJsonPath('data.status', 'pending')
+            ->json('data.job_id');
+
+        Bus::assertDispatched(GenerateReportJob::class, fn (GenerateReportJob $job): bool => $job->jobId === $jobId);
+        $this->assertDatabaseHas('report_exports', [
+            'school_id' => $school->id,
+            'job_id' => $jobId,
+            'type' => 'marksheet',
+            'status' => 'pending',
+        ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $user->id,
+            'event' => 'report.exported',
+        ]);
+    }
+
+    public function test_phase_four_report_download_returns_signed_url_when_completed(): void
+    {
+        Storage::fake('local');
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Report Download School', 'slug' => 'report-download-school']);
+        $this->addActiveMember($user, $school);
+        $this->grantSchoolPermission($user, $school, 'reports.view', 'reports');
+        Storage::disk('local')->put("reports/{$school->id}/ready.pdf", 'pdf-content');
+        $export = $school->reportExports()->create([
+            'job_id' => '11111111-1111-4111-8111-111111111111',
+            'requested_by' => $user->id,
+            'type' => 'result-sheet',
+            'status' => 'completed',
+            'parameters' => ['exam_id' => 1],
+            'file_path' => "reports/{$school->id}/ready.pdf",
+            'file_name' => 'ready.pdf',
+            'completed_at' => now(),
+        ]);
+
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson("/api/schools/{$school->id}/reports/{$export->job_id}/download")
+            ->assertOk()
+            ->assertJsonPath('data.status', 'completed')
+            ->assertJsonPath('data.file_name', 'ready.pdf');
+
+        $downloadUrl = $response->json('data.download_url');
+        $this->assertIsString($downloadUrl);
+        $this->assertStringContainsString('signature=', $downloadUrl);
+        $this->assertStringNotContainsString($export->file_path, $downloadUrl);
+    }
+
+    public function test_phase_four_student_attendance_summary_and_dashboard_analytics_return_aggregates(): void
+    {
+        $user = User::factory()->create();
+        $school = School::query()->create(['name' => 'Analytics School', 'slug' => 'analytics-school']);
+        $this->addActiveMember($user, $school);
+        $this->grantSchoolPermission($user, $school, 'reports.view', 'reports');
+        $academicYear = $school->academicYears()->create(['name' => 'Academic Year 2026', 'code' => 'AY-2026', 'starts_on' => '2026-01-01', 'ends_on' => '2026-12-31']);
+        $academicClass = $school->academicClasses()->create(['name' => 'Class Three', 'code' => 'C3']);
+        $student = $school->students()->create(['admission_no' => 'ADM-ANA-01', 'full_name' => 'Analytics Student', 'admitted_on' => '2026-01-05']);
+        $enrollment = $school->studentEnrollments()->create(['student_id' => $student->id, 'academic_year_id' => $academicYear->id, 'academic_class_id' => $academicClass->id, 'enrolled_on' => '2026-01-10']);
+        $invoice = $school->studentInvoices()->create(['student_enrollment_id' => $enrollment->id, 'academic_year_id' => $academicYear->id, 'invoice_no' => 'INV-ANA-01', 'subtotal' => 1000, 'discount' => 0, 'total' => 1000, 'paid_amount' => 400, 'status' => 'partial']);
+        $school->invoicePayments()->create(['student_invoice_id' => $invoice->id, 'amount' => 400, 'paid_on' => now()->toDateString(), 'payment_method' => 'cash']);
+        $school->studentAttendanceRecords()->create(['student_enrollment_id' => $enrollment->id, 'attendance_date' => '2026-04-01', 'status' => 'present']);
+        $school->studentAttendanceRecords()->create(['student_enrollment_id' => $enrollment->id, 'attendance_date' => '2026-04-02', 'status' => 'late']);
+        $school->studentAttendanceRecords()->create(['student_enrollment_id' => $enrollment->id, 'attendance_date' => '2026-04-03', 'status' => 'absent']);
+        $school->leaveApplications()->create(['employee_id' => $school->employees()->create(['employee_no' => 'EMP-ANA-01', 'full_name' => 'Analytics Employee', 'joined_on' => '2026-01-10'])->id, 'leave_type_id' => $school->leaveTypes()->create(['name' => 'Casual Leave', 'code' => 'ANA-CL', 'max_days_per_year' => 10])->id, 'from_date' => '2026-04-10', 'to_date' => '2026-04-10', 'total_days' => 1, 'reason' => 'Work', 'status' => 'pending', 'applied_at' => now()]);
+
+        Sanctum::actingAs($user);
+
+        $this->getJson("/api/schools/{$school->id}/attendance/summary?month=2026-04")
+            ->assertOk()
+            ->assertJsonPath('data.0.counts.present', 1)
+            ->assertJsonPath('data.0.counts.late', 1)
+            ->assertJsonPath('data.0.counts.absent', 1);
+
+        $this->getJson("/api/schools/{$school->id}/dashboard/summary")
+            ->assertOk()
+            ->assertJsonPath('data.admin.student_count', 1)
+            ->assertJsonPath('data.admin.pending_leave_applications', 1)
+            ->assertJsonPath('data.accountant.unpaid_invoices', 1);
     }
 
     private function addActiveMember(User $user, School $school): void
