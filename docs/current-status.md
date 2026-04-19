@@ -4,7 +4,7 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Production Stabilization Status
 
-Current page/module complete: Production Stabilization Checkpoint F, Permission and Tenant Isolation Tests.
+Current page/module complete: Production Stabilization Checkpoint G, PDF Rendering Reliability.
 
 - Checkpoint A roadmap is complete and pushed as `933a920 docs: add production stabilization roadmap`.
 - Checkpoint B frontend foundation is complete locally and ready for checkpoint commit:
@@ -52,7 +52,17 @@ Current page/module complete: Production Stabilization Checkpoint F, Permission 
 - `vendor\bin\pint --dirty` passes.
 - `php artisan test` passes with 91 tests / 573 assertions.
 
-Next page/module: Production Stabilization Checkpoint G, PDF Rendering Reliability.
+- Checkpoint G PDF Rendering Reliability is complete:
+  - added dedicated Blade PDF views for marksheets and invoice receipts.
+  - updated `GenerateReportJob` to select dedicated views for `marksheet` and `invoice-receipt`, with `reports.generic` as fallback.
+  - added report-specific payload assembly for enrollment/exam/marks/result-summary data and invoice/payment-history data.
+  - added retry/backoff properties to `GenerateReportJob`.
+  - added `apps/api/tests/Feature/PdfGenerationTest.php`.
+- `php artisan test --filter=PdfGeneration` passes with 4 tests / 12 assertions.
+- `vendor\bin\pint --dirty` fixed and passed for the PDF changes.
+- `php artisan test` passes with 95 tests / 585 assertions.
+
+Next page/module: Production Stabilization Checkpoint H, Background Job Observability.
 
 ## Completed
 

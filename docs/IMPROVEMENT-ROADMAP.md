@@ -164,7 +164,7 @@ Acceptance:
 
 ## Checkpoint G: PDF Rendering Reliability
 
-**Status:** Pending
+**Status:** Complete
 
 Deliverables:
 
@@ -180,9 +180,10 @@ Deliverables:
 
 Acceptance:
 
-- `php artisan test --filter=PdfGeneration` passes.
-- At least one PDF test exercises the job synchronously and verifies a completed export artifact.
-- Generated PDFs are not blank.
+- `php artisan test --filter=PdfGeneration` passes with 4 tests / 12 assertions.
+- Full `php artisan test` passes with 95 tests / 585 assertions.
+- Marksheet and invoice receipt tests run `GenerateReportJob` synchronously and verify completed PDF artifacts larger than 1 KB.
+- Missing dedicated report data marks the export failed before the job rethrows.
 
 ## Checkpoint H: Background Job Observability
 

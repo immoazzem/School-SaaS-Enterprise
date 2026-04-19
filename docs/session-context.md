@@ -566,7 +566,7 @@ npm run lint
 
 ## Latest Checkpoint
 
-Current page/module complete: Production Stabilization Checkpoint F, Permission and Tenant Isolation Tests.
+Current page/module complete: Production Stabilization Checkpoint G, PDF Rendering Reliability.
 
 Production stabilization status:
 
@@ -610,10 +610,22 @@ Production stabilization status:
 - `php artisan test --filter=PermissionIsolation` passed with 12 tests / 26 assertions.
 - `vendor\bin\pint --dirty` passed.
 - Full `php artisan test` passed with 91 tests / 573 assertions.
+- Checkpoint G PDF Rendering Reliability is complete.
+- Dedicated report views exist at:
+  - `apps/api/resources/views/reports/marksheet.blade.php`
+  - `apps/api/resources/views/reports/invoice.blade.php`
+- `GenerateReportJob` now routes `marksheet` and `invoice-receipt` exports to dedicated views and falls back to `reports.generic` for other report types.
+- Marksheet payloads include enrollment/student/class/section/year, exam/type, marks entries, and result summary data.
+- Invoice payloads include student/class/year, invoice totals, and payment history.
+- `GenerateReportJob` has `tries = 3` and `backoff = 30`.
+- `apps/api/tests/Feature/PdfGenerationTest.php` exists.
+- `php artisan test --filter=PdfGeneration` passed with 4 tests / 12 assertions.
+- `vendor\bin\pint --dirty` passed after formatting the PDF changes.
+- Full `php artisan test` passed with 95 tests / 585 assertions.
 
 Next page/module:
 
-- Production Stabilization Checkpoint G: PDF rendering reliability.
+- Production Stabilization Checkpoint H: background job observability.
 
 Previous product checkpoint:
 

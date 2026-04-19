@@ -735,3 +735,19 @@ Scope: added dedicated backend isolation coverage before Phase 7:
 Verification: `php artisan test --filter=PermissionIsolation` passed with 12 tests / 26 assertions; `vendor\bin\pint --dirty` passed; full `php artisan test` passed with 91 tests / 573 assertions.
 
 Next: continue with Production Stabilization Checkpoint G: PDF rendering reliability.
+
+### Production Stabilization PDF Rendering Reliability
+
+Current page/module complete: Production Stabilization Checkpoint G, PDF Rendering Reliability.
+
+Scope: hardened queued report PDFs before Phase 7:
+- added dedicated Blade views for marksheets and invoice receipts.
+- updated `GenerateReportJob` to route `marksheet` and `invoice-receipt` exports to dedicated views while preserving `reports.generic` fallback for other report types.
+- enriched marksheet payloads with enrollment, student, class, section, academic year, exam, subject marks, and result summary data.
+- enriched invoice payloads with student, class, academic year, invoice totals, and payment history data.
+- added retry/backoff settings to `GenerateReportJob`.
+- added `apps/api/tests/Feature/PdfGenerationTest.php` covering marksheet PDF generation, invoice PDF generation with payments, failed export state for missing required data, and report permission denial.
+
+Verification: `php artisan test --filter=PdfGeneration` passed with 4 tests / 12 assertions; `vendor\bin\pint --dirty` fixed formatting and passed; full `php artisan test` passed with 95 tests / 585 assertions.
+
+Next: continue with Production Stabilization Checkpoint H: background job observability.
