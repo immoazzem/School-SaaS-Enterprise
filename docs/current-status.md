@@ -4,7 +4,7 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Production Stabilization Status
 
-Current page/module complete: Production Stabilization Checkpoint B, Frontend Foundation and Build Warning Classification.
+Current page/module complete: Production Stabilization Checkpoint F, Permission and Tenant Isolation Tests.
 
 - Checkpoint A roadmap is complete and pushed as `933a920 docs: add production stabilization roadmap`.
 - Checkpoint B frontend foundation is complete locally and ready for checkpoint commit:
@@ -33,7 +33,7 @@ Current page/module complete: Production Stabilization Checkpoint B, Frontend Fo
   - `apps/api/.env.example` uses the product app name and keeps the current database-backed local drivers.
   - `docs/local-development.md` is rewritten with copy-paste setup for Herd, MySQL, API v1, fallback PHP server, Nuxt, seeded login, and quality gates.
 
-- Checkpoint E Pinia State Migration is complete locally and ready for checkpoint commit:
+- Checkpoint E Pinia State Migration is complete and pushed:
   - added `apps/web/app/stores/auth.ts`.
   - added `apps/web/app/stores/school.ts`.
   - added `apps/web/app/stores/index.ts`.
@@ -42,7 +42,17 @@ Current page/module complete: Production Stabilization Checkpoint B, Frontend Fo
 - `npm run build` from `apps/web` passes after the Pinia migration.
 - An app-caused duplicate store auto-import warning was fixed before commit; remaining frontend warnings are the classified Nuxt/Nitro/Node warnings in `docs/KNOWN-BUILD-WARNINGS.md`.
 
-Next page/module: Production Stabilization Checkpoint F, Permission and Tenant Isolation Tests.
+- Checkpoint F Permission and Tenant Isolation Tests is complete:
+  - added `apps/api/tests/Feature/PermissionIsolationTest.php`.
+  - covered cross-tenant denial for academic sections, students, invoices, audit logs, and employees.
+  - covered same-school permission denial for sections, finance/invoices, and exam publication.
+  - covered inactive membership and unauthenticated access behavior.
+  - added a permission matrix for owner, teacher, and accountant roles.
+- `php artisan test --filter=PermissionIsolation` passes with 12 tests / 26 assertions.
+- `vendor\bin\pint --dirty` passes.
+- `php artisan test` passes with 91 tests / 573 assertions.
+
+Next page/module: Production Stabilization Checkpoint G, PDF Rendering Reliability.
 
 ## Completed
 

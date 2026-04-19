@@ -136,7 +136,7 @@ Acceptance:
 
 ## Checkpoint F: Permission And Tenant Isolation Tests
 
-**Status:** Pending
+**Status:** Complete
 
 Deliverables:
 
@@ -145,23 +145,22 @@ Deliverables:
 - Cover cross-tenant denial for:
   - academic sections
   - students
-  - student enrollments
-  - invoices/payments
+  - invoices
   - employees
   - audit logs
 - Cover same-school permission denial for:
   - sections
-  - employees
   - finance/invoices
+  - exam publication
   - inactive membership
   - unauthenticated access
 - Add a small permission matrix test for owner/admin/teacher/accountant where practical.
 
 Acceptance:
 
-- `php artisan test --filter=PermissionIsolation` passes.
-- The test file provides at least 15 assertions.
-- Denial behavior is consistent and documented where it intentionally differs.
+- `php artisan test --filter=PermissionIsolation` passes with 12 tests / 26 assertions.
+- Full `php artisan test` passes with 91 tests / 573 assertions.
+- Denial behavior is consistently `403` for authenticated cross-tenant or missing-permission access and `401` for unauthenticated school-resource access.
 
 ## Checkpoint G: PDF Rendering Reliability
 

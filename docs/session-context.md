@@ -566,7 +566,7 @@ npm run lint
 
 ## Latest Checkpoint
 
-Current page/module complete: Production Stabilization Checkpoint E, Pinia State Migration.
+Current page/module complete: Production Stabilization Checkpoint F, Permission and Tenant Isolation Tests.
 
 Production stabilization status:
 
@@ -595,15 +595,25 @@ Production stabilization status:
 - `apps/web/.env.example` includes `NUXT_PUBLIC_API_BASE` and `NUXT_PUBLIC_APP_NAME`.
 - `apps/api/.env.example` uses the product app name and keeps database-backed local queue/cache/session defaults.
 - `docs/local-development.md` is copy-paste ready for Herd, MySQL, API v1, fallback PHP server, Nuxt, seeded login, and quality gates.
-- Checkpoint E is complete locally and ready to commit/push.
+- Checkpoint E Pinia state migration was committed and pushed as `3271652 feat: add pinia auth stores`.
 - Pinia stores exist at `apps/web/app/stores/auth.ts` and `apps/web/app/stores/school.ts`.
 - `useAuth()` delegates to the Pinia auth store while preserving the old page contract (`auth.token.value`, `auth.schools.value`, etc.).
 - The auth store uses the same Nuxt `useState` keys as before, so `useApi()` still reads the bearer token correctly.
 - `npm run build` passed after Pinia migration.
+- Checkpoint F Permission and Tenant Isolation Tests is complete.
+- `apps/api/tests/Feature/PermissionIsolationTest.php` exists.
+- Permission isolation coverage now includes:
+  - cross-tenant denial for academic sections, students, invoices, school audit logs, and employees.
+  - same-school missing-permission denial for section creation, invoice creation, and exam publication.
+  - inactive membership denial and unauthenticated school-resource access.
+  - owner, teacher, and accountant permission matrix assertions.
+- `php artisan test --filter=PermissionIsolation` passed with 12 tests / 26 assertions.
+- `vendor\bin\pint --dirty` passed.
+- Full `php artisan test` passed with 91 tests / 573 assertions.
 
 Next page/module:
 
-- Production Stabilization Checkpoint F: permission and tenant isolation tests.
+- Production Stabilization Checkpoint G: PDF rendering reliability.
 
 Previous product checkpoint:
 

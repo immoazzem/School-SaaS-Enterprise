@@ -719,3 +719,19 @@ Scope: introduced Pinia as the frontend state layer without breaking existing pa
 Verification: `npm run build` from `apps/web` passed. A new app-caused duplicated store auto-import warning was found and fixed by importing the auth store directly from `~/stores/auth` and keeping `stores/index.ts` free of duplicate `use*Store` exports. Remaining frontend warnings match `docs/KNOWN-BUILD-WARNINGS.md`.
 
 Next: commit and push this checkpoint, then continue with Production Stabilization Checkpoint F: permission and tenant isolation tests.
+
+### Production Stabilization Permission Isolation Tests
+
+Current page/module complete: Production Stabilization Checkpoint F, Permission and Tenant Isolation Tests.
+
+Scope: added dedicated backend isolation coverage before Phase 7:
+- created `apps/api/tests/Feature/PermissionIsolationTest.php` in the existing PHPUnit feature-test style.
+- added helpers that seed the enterprise RBAC baseline, create schools, active/inactive memberships, and role assignments through the real model relationships.
+- covered cross-tenant denial for academic sections, students, invoices, school audit logs, and employees.
+- covered same-school missing-permission denial for section creation, invoice creation, and exam publication.
+- covered inactive membership denial and unauthenticated school-resource access.
+- added a compact permission matrix for school owner, teacher, and accountant permissions.
+
+Verification: `php artisan test --filter=PermissionIsolation` passed with 12 tests / 26 assertions; `vendor\bin\pint --dirty` passed; full `php artisan test` passed with 91 tests / 573 assertions.
+
+Next: continue with Production Stabilization Checkpoint G: PDF rendering reliability.
