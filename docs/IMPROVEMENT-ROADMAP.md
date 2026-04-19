@@ -72,7 +72,7 @@ Acceptance:
 
 ## Checkpoint C: API Versioning
 
-**Status:** Pending
+**Status:** Complete
 
 Deliverables:
 

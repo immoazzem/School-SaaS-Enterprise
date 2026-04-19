@@ -21,7 +21,7 @@ class PhaseSixPromotionApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/promotions/preview", [
+        $this->postJson("/api/v1/schools/{$school->id}/promotions/preview", [
             'from_academic_year_id' => $fromYear->id,
             'to_academic_year_id' => $toYear->id,
             'from_academic_class_id' => $fromClass->id,
@@ -40,7 +40,7 @@ class PhaseSixPromotionApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $batchId = $this->postJson("/api/schools/{$school->id}/promotions", [
+        $batchId = $this->postJson("/api/v1/schools/{$school->id}/promotions", [
             'from_academic_year_id' => $fromYear->id,
             'to_academic_year_id' => $toYear->id,
             'from_academic_class_id' => $fromClass->id,
@@ -53,14 +53,14 @@ class PhaseSixPromotionApiTest extends TestCase
 
         $recordId = PromotionBatch::query()->findOrFail($batchId)->records()->where('student_enrollment_id', $failedEnrollment->id)->firstOrFail()->id;
 
-        $this->patchJson("/api/schools/{$school->id}/promotions/{$batchId}/records/{$recordId}", [
+        $this->patchJson("/api/v1/schools/{$school->id}/promotions/{$batchId}/records/{$recordId}", [
             'action' => 'promoted',
             'notes' => 'Manual promotion after review.',
         ])
             ->assertOk()
             ->assertJsonPath('data.action', 'promoted');
 
-        $this->postJson("/api/schools/{$school->id}/promotions/{$batchId}/execute")
+        $this->postJson("/api/v1/schools/{$school->id}/promotions/{$batchId}/execute")
             ->assertOk()
             ->assertJsonPath('data.status', 'completed')
             ->assertJsonPath('data.processed_count', 2);
@@ -81,7 +81,7 @@ class PhaseSixPromotionApiTest extends TestCase
             'event' => 'promotion.executed',
         ]);
 
-        $this->postJson("/api/schools/{$school->id}/promotions/{$batchId}/rollback")
+        $this->postJson("/api/v1/schools/{$school->id}/promotions/{$batchId}/rollback")
             ->assertOk()
             ->assertJsonPath('data.status', 'rolled_back');
 
@@ -102,17 +102,17 @@ class PhaseSixPromotionApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $batchId = $this->postJson("/api/schools/{$school->id}/promotions", [
+        $batchId = $this->postJson("/api/v1/schools/{$school->id}/promotions", [
             'from_academic_year_id' => $fromYear->id,
             'to_academic_year_id' => $toYear->id,
             'from_academic_class_id' => $fromClass->id,
             'to_academic_class_id' => $toClass->id,
         ])->assertCreated()->json('data.id');
 
-        $this->postJson("/api/schools/{$school->id}/promotions/{$batchId}/execute")
+        $this->postJson("/api/v1/schools/{$school->id}/promotions/{$batchId}/execute")
             ->assertOk();
 
-        $this->postJson("/api/schools/{$school->id}/promotions/{$batchId}/execute")
+        $this->postJson("/api/v1/schools/{$school->id}/promotions/{$batchId}/execute")
             ->assertUnprocessable()
             ->assertJsonValidationErrors('batch');
     }

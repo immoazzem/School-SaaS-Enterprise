@@ -52,7 +52,7 @@ class PhaseFourReportingApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/exams/{$exam->id}/publish")
+        $this->postJson("/api/v1/schools/{$school->id}/exams/{$exam->id}/publish")
             ->assertOk()
             ->assertJsonPath('data.is_published', true)
             ->assertJsonPath('data.status', 'completed')
@@ -82,7 +82,7 @@ class PhaseFourReportingApiTest extends TestCase
             'title' => 'Result published',
         ]);
 
-        $this->getJson("/api/schools/{$school->id}/exams/{$exam->id}/result-summaries")
+        $this->getJson("/api/v1/schools/{$school->id}/exams/{$exam->id}/result-summaries")
             ->assertOk()
             ->assertJsonPath('data.0.student_enrollment.student.full_name', 'First Student')
             ->assertJsonPath('data.0.position_in_class', 1);
@@ -99,7 +99,7 @@ class PhaseFourReportingApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->getJson("/api/schools/{$school->id}/exams/{$exam->id}/result-summaries")
+        $this->getJson("/api/v1/schools/{$school->id}/exams/{$exam->id}/result-summaries")
             ->assertForbidden();
     }
 
@@ -118,7 +118,7 @@ class PhaseFourReportingApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->getJson("/api/schools/{$school->id}/attendance/employee-summary?month=2026-04")
+        $this->getJson("/api/v1/schools/{$school->id}/attendance/employee-summary?month=2026-04")
             ->assertOk()
             ->assertJsonPath('data.0.employee.full_name', 'Amina Rahman')
             ->assertJsonPath('data.0.counts.present', 1)
@@ -142,20 +142,20 @@ class PhaseFourReportingApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->getJson("/api/schools/{$school->id}/notifications")
+        $this->getJson("/api/v1/schools/{$school->id}/notifications")
             ->assertOk()
             ->assertJsonPath('data.0.id', $notification->id)
             ->assertJsonPath('data.0.type', 'payment.received');
 
-        $this->getJson("/api/schools/{$school->id}/notifications/unread-count")
+        $this->getJson("/api/v1/schools/{$school->id}/notifications/unread-count")
             ->assertOk()
             ->assertJsonPath('data.unread_count', 1);
 
-        $this->postJson("/api/schools/{$school->id}/notifications/mark-read", ['ids' => [$notification->id]])
+        $this->postJson("/api/v1/schools/{$school->id}/notifications/mark-read", ['ids' => [$notification->id]])
             ->assertOk()
             ->assertJsonPath('data.updated', 1);
 
-        $this->getJson("/api/schools/{$school->id}/notifications/unread-count")
+        $this->getJson("/api/v1/schools/{$school->id}/notifications/unread-count")
             ->assertOk()
             ->assertJsonPath('data.unread_count', 0);
     }
@@ -174,7 +174,7 @@ class PhaseFourReportingApiTest extends TestCase
 
         Sanctum::actingAs($manager);
 
-        $eventId = $this->postJson("/api/schools/{$school->id}/calendar-events", [
+        $eventId = $this->postJson("/api/v1/schools/{$school->id}/calendar-events", [
             'academic_year_id' => $academicYear->id,
             'academic_class_id' => $academicClass->id,
             'title' => 'Class Five parent meeting',
@@ -188,7 +188,7 @@ class PhaseFourReportingApiTest extends TestCase
             ->assertJsonPath('data.academic_class.id', $academicClass->id)
             ->json('data.id');
 
-        $this->postJson("/api/schools/{$school->id}/calendar-events/bulk-import-holidays", [
+        $this->postJson("/api/v1/schools/{$school->id}/calendar-events/bulk-import-holidays", [
             'academic_year_id' => $academicYear->id,
             'holidays' => [
                 ['title' => 'Victory Day', 'date' => '2026-12-16'],
@@ -213,7 +213,7 @@ class PhaseFourReportingApiTest extends TestCase
 
         Sanctum::actingAs($viewer);
 
-        $this->getJson("/api/schools/{$school->id}/calendar-events?academic_class_id={$academicClass->id}&from=2026-04-01&to=2026-12-31")
+        $this->getJson("/api/v1/schools/{$school->id}/calendar-events?academic_class_id={$academicClass->id}&from=2026-04-01&to=2026-12-31")
             ->assertOk()
             ->assertJsonPath('data.0.title', 'Class Five parent meeting');
     }
@@ -244,7 +244,7 @@ class PhaseFourReportingApiTest extends TestCase
 
         Sanctum::actingAs($accountant);
 
-        $this->postJson("/api/schools/{$school->id}/invoice-payments", [
+        $this->postJson("/api/v1/schools/{$school->id}/invoice-payments", [
             'student_invoice_id' => $invoice->id,
             'amount' => 500,
             'paid_on' => '2026-04-18',
@@ -284,7 +284,7 @@ class PhaseFourReportingApiTest extends TestCase
 
         Sanctum::actingAs($reviewer);
 
-        $this->patchJson("/api/schools/{$school->id}/leave-applications/{$application->id}/approve")
+        $this->patchJson("/api/v1/schools/{$school->id}/leave-applications/{$application->id}/approve")
             ->assertOk()
             ->assertJsonPath('data.status', 'approved');
 
@@ -310,7 +310,7 @@ class PhaseFourReportingApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/documents", [
+        $this->postJson("/api/v1/schools/{$school->id}/documents", [
             'category' => 'student_document',
             'title' => 'Admission Form',
             'is_public' => false,
@@ -336,7 +336,7 @@ class PhaseFourReportingApiTest extends TestCase
 
         Sanctum::actingAs($manager);
 
-        $documentId = $this->postJson("/api/schools/{$school->id}/documents", [
+        $documentId = $this->postJson("/api/v1/schools/{$school->id}/documents", [
             'category' => 'circular',
             'title' => 'Annual Circular',
             'is_public' => true,
@@ -350,7 +350,7 @@ class PhaseFourReportingApiTest extends TestCase
 
         Sanctum::actingAs($viewer);
 
-        $response = $this->getJson("/api/schools/{$school->id}/documents/{$documentId}")
+        $response = $this->getJson("/api/v1/schools/{$school->id}/documents/{$documentId}")
             ->assertOk()
             ->assertJsonMissingPath('data.file_path')
             ->assertJsonPath('data.title', 'Annual Circular');
@@ -378,7 +378,7 @@ class PhaseFourReportingApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $jobId = $this->postJson("/api/schools/{$school->id}/reports/marksheet", [
+        $jobId = $this->postJson("/api/v1/schools/{$school->id}/reports/marksheet", [
             'exam_id' => $exam->id,
             'student_enrollment_id' => $enrollment->id,
         ])->assertAccepted()
@@ -421,7 +421,7 @@ class PhaseFourReportingApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $response = $this->getJson("/api/schools/{$school->id}/reports/{$export->job_id}/download")
+        $response = $this->getJson("/api/v1/schools/{$school->id}/reports/{$export->job_id}/download")
             ->assertOk()
             ->assertJsonPath('data.status', 'completed')
             ->assertJsonPath('data.file_name', 'ready.pdf');
@@ -451,13 +451,13 @@ class PhaseFourReportingApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->getJson("/api/schools/{$school->id}/attendance/summary?month=2026-04")
+        $this->getJson("/api/v1/schools/{$school->id}/attendance/summary?month=2026-04")
             ->assertOk()
             ->assertJsonPath('data.0.counts.present', 1)
             ->assertJsonPath('data.0.counts.late', 1)
             ->assertJsonPath('data.0.counts.absent', 1);
 
-        $this->getJson("/api/schools/{$school->id}/dashboard/summary")
+        $this->getJson("/api/v1/schools/{$school->id}/dashboard/summary")
             ->assertOk()
             ->assertJsonPath('data.admin.student_count', 1)
             ->assertJsonPath('data.admin.pending_leave_applications', 1)

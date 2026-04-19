@@ -672,3 +672,21 @@ Verification: `npm install` passed; `npm run build` from `apps/web` passed with 
 Local notes: the Codex shell currently reports Node `v25.0.0` and npm `11.11.0`; the project target is locked to Node `20.11.0` and npm `>=10.2.0`.
 
 Next: commit and push this checkpoint, then continue with Production Stabilization Checkpoint C: API versioning to `/api/v1`.
+
+### Production Stabilization API Versioning
+
+Current page/module complete: Production Stabilization Checkpoint C, API Versioning to `/api/v1`.
+
+Scope: moved the current Laravel API surface under a v1 route prefix and kept the frontend call sites stable:
+- wrapped `apps/api/routes/api.php` in `Route::prefix('v1')`.
+- kept login throttling and authenticated `auth:sanctum`/`throttle:api` behavior intact.
+- versioned the legacy `/user` route as `/api/v1/user`.
+- updated all feature-test request URLs from `/api/...` to `/api/v1/...`.
+- updated `apps/web/app/composables/useApi.ts` to append `/v1` centrally.
+- updated the login page API status text to show the effective `/api/v1` endpoint.
+- documented the v1 compatibility and future v2 deprecation policy in `docs/api-contract.md`.
+- added `docs/ARCHITECTURE.md` with the API version strategy.
+
+Verification: `vendor\bin\pint --dirty` passed after formatting `routes/api.php`; `php artisan route:list --path=api/v1 --except-vendor` showed 228 versioned routes; `php artisan test` passed with 79 tests / 547 assertions; `npm run build` from `apps/web` passed after the API client change.
+
+Next: commit and push this checkpoint, then continue with Production Stabilization Checkpoint D: environment examples and local-development docs.

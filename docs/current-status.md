@@ -18,7 +18,17 @@ Current page/module complete: Production Stabilization Checkpoint B, Frontend Fo
 - `npm run build` from `apps/web` passes with exit code `0`.
 - Current Codex shell uses Node `v25.0.0`; the project target is locked to Node `20.11.0`.
 
-Next page/module: Production Stabilization Checkpoint C, API Versioning to `/api/v1`.
+- Checkpoint C API versioning is complete locally and ready for checkpoint commit:
+  - all Laravel API routes are wrapped under `/api/v1`.
+  - legacy `/api/user` is now versioned as `/api/v1/user`.
+  - Nuxt `useApi()` appends `/v1` centrally while `NUXT_PUBLIC_API_BASE` stays at `/api`.
+  - all existing feature-test URLs were updated to `/api/v1`.
+  - `docs/api-contract.md` and `docs/ARCHITECTURE.md` document v1 compatibility and future v2 deprecation rules.
+- `php artisan route:list --path=api/v1 --except-vendor` shows 228 versioned routes.
+- `php artisan test` from `apps/api` passes with 79 tests / 547 assertions.
+- `npm run build` from `apps/web` passes after the API client change.
+
+Next page/module: Production Stabilization Checkpoint D, Environment and Local Development cleanup.
 
 ## Completed
 

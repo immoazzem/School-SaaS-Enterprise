@@ -40,7 +40,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'password' => 'secret-password',
         ]);
 
-        $response = $this->postJson('/api/auth/login', [
+        $response = $this->postJson('/api/v1/auth/login', [
             'email' => 'principal@example.test',
             'password' => 'secret-password',
             'device_name' => 'feature-test',
@@ -55,7 +55,7 @@ class EnterpriseFoundationApiTest extends TestCase
         $token = $response->json('token');
 
         $this->withToken($token)
-            ->getJson('/api/me')
+            ->getJson('/api/v1/me')
             ->assertOk()
             ->assertJsonPath('user.email', $user->email);
     }
@@ -67,7 +67,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $response = $this->postJson('/api/schools', [
+        $response = $this->postJson('/api/v1/schools', [
             'name' => 'North Star Academy',
             'timezone' => 'Asia/Dhaka',
         ]);
@@ -92,7 +92,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'assigned_by' => $user->id,
         ]);
 
-        $this->getJson('/api/me')
+        $this->getJson('/api/v1/me')
             ->assertOk()
             ->assertJson(fn (AssertableJson $json) => $json
                 ->where('user.schools.0.id', $schoolId)
@@ -118,7 +118,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/schools?per_page=1')
+        $this->getJson('/api/v1/schools?per_page=1')
             ->assertOk()
             ->assertJsonPath('data.0.id', $alphaSchool->id)
             ->assertJsonPath('meta.per_page', 1)
@@ -139,11 +139,11 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->getJson("/api/schools/{$school->id}")
+        $this->getJson("/api/v1/schools/{$school->id}")
             ->assertOk()
             ->assertJsonPath('data.id', $school->id);
 
-        $this->patchJson("/api/schools/{$school->id}", [
+        $this->patchJson("/api/v1/schools/{$school->id}", [
             'name' => 'Enterprise School Prime',
             'timezone' => 'Asia/Dhaka',
             'settings' => ['academic_week_start' => 'sunday'],
@@ -184,7 +184,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->patchJson("/api/schools/{$school->id}", [
+        $this->patchJson("/api/v1/schools/{$school->id}", [
             'name' => 'Blocked Update',
         ])->assertForbidden();
     }
@@ -196,7 +196,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->getJson("/api/schools/{$school->id}")
+        $this->getJson("/api/v1/schools/{$school->id}")
             ->assertForbidden();
     }
 
@@ -213,7 +213,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $created = $this->postJson("/api/schools/{$school->id}/academic-classes", [
+        $created = $this->postJson("/api/v1/schools/{$school->id}/academic-classes", [
             'name' => 'Class One',
             'code' => 'C1',
             'sort_order' => 10,
@@ -233,11 +233,11 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $classId,
         ]);
 
-        $this->getJson("/api/schools/{$school->id}/academic-classes")
+        $this->getJson("/api/v1/schools/{$school->id}/academic-classes")
             ->assertOk()
             ->assertJsonPath('data.0.id', $classId);
 
-        $this->patchJson("/api/schools/{$school->id}/academic-classes/{$classId}", [
+        $this->patchJson("/api/v1/schools/{$school->id}/academic-classes/{$classId}", [
             'name' => 'Class 1',
         ])->assertOk()->assertJsonPath('data.name', 'Class 1');
 
@@ -248,7 +248,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $classId,
         ]);
 
-        $this->deleteJson("/api/schools/{$school->id}/academic-classes/{$classId}")
+        $this->deleteJson("/api/v1/schools/{$school->id}/academic-classes/{$classId}")
             ->assertNoContent();
 
         $this->assertSoftDeleted(AcademicClass::class, ['id' => $classId]);
@@ -278,7 +278,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $created = $this->postJson("/api/schools/{$school->id}/academic-sections", [
+        $created = $this->postJson("/api/v1/schools/{$school->id}/academic-sections", [
             'academic_class_id' => $academicClass->id,
             'name' => 'Section A',
             'code' => 'A',
@@ -301,11 +301,11 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $sectionId,
         ]);
 
-        $this->getJson("/api/schools/{$school->id}/academic-sections?academic_class_id={$academicClass->id}")
+        $this->getJson("/api/v1/schools/{$school->id}/academic-sections?academic_class_id={$academicClass->id}")
             ->assertOk()
             ->assertJsonPath('data.0.id', $sectionId);
 
-        $this->patchJson("/api/schools/{$school->id}/academic-sections/{$sectionId}", [
+        $this->patchJson("/api/v1/schools/{$school->id}/academic-sections/{$sectionId}", [
             'name' => 'Section Alpha',
             'capacity' => 40,
         ])->assertOk()
@@ -319,7 +319,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $sectionId,
         ]);
 
-        $this->deleteJson("/api/schools/{$school->id}/academic-sections/{$sectionId}")
+        $this->deleteJson("/api/v1/schools/{$school->id}/academic-sections/{$sectionId}")
             ->assertNoContent();
 
         $this->assertSoftDeleted(AcademicSection::class, ['id' => $sectionId]);
@@ -344,7 +344,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $created = $this->postJson("/api/schools/{$school->id}/academic-years", [
+        $created = $this->postJson("/api/v1/schools/{$school->id}/academic-years", [
             'name' => 'Academic Year 2026',
             'code' => 'AY-2026',
             'starts_on' => '2026-01-01',
@@ -366,11 +366,11 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $yearId,
         ]);
 
-        $this->getJson("/api/schools/{$school->id}/academic-years?is_current=1")
+        $this->getJson("/api/v1/schools/{$school->id}/academic-years?is_current=1")
             ->assertOk()
             ->assertJsonPath('data.0.id', $yearId);
 
-        $this->patchJson("/api/schools/{$school->id}/academic-years/{$yearId}", [
+        $this->patchJson("/api/v1/schools/{$school->id}/academic-years/{$yearId}", [
             'name' => 'Academic Year 2026-27',
             'ends_on' => '2027-03-31',
         ])->assertOk()
@@ -383,7 +383,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $yearId,
         ]);
 
-        $this->deleteJson("/api/schools/{$school->id}/academic-years/{$yearId}")
+        $this->deleteJson("/api/v1/schools/{$school->id}/academic-years/{$yearId}")
             ->assertNoContent();
 
         $this->assertSoftDeleted(AcademicYear::class, ['id' => $yearId]);
@@ -416,7 +416,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $created = $this->postJson("/api/schools/{$school->id}/academic-years", [
+        $created = $this->postJson("/api/v1/schools/{$school->id}/academic-years", [
             'name' => 'Academic Year 2026',
             'code' => 'AY-2026',
             'starts_on' => '2026-01-01',
@@ -443,7 +443,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $created = $this->postJson("/api/schools/{$school->id}/subjects", [
+        $created = $this->postJson("/api/v1/schools/{$school->id}/subjects", [
             'name' => 'Mathematics',
             'code' => 'MATH',
             'type' => 'core',
@@ -467,11 +467,11 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $subjectId,
         ]);
 
-        $this->getJson("/api/schools/{$school->id}/subjects?type=core&search=math")
+        $this->getJson("/api/v1/schools/{$school->id}/subjects?type=core&search=math")
             ->assertOk()
             ->assertJsonPath('data.0.id', $subjectId);
 
-        $this->patchJson("/api/schools/{$school->id}/subjects/{$subjectId}", [
+        $this->patchJson("/api/v1/schools/{$school->id}/subjects/{$subjectId}", [
             'name' => 'Advanced Mathematics',
             'credit_hours' => 5,
         ])->assertOk()
@@ -485,7 +485,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $subjectId,
         ]);
 
-        $this->deleteJson("/api/schools/{$school->id}/subjects/{$subjectId}")
+        $this->deleteJson("/api/v1/schools/{$school->id}/subjects/{$subjectId}")
             ->assertNoContent();
 
         $this->assertSoftDeleted(Subject::class, ['id' => $subjectId]);
@@ -513,7 +513,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $created = $this->postJson("/api/schools/{$school->id}/class-subjects", [
+        $created = $this->postJson("/api/v1/schools/{$school->id}/class-subjects", [
             'academic_class_id' => $academicClass->id,
             'subject_id' => $subject->id,
             'full_marks' => 100,
@@ -537,11 +537,11 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $assignmentId,
         ]);
 
-        $this->getJson("/api/schools/{$school->id}/class-subjects?academic_class_id={$academicClass->id}&search=physics")
+        $this->getJson("/api/v1/schools/{$school->id}/class-subjects?academic_class_id={$academicClass->id}&search=physics")
             ->assertOk()
             ->assertJsonPath('data.0.id', $assignmentId);
 
-        $this->patchJson("/api/schools/{$school->id}/class-subjects/{$assignmentId}", [
+        $this->patchJson("/api/v1/schools/{$school->id}/class-subjects/{$assignmentId}", [
             'full_marks' => 100,
             'pass_marks' => 45,
             'status' => 'active',
@@ -555,7 +555,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $assignmentId,
         ]);
 
-        $this->deleteJson("/api/schools/{$school->id}/class-subjects/{$assignmentId}")
+        $this->deleteJson("/api/v1/schools/{$school->id}/class-subjects/{$assignmentId}")
             ->assertNoContent();
 
         $this->assertSoftDeleted(ClassSubject::class, ['id' => $assignmentId]);
@@ -584,7 +584,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/class-subjects", [
+        $this->postJson("/api/v1/schools/{$school->id}/class-subjects", [
             'academic_class_id' => $academicClass->id,
             'subject_id' => $foreignSubject->id,
         ])->assertUnprocessable()
@@ -604,7 +604,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $created = $this->postJson("/api/schools/{$school->id}/student-groups", [
+        $created = $this->postJson("/api/v1/schools/{$school->id}/student-groups", [
             'name' => 'Science Group',
             'code' => 'SCI',
             'description' => 'Science-focused student cohort.',
@@ -625,11 +625,11 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $groupId,
         ]);
 
-        $this->getJson("/api/schools/{$school->id}/student-groups?search=science")
+        $this->getJson("/api/v1/schools/{$school->id}/student-groups?search=science")
             ->assertOk()
             ->assertJsonPath('data.0.id', $groupId);
 
-        $this->patchJson("/api/schools/{$school->id}/student-groups/{$groupId}", [
+        $this->patchJson("/api/v1/schools/{$school->id}/student-groups/{$groupId}", [
             'name' => 'Science Cohort',
         ])->assertOk()
             ->assertJsonPath('data.name', 'Science Cohort');
@@ -641,7 +641,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $groupId,
         ]);
 
-        $this->deleteJson("/api/schools/{$school->id}/student-groups/{$groupId}")
+        $this->deleteJson("/api/v1/schools/{$school->id}/student-groups/{$groupId}")
             ->assertNoContent();
 
         $this->assertSoftDeleted(StudentGroup::class, ['id' => $groupId]);
@@ -666,7 +666,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $created = $this->postJson("/api/schools/{$school->id}/shifts", [
+        $created = $this->postJson("/api/v1/schools/{$school->id}/shifts", [
             'name' => 'Morning Shift',
             'code' => 'MOR',
             'starts_at' => '08:00',
@@ -689,11 +689,11 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $shiftId,
         ]);
 
-        $this->getJson("/api/schools/{$school->id}/shifts?search=morning")
+        $this->getJson("/api/v1/schools/{$school->id}/shifts?search=morning")
             ->assertOk()
             ->assertJsonPath('data.0.id', $shiftId);
 
-        $this->patchJson("/api/schools/{$school->id}/shifts/{$shiftId}", [
+        $this->patchJson("/api/v1/schools/{$school->id}/shifts/{$shiftId}", [
             'name' => 'Morning Session',
             'ends_at' => '13:00',
         ])->assertOk()
@@ -707,7 +707,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $shiftId,
         ]);
 
-        $this->deleteJson("/api/schools/{$school->id}/shifts/{$shiftId}")
+        $this->deleteJson("/api/v1/schools/{$school->id}/shifts/{$shiftId}")
             ->assertNoContent();
 
         $this->assertSoftDeleted(Shift::class, ['id' => $shiftId]);
@@ -732,7 +732,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $created = $this->postJson("/api/schools/{$school->id}/designations", [
+        $created = $this->postJson("/api/v1/schools/{$school->id}/designations", [
             'name' => 'Senior Teacher',
             'code' => 'SNR-TCHR',
             'description' => 'Lead classroom teacher designation.',
@@ -753,11 +753,11 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $designationId,
         ]);
 
-        $this->getJson("/api/schools/{$school->id}/designations?search=senior")
+        $this->getJson("/api/v1/schools/{$school->id}/designations?search=senior")
             ->assertOk()
             ->assertJsonPath('data.0.id', $designationId);
 
-        $this->patchJson("/api/schools/{$school->id}/designations/{$designationId}", [
+        $this->patchJson("/api/v1/schools/{$school->id}/designations/{$designationId}", [
             'name' => 'Senior Faculty',
         ])->assertOk()
             ->assertJsonPath('data.name', 'Senior Faculty');
@@ -769,7 +769,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $designationId,
         ]);
 
-        $this->deleteJson("/api/schools/{$school->id}/designations/{$designationId}")
+        $this->deleteJson("/api/v1/schools/{$school->id}/designations/{$designationId}")
             ->assertNoContent();
 
         $this->assertSoftDeleted(Designation::class, ['id' => $designationId]);
@@ -799,7 +799,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $created = $this->postJson("/api/schools/{$school->id}/employees", [
+        $created = $this->postJson("/api/v1/schools/{$school->id}/employees", [
             'designation_id' => $designation->id,
             'employee_no' => 'EMP-2026-0001',
             'full_name' => 'Amina Rahman',
@@ -832,11 +832,11 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $employeeId,
         ]);
 
-        $this->getJson("/api/schools/{$school->id}/employees?employee_type=teacher&search=amina")
+        $this->getJson("/api/v1/schools/{$school->id}/employees?employee_type=teacher&search=amina")
             ->assertOk()
             ->assertJsonPath('data.0.id', $employeeId);
 
-        $this->patchJson("/api/schools/{$school->id}/employees/{$employeeId}", [
+        $this->patchJson("/api/v1/schools/{$school->id}/employees/{$employeeId}", [
             'full_name' => 'Amina Karim Rahman',
             'salary' => 60000,
         ])->assertOk()
@@ -850,7 +850,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $employeeId,
         ]);
 
-        $this->deleteJson("/api/schools/{$school->id}/employees/{$employeeId}")
+        $this->deleteJson("/api/v1/schools/{$school->id}/employees/{$employeeId}")
             ->assertNoContent();
 
         $this->assertSoftDeleted(Employee::class, ['id' => $employeeId]);
@@ -881,7 +881,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/employees", [
+        $this->postJson("/api/v1/schools/{$school->id}/employees", [
             'designation_id' => $foreignDesignation->id,
             'employee_no' => 'EMP-2026-0002',
             'full_name' => 'Foreign Designation User',
@@ -903,7 +903,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $created = $this->postJson("/api/schools/{$school->id}/guardians", [
+        $created = $this->postJson("/api/v1/schools/{$school->id}/guardians", [
             'full_name' => 'Karim Rahman',
             'relationship' => 'Father',
             'phone' => '+8801700001000',
@@ -926,11 +926,11 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $guardianId,
         ]);
 
-        $this->getJson("/api/schools/{$school->id}/guardians?search=karim")
+        $this->getJson("/api/v1/schools/{$school->id}/guardians?search=karim")
             ->assertOk()
             ->assertJsonPath('data.0.id', $guardianId);
 
-        $this->patchJson("/api/schools/{$school->id}/guardians/{$guardianId}", [
+        $this->patchJson("/api/v1/schools/{$school->id}/guardians/{$guardianId}", [
             'occupation' => 'Architect',
         ])->assertOk()
             ->assertJsonPath('data.occupation', 'Architect');
@@ -942,7 +942,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $guardianId,
         ]);
 
-        $this->deleteJson("/api/schools/{$school->id}/guardians/{$guardianId}")
+        $this->deleteJson("/api/v1/schools/{$school->id}/guardians/{$guardianId}")
             ->assertNoContent();
 
         $this->assertSoftDeleted(Guardian::class, ['id' => $guardianId]);
@@ -973,7 +973,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $created = $this->postJson("/api/schools/{$school->id}/students", [
+        $created = $this->postJson("/api/v1/schools/{$school->id}/students", [
             'guardian_id' => $guardian->id,
             'admission_no' => 'ADM-2026-0001',
             'full_name' => 'Nadia Rahman',
@@ -1004,11 +1004,11 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $studentId,
         ]);
 
-        $this->getJson("/api/schools/{$school->id}/students?search=nadia")
+        $this->getJson("/api/v1/schools/{$school->id}/students?search=nadia")
             ->assertOk()
             ->assertJsonPath('data.0.id', $studentId);
 
-        $this->patchJson("/api/schools/{$school->id}/students/{$studentId}", [
+        $this->patchJson("/api/v1/schools/{$school->id}/students/{$studentId}", [
             'full_name' => 'Nadia Karim Rahman',
         ])->assertOk()
             ->assertJsonPath('data.full_name', 'Nadia Karim Rahman');
@@ -1020,7 +1020,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $studentId,
         ]);
 
-        $this->deleteJson("/api/schools/{$school->id}/students/{$studentId}")
+        $this->deleteJson("/api/v1/schools/{$school->id}/students/{$studentId}")
             ->assertNoContent();
 
         $this->assertSoftDeleted(Student::class, ['id' => $studentId]);
@@ -1051,7 +1051,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/students", [
+        $this->postJson("/api/v1/schools/{$school->id}/students", [
             'guardian_id' => $foreignGuardian->id,
             'admission_no' => 'ADM-2026-0002',
             'full_name' => 'Foreign Guardian Student',
@@ -1093,7 +1093,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $created = $this->postJson("/api/schools/{$school->id}/student-enrollments", [
+        $created = $this->postJson("/api/v1/schools/{$school->id}/student-enrollments", [
             'student_id' => $student->id,
             'academic_year_id' => $academicYear->id,
             'academic_class_id' => $academicClass->id,
@@ -1120,11 +1120,11 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $enrollmentId,
         ]);
 
-        $this->getJson("/api/schools/{$school->id}/student-enrollments?search=nadia")
+        $this->getJson("/api/v1/schools/{$school->id}/student-enrollments?search=nadia")
             ->assertOk()
             ->assertJsonPath('data.0.id', $enrollmentId);
 
-        $this->patchJson("/api/schools/{$school->id}/student-enrollments/{$enrollmentId}", [
+        $this->patchJson("/api/v1/schools/{$school->id}/student-enrollments/{$enrollmentId}", [
             'roll_no' => '15',
             'status' => 'active',
         ])->assertOk()
@@ -1137,7 +1137,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $enrollmentId,
         ]);
 
-        $this->deleteJson("/api/schools/{$school->id}/student-enrollments/{$enrollmentId}")
+        $this->deleteJson("/api/v1/schools/{$school->id}/student-enrollments/{$enrollmentId}")
             ->assertNoContent();
 
         $this->assertSoftDeleted(StudentEnrollment::class, ['id' => $enrollmentId]);
@@ -1176,7 +1176,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/student-enrollments", [
+        $this->postJson("/api/v1/schools/{$school->id}/student-enrollments", [
             'student_id' => $foreignStudent->id,
             'academic_year_id' => $academicYear->id,
             'academic_class_id' => $academicClass->id,
@@ -1218,7 +1218,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $created = $this->postJson("/api/schools/{$school->id}/student-attendance-records", [
+        $created = $this->postJson("/api/v1/schools/{$school->id}/student-attendance-records", [
             'student_enrollment_id' => $enrollment->id,
             'attendance_date' => '2026-04-18',
             'status' => 'present',
@@ -1240,18 +1240,18 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $recordId,
         ]);
 
-        $this->getJson("/api/schools/{$school->id}/student-attendance-records?attendance_date=2026-04-18&search=attendance")
+        $this->getJson("/api/v1/schools/{$school->id}/student-attendance-records?attendance_date=2026-04-18&search=attendance")
             ->assertOk()
             ->assertJsonPath('data.0.id', $recordId);
 
-        $this->postJson("/api/schools/{$school->id}/student-attendance-records", [
+        $this->postJson("/api/v1/schools/{$school->id}/student-attendance-records", [
             'student_enrollment_id' => $enrollment->id,
             'attendance_date' => '2026-04-18',
             'status' => 'late',
         ])->assertUnprocessable()
             ->assertJsonValidationErrors('attendance_date');
 
-        $this->patchJson("/api/schools/{$school->id}/student-attendance-records/{$recordId}", [
+        $this->patchJson("/api/v1/schools/{$school->id}/student-attendance-records/{$recordId}", [
             'status' => 'late',
             'remarks' => 'Arrived after assembly.',
         ])->assertOk()
@@ -1265,7 +1265,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $recordId,
         ]);
 
-        $this->deleteJson("/api/schools/{$school->id}/student-attendance-records/{$recordId}")
+        $this->deleteJson("/api/v1/schools/{$school->id}/student-attendance-records/{$recordId}")
             ->assertNoContent();
 
         $this->assertSoftDeleted(StudentAttendanceRecord::class, ['id' => $recordId]);
@@ -1310,7 +1310,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/student-attendance-records", [
+        $this->postJson("/api/v1/schools/{$school->id}/student-attendance-records", [
             'student_enrollment_id' => $foreignEnrollment->id,
             'attendance_date' => '2026-04-18',
             'status' => 'present',
@@ -1337,7 +1337,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $created = $this->postJson("/api/schools/{$school->id}/teacher-profiles", [
+        $created = $this->postJson("/api/v1/schools/{$school->id}/teacher-profiles", [
             'employee_id' => $employee->id,
             'teacher_no' => 'TCHR-2026-0001',
             'specialization' => 'Mathematics',
@@ -1361,11 +1361,11 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $profileId,
         ]);
 
-        $this->getJson("/api/schools/{$school->id}/teacher-profiles?search=amina")
+        $this->getJson("/api/v1/schools/{$school->id}/teacher-profiles?search=amina")
             ->assertOk()
             ->assertJsonPath('data.0.id', $profileId);
 
-        $this->patchJson("/api/schools/{$school->id}/teacher-profiles/{$profileId}", [
+        $this->patchJson("/api/v1/schools/{$school->id}/teacher-profiles/{$profileId}", [
             'specialization' => 'Advanced Mathematics',
         ])->assertOk()
             ->assertJsonPath('data.specialization', 'Advanced Mathematics');
@@ -1377,7 +1377,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $profileId,
         ]);
 
-        $this->deleteJson("/api/schools/{$school->id}/teacher-profiles/{$profileId}")
+        $this->deleteJson("/api/v1/schools/{$school->id}/teacher-profiles/{$profileId}")
             ->assertNoContent();
 
         $this->assertSoftDeleted(TeacherProfile::class, ['id' => $profileId]);
@@ -1409,7 +1409,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/teacher-profiles", [
+        $this->postJson("/api/v1/schools/{$school->id}/teacher-profiles", [
             'employee_id' => $foreignEmployee->id,
             'teacher_no' => 'TCHR-FOREIGN',
         ])->assertUnprocessable()
@@ -1444,7 +1444,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $type = $this->postJson("/api/schools/{$school->id}/exam-types", [
+        $type = $this->postJson("/api/v1/schools/{$school->id}/exam-types", [
             'name' => 'Midterm',
             'code' => 'MID',
             'weightage_percent' => 40,
@@ -1465,7 +1465,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'auditable_id' => $examTypeId,
         ]);
 
-        $exam = $this->postJson("/api/schools/{$school->id}/exams", [
+        $exam = $this->postJson("/api/v1/schools/{$school->id}/exams", [
             'exam_type_id' => $examTypeId,
             'academic_year_id' => $academicYear->id,
             'name' => 'Midterm 2026',
@@ -1491,7 +1491,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'published_by' => null,
         ]);
 
-        $schedule = $this->postJson("/api/schools/{$school->id}/exam-schedules", [
+        $schedule = $this->postJson("/api/v1/schools/{$school->id}/exam-schedules", [
             'exam_id' => $examId,
             'class_subject_id' => $classSubject->id,
             'exam_date' => '2026-06-03',
@@ -1508,17 +1508,17 @@ class EnterpriseFoundationApiTest extends TestCase
 
         $scheduleId = $schedule->json('data.id');
 
-        $this->getJson("/api/schools/{$school->id}/exam-schedules?exam_id={$examId}")
+        $this->getJson("/api/v1/schools/{$school->id}/exam-schedules?exam_id={$examId}")
             ->assertOk()
             ->assertJsonPath('data.0.id', $scheduleId)
             ->assertJsonPath('meta.total', 1);
 
-        $this->patchJson("/api/schools/{$school->id}/exam-schedules/{$scheduleId}", [
+        $this->patchJson("/api/v1/schools/{$school->id}/exam-schedules/{$scheduleId}", [
             'room' => 'Room 202',
         ])->assertOk()
             ->assertJsonPath('data.room', 'Room 202');
 
-        $this->deleteJson("/api/schools/{$school->id}/exam-schedules/{$scheduleId}")
+        $this->deleteJson("/api/v1/schools/{$school->id}/exam-schedules/{$scheduleId}")
             ->assertNoContent();
 
         $this->assertSoftDeleted(ExamSchedule::class, ['id' => $scheduleId]);
@@ -1546,7 +1546,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/exams", [
+        $this->postJson("/api/v1/schools/{$school->id}/exams", [
             'exam_type_id' => $foreignExamType->id,
             'academic_year_id' => $academicYear->id,
             'name' => 'Blocked Exam',
@@ -1576,7 +1576,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/grade-scales", [
+        $this->postJson("/api/v1/schools/{$school->id}/grade-scales", [
             'name' => 'A Plus',
             'code' => 'A+',
             'min_percent' => 80,
@@ -1588,7 +1588,7 @@ class EnterpriseFoundationApiTest extends TestCase
             ->assertJsonPath('data.fail_below_percent', '33.00')
             ->assertJsonPath('data.gpa_calculation_method', 'weighted');
 
-        $entry = $this->postJson("/api/schools/{$school->id}/marks-entries", [
+        $entry = $this->postJson("/api/v1/schools/{$school->id}/marks-entries", [
             'exam_id' => $exam->id,
             'class_subject_id' => $classSubject->id,
             'student_enrollment_id' => $enrollment->id,
@@ -1599,7 +1599,7 @@ class EnterpriseFoundationApiTest extends TestCase
             ->assertJsonPath('data.full_marks', 80)
             ->assertJsonPath('data.pass_marks', 27);
 
-        $this->patchJson("/api/schools/{$school->id}/marks-entries/{$entry->json('data.id')}", [
+        $this->patchJson("/api/v1/schools/{$school->id}/marks-entries/{$entry->json('data.id')}", [
             'is_absent' => true,
             'absent_reason' => 'Sick leave',
         ])->assertOk()
@@ -1622,13 +1622,13 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $categoryId = $this->postJson("/api/schools/{$school->id}/fee-categories", [
+        $categoryId = $this->postJson("/api/v1/schools/{$school->id}/fee-categories", [
             'name' => 'Monthly Tuition',
             'code' => 'TUITION',
             'billing_type' => 'monthly',
         ])->assertCreated()->json('data.id');
 
-        $feeStructureId = $this->postJson("/api/schools/{$school->id}/fee-structures", [
+        $feeStructureId = $this->postJson("/api/v1/schools/{$school->id}/fee-structures", [
             'fee_category_id' => $categoryId,
             'academic_year_id' => $academicYear->id,
             'academic_class_id' => $academicClass->id,
@@ -1637,7 +1637,7 @@ class EnterpriseFoundationApiTest extends TestCase
             'is_recurring' => true,
         ])->assertCreated()->json('data.id');
 
-        $policyId = $this->postJson("/api/schools/{$school->id}/discount-policies", [
+        $policyId = $this->postJson("/api/v1/schools/{$school->id}/discount-policies", [
             'name' => 'Scholarship',
             'code' => 'SCHOLAR',
             'discount_type' => 'percent',
@@ -1645,13 +1645,13 @@ class EnterpriseFoundationApiTest extends TestCase
             'applies_to_category_ids' => [$categoryId],
         ])->assertCreated()->json('data.id');
 
-        $this->postJson("/api/schools/{$school->id}/student-discounts", [
+        $this->postJson("/api/v1/schools/{$school->id}/student-discounts", [
             'student_enrollment_id' => $enrollment->id,
             'discount_policy_id' => $policyId,
             'academic_year_id' => $academicYear->id,
         ])->assertCreated();
 
-        $this->postJson("/api/schools/{$school->id}/student-invoices", [
+        $this->postJson("/api/v1/schools/{$school->id}/student-invoices", [
             'student_enrollment_id' => $enrollment->id,
             'academic_year_id' => $academicYear->id,
             'fee_month' => '2026-04',
@@ -1661,7 +1661,7 @@ class EnterpriseFoundationApiTest extends TestCase
             ->assertJsonPath('data.discount', '100.00')
             ->assertJsonPath('data.total', '900.00');
 
-        $this->postJson("/api/schools/{$school->id}/student-invoices/bulk-generate", [
+        $this->postJson("/api/v1/schools/{$school->id}/student-invoices/bulk-generate", [
             'academic_class_id' => $academicClass->id,
             'academic_year_id' => $academicYear->id,
             'month' => '2026-05',
@@ -1686,7 +1686,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/salary-records", [
+        $this->postJson("/api/v1/schools/{$school->id}/salary-records", [
             'employee_id' => $employee->id,
             'academic_year_id' => $academicYear->id,
             'month' => '2026-04',
@@ -1698,7 +1698,7 @@ class EnterpriseFoundationApiTest extends TestCase
             ->assertJsonPath('data.total_deductions', '1000.00')
             ->assertJsonPath('data.net_amount', '12500.00');
 
-        $attendanceId = $this->postJson("/api/schools/{$school->id}/employee-attendance-records", [
+        $attendanceId = $this->postJson("/api/v1/schools/{$school->id}/employee-attendance-records", [
             'employee_id' => $employee->id,
             'date' => '2026-04-18',
             'status' => 'late',
@@ -1707,7 +1707,7 @@ class EnterpriseFoundationApiTest extends TestCase
             ->assertJsonPath('data.status', 'late')
             ->json('data.id');
 
-        $this->postJson("/api/schools/{$school->id}/employee-attendance-records", [
+        $this->postJson("/api/v1/schools/{$school->id}/employee-attendance-records", [
             'employee_id' => $employee->id,
             'date' => '2026-04-18',
             'status' => 'present',
@@ -1716,13 +1716,13 @@ class EnterpriseFoundationApiTest extends TestCase
             ->assertJsonPath('data.id', $attendanceId)
             ->assertJsonPath('data.status', 'present');
 
-        $leaveTypeId = $this->postJson("/api/schools/{$school->id}/leave-types", [
+        $leaveTypeId = $this->postJson("/api/v1/schools/{$school->id}/leave-types", [
             'name' => 'Casual Leave',
             'code' => 'CL',
             'max_days_per_year' => 10,
         ])->assertCreated()->json('data.id');
 
-        $this->postJson("/api/schools/{$school->id}/leave-balances", [
+        $this->postJson("/api/v1/schools/{$school->id}/leave-balances", [
             'employee_id' => $employee->id,
             'leave_type_id' => $leaveTypeId,
             'academic_year_id' => $academicYear->id,
@@ -1731,7 +1731,7 @@ class EnterpriseFoundationApiTest extends TestCase
         ])->assertCreated()
             ->assertJsonPath('data.remaining_days', 10);
 
-        $applicationId = $this->postJson("/api/schools/{$school->id}/leave-applications", [
+        $applicationId = $this->postJson("/api/v1/schools/{$school->id}/leave-applications", [
             'employee_id' => $employee->id,
             'leave_type_id' => $leaveTypeId,
             'from_date' => '2026-04-20',
@@ -1741,14 +1741,14 @@ class EnterpriseFoundationApiTest extends TestCase
             ->assertJsonPath('data.total_days', 2)
             ->json('data.id');
 
-        $this->patchJson("/api/schools/{$school->id}/leave-applications/{$applicationId}/approve")
+        $this->patchJson("/api/v1/schools/{$school->id}/leave-applications/{$applicationId}/approve")
             ->assertOk()
             ->assertJsonPath('data.status', 'approved');
 
         $this->assertDatabaseHas('leave_balances', ['employee_id' => $employee->id, 'used_days' => 2, 'remaining_days' => 8]);
         $this->assertDatabaseHas('employee_attendance_records', ['employee_id' => $employee->id, 'date' => '2026-04-20', 'status' => 'on_leave']);
 
-        $this->patchJson("/api/schools/{$school->id}/leave-applications/{$applicationId}/cancel")
+        $this->patchJson("/api/v1/schools/{$school->id}/leave-applications/{$applicationId}/cancel")
             ->assertOk()
             ->assertJsonPath('data.status', 'cancelled');
 
@@ -1769,7 +1769,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $recordId = $this->postJson("/api/schools/{$school->id}/student-attendance/bulk", [
+        $recordId = $this->postJson("/api/v1/schools/{$school->id}/student-attendance/bulk", [
             'academic_class_id' => $academicClass->id,
             'date' => '2026-04-18',
             'records' => [
@@ -1780,7 +1780,7 @@ class EnterpriseFoundationApiTest extends TestCase
             ->assertJsonPath('data.0.half_day', true)
             ->json('data.0.id');
 
-        $this->postJson("/api/schools/{$school->id}/student-attendance/bulk", [
+        $this->postJson("/api/v1/schools/{$school->id}/student-attendance/bulk", [
             'academic_class_id' => $academicClass->id,
             'date' => '2026-04-18',
             'records' => [
@@ -1810,7 +1810,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/academic-sections", [
+        $this->postJson("/api/v1/schools/{$school->id}/academic-sections", [
             'academic_class_id' => $foreignClass->id,
             'name' => 'Section A',
             'code' => 'A',
@@ -1825,7 +1825,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->getJson("/api/schools/{$school->id}/academic-classes")
+        $this->getJson("/api/v1/schools/{$school->id}/academic-classes")
             ->assertForbidden();
     }
 
@@ -1841,7 +1841,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->getJson("/api/schools/{$school->id}/academic-classes")
+        $this->getJson("/api/v1/schools/{$school->id}/academic-classes")
             ->assertForbidden();
     }
 
@@ -1857,7 +1857,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/academic-classes", [
+        $this->postJson("/api/v1/schools/{$school->id}/academic-classes", [
             'name' => 'Class One',
             'code' => 'C1',
         ])->assertForbidden();
@@ -1879,7 +1879,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/academic-sections", [
+        $this->postJson("/api/v1/schools/{$school->id}/academic-sections", [
             'academic_class_id' => $academicClass->id,
             'name' => 'Section A',
             'code' => 'A',
@@ -1898,7 +1898,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/academic-years", [
+        $this->postJson("/api/v1/schools/{$school->id}/academic-years", [
             'name' => 'Academic Year 2026',
             'code' => 'AY-2026',
             'starts_on' => '2026-01-01',
@@ -1918,7 +1918,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/subjects", [
+        $this->postJson("/api/v1/schools/{$school->id}/subjects", [
             'name' => 'Science',
             'code' => 'SCI',
         ])->assertForbidden();
@@ -1938,7 +1938,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/class-subjects", [
+        $this->postJson("/api/v1/schools/{$school->id}/class-subjects", [
             'academic_class_id' => $academicClass->id,
             'subject_id' => $subject->id,
         ])->assertForbidden();
@@ -1956,7 +1956,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/student-groups", [
+        $this->postJson("/api/v1/schools/{$school->id}/student-groups", [
             'name' => 'Commerce Group',
             'code' => 'COM',
         ])->assertForbidden();
@@ -1974,7 +1974,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/shifts", [
+        $this->postJson("/api/v1/schools/{$school->id}/shifts", [
             'name' => 'Day Shift',
             'code' => 'DAY',
         ])->assertForbidden();
@@ -1992,7 +1992,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/designations", [
+        $this->postJson("/api/v1/schools/{$school->id}/designations", [
             'name' => 'Assistant Teacher',
             'code' => 'AST-TCHR',
         ])->assertForbidden();
@@ -2010,7 +2010,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/employees", [
+        $this->postJson("/api/v1/schools/{$school->id}/employees", [
             'employee_no' => 'EMP-2026-0003',
             'full_name' => 'Limited Employee',
             'joined_on' => '2026-01-15',
@@ -2029,7 +2029,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/guardians", [
+        $this->postJson("/api/v1/schools/{$school->id}/guardians", [
             'full_name' => 'Limited Guardian',
         ])->assertForbidden();
     }
@@ -2046,7 +2046,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/students", [
+        $this->postJson("/api/v1/schools/{$school->id}/students", [
             'admission_no' => 'ADM-2026-0003',
             'full_name' => 'Limited Student',
             'admitted_on' => '2026-01-10',
@@ -2077,7 +2077,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/student-enrollments", [
+        $this->postJson("/api/v1/schools/{$school->id}/student-enrollments", [
             'student_id' => $student->id,
             'academic_year_id' => $academicYear->id,
             'academic_class_id' => $academicClass->id,
@@ -2115,7 +2115,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/student-attendance-records", [
+        $this->postJson("/api/v1/schools/{$school->id}/student-attendance-records", [
             'student_enrollment_id' => $enrollment->id,
             'attendance_date' => '2026-04-18',
             'status' => 'present',
@@ -2139,7 +2139,7 @@ class EnterpriseFoundationApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/teacher-profiles", [
+        $this->postJson("/api/v1/schools/{$school->id}/teacher-profiles", [
             'employee_id' => $employee->id,
             'teacher_no' => 'TCHR-2026-0101',
         ])->assertForbidden();

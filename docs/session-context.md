@@ -566,13 +566,13 @@ npm run lint
 
 ## Latest Checkpoint
 
-Current page/module complete: Production Stabilization Checkpoint B, Frontend Foundation and Build Warning Classification.
+Current page/module complete: Production Stabilization Checkpoint C, API Versioning to `/api/v1`.
 
 Production stabilization status:
 
 - `docs/IMPROVEMENT-ROADMAP.md` is the active pre-Phase 7 stabilization roadmap.
 - Checkpoint A roadmap was committed and pushed as `933a920 docs: add production stabilization roadmap`.
-- Checkpoint B is complete locally and ready to commit/push.
+- Checkpoint B frontend foundation was committed and pushed as `a6bcff8 feat: stabilize frontend foundation`.
 - Nuxt frontend dependencies now include Tailwind CSS module, Tailwind v3, Pinia, VueUse, Zod, PostCSS, and Autoprefixer.
 - Pinia is intentionally `^3.0.4` with `@pinia/nuxt ^0.11.3` because Vue Router 5 declares optional Pinia 3 peer compatibility.
 - `apps/web/.nvmrc` locks Node to `20.11.0`.
@@ -583,10 +583,18 @@ Production stabilization status:
 - `npm install` passed.
 - `npm run build` from `apps/web` passed with exit code `0`.
 - Current Codex shell reports Node `v25.0.0`; project target is Node `20.11.0`.
+- Checkpoint C is complete locally and ready to commit/push.
+- Laravel routes are wrapped under `Route::prefix('v1')`; current application routes are under `/api/v1`.
+- Nuxt `useApi()` appends `/v1` centrally while `.env` keeps `NUXT_PUBLIC_API_BASE` at the `/api` level.
+- Feature tests now target `/api/v1/...`.
+- `docs/api-contract.md` and `docs/ARCHITECTURE.md` document API versioning and future v2 deprecation rules.
+- `php artisan route:list --path=api/v1 --except-vendor` showed 228 versioned routes.
+- `php artisan test` passed with 79 tests / 547 assertions.
+- `npm run build` passed after the API client change.
 
 Next page/module:
 
-- Production Stabilization Checkpoint C: version the API under `/api/v1`, update the frontend API composable, update tests, and document API versioning.
+- Production Stabilization Checkpoint D: environment examples and local-development docs.
 
 Previous product checkpoint:
 

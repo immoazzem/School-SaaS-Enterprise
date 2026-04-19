@@ -23,7 +23,7 @@ class PhaseFiveSaasAdminApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->getJson('/api/admin/system/stats')->assertForbidden();
+        $this->getJson('/api/v1/admin/system/stats')->assertForbidden();
     }
 
     public function test_super_admin_can_manage_school_saas_profile_and_onboarding(): void
@@ -35,11 +35,11 @@ class PhaseFiveSaasAdminApiTest extends TestCase
 
         Sanctum::actingAs($admin);
 
-        $this->getJson('/api/admin/system/stats')
+        $this->getJson('/api/v1/admin/system/stats')
             ->assertOk()
             ->assertJsonPath('data.schools', 1);
 
-        $this->patchJson("/api/admin/schools/{$school->id}", [
+        $this->patchJson("/api/v1/admin/schools/{$school->id}", [
             'plan' => 'growth',
             'subscription_status' => 'active',
             'plan_limits' => [
@@ -54,7 +54,7 @@ class PhaseFiveSaasAdminApiTest extends TestCase
             ->assertJsonPath('data.plan', 'growth')
             ->assertJsonPath('data.plan_limits.max_students', 500);
 
-        $this->postJson("/api/admin/schools/{$school->id}/onboard")
+        $this->postJson("/api/v1/admin/schools/{$school->id}/onboard")
             ->assertOk()
             ->assertJsonPath('data.subscription_status', 'trialing');
 
@@ -79,7 +79,7 @@ class PhaseFiveSaasAdminApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->patchJson("/api/schools/{$school->id}/settings", [
+        $this->patchJson("/api/v1/schools/{$school->id}/settings", [
             'timezone' => 'Asia/Dhaka',
             'locale' => 'en_BD',
             'currency' => 'BDT',
@@ -99,7 +99,7 @@ class PhaseFiveSaasAdminApiTest extends TestCase
             ->assertJsonPath('data.currency', 'BDT')
             ->assertJsonPath('data.allow_parent_portal', true);
 
-        $this->getJson("/api/schools/{$school->id}/settings")
+        $this->getJson("/api/v1/schools/{$school->id}/settings")
             ->assertOk()
             ->assertJsonPath('data.fee_invoice_prefix', 'FEE');
 
@@ -128,7 +128,7 @@ class PhaseFiveSaasAdminApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->postJson("/api/schools/{$school->id}/students", [
+        $this->postJson("/api/v1/schools/{$school->id}/students", [
             'admission_no' => 'ADM-LIMIT-02',
             'full_name' => 'Blocked Student',
             'admitted_on' => '2026-01-02',
@@ -150,7 +150,7 @@ class PhaseFiveSaasAdminApiTest extends TestCase
 
         Sanctum::actingAs($user);
 
-        $this->getJson("/api/schools/{$school->id}/audit-logs?event=school.updated&per_page=1")
+        $this->getJson("/api/v1/schools/{$school->id}/audit-logs?event=school.updated&per_page=1")
             ->assertOk()
             ->assertJsonPath('data.0.school_id', $school->id)
             ->assertJsonPath('meta.total', 1);
@@ -172,7 +172,7 @@ class PhaseFiveSaasAdminApiTest extends TestCase
 
         Sanctum::actingAs($manager);
 
-        $token = $this->postJson("/api/schools/{$school->id}/invitations", [
+        $token = $this->postJson("/api/v1/schools/{$school->id}/invitations", [
             'email' => 'New.Teacher@example.test',
             'name' => 'New Teacher',
             'role_id' => $teacherRole->id,
@@ -182,13 +182,13 @@ class PhaseFiveSaasAdminApiTest extends TestCase
             ->assertJsonPath('data.role.key', 'teacher')
             ->json('data.token');
 
-        $this->getJson("/api/schools/{$school->id}/invitations")
+        $this->getJson("/api/v1/schools/{$school->id}/invitations")
             ->assertOk()
             ->assertJsonPath('data.0.email', 'new.teacher@example.test');
 
         Sanctum::actingAs($invitee);
 
-        $this->postJson("/api/invitations/{$token}/accept")
+        $this->postJson("/api/v1/invitations/{$token}/accept")
             ->assertOk()
             ->assertJsonPath('data.status', 'accepted')
             ->assertJsonPath('data.school.id', $school->id);
@@ -205,11 +205,11 @@ class PhaseFiveSaasAdminApiTest extends TestCase
         ]);
 
         Sanctum::actingAs($manager);
-        $revokedInvitationId = $this->postJson("/api/schools/{$school->id}/invitations", [
+        $revokedInvitationId = $this->postJson("/api/v1/schools/{$school->id}/invitations", [
             'email' => 'revoked@example.test',
         ])->assertCreated()->json('data.id');
 
-        $this->deleteJson("/api/schools/{$school->id}/invitations/{$revokedInvitationId}")
+        $this->deleteJson("/api/v1/schools/{$school->id}/invitations/{$revokedInvitationId}")
             ->assertNoContent();
 
         $this->assertDatabaseHas('school_invitations', [
@@ -232,7 +232,7 @@ class PhaseFiveSaasAdminApiTest extends TestCase
 
         Sanctum::actingAs($invitee);
 
-        $this->postJson("/api/invitations/{$invitation->token}/accept")
+        $this->postJson("/api/v1/invitations/{$invitation->token}/accept")
             ->assertUnprocessable()
             ->assertJsonValidationErrors('token');
 
@@ -252,24 +252,24 @@ class PhaseFiveSaasAdminApiTest extends TestCase
 
         Sanctum::actingAs($studentUser);
 
-        $this->getJson("/api/schools/{$school->id}/portal/student/profile")
+        $this->getJson("/api/v1/schools/{$school->id}/portal/student/profile")
             ->assertOk()
             ->assertJsonPath('data.email', 'student.portal@example.test')
             ->assertJsonPath('data.enrollments.0.id', $records['enrollment']->id);
 
-        $this->getJson("/api/schools/{$school->id}/portal/student/attendance")
+        $this->getJson("/api/v1/schools/{$school->id}/portal/student/attendance")
             ->assertOk()
             ->assertJsonPath('data.0.status', 'present');
 
-        $this->getJson("/api/schools/{$school->id}/portal/student/results")
+        $this->getJson("/api/v1/schools/{$school->id}/portal/student/results")
             ->assertOk()
             ->assertJsonPath('data.0.grade', 'A+');
 
-        $this->getJson("/api/schools/{$school->id}/portal/student/invoices")
+        $this->getJson("/api/v1/schools/{$school->id}/portal/student/invoices")
             ->assertOk()
             ->assertJsonPath('data.0.invoice_no', 'INV-PORTAL-01');
 
-        $this->getJson("/api/schools/{$school->id}/portal/student/notifications")
+        $this->getJson("/api/v1/schools/{$school->id}/portal/student/notifications")
             ->assertOk()
             ->assertJsonPath('data.0.type', 'portal.notice');
     }
@@ -285,24 +285,24 @@ class PhaseFiveSaasAdminApiTest extends TestCase
 
         Sanctum::actingAs($parentUser);
 
-        $this->getJson("/api/schools/{$school->id}/portal/parent/children")
+        $this->getJson("/api/v1/schools/{$school->id}/portal/parent/children")
             ->assertOk()
             ->assertJsonPath('data.0.email', 'child.portal@example.test')
             ->assertJsonPath('data.0.enrollments.0.id', $enrollmentId);
 
-        $this->getJson("/api/schools/{$school->id}/portal/parent/children/{$enrollmentId}/attendance")
+        $this->getJson("/api/v1/schools/{$school->id}/portal/parent/children/{$enrollmentId}/attendance")
             ->assertOk()
             ->assertJsonPath('data.0.status', 'present');
 
-        $this->getJson("/api/schools/{$school->id}/portal/parent/children/{$enrollmentId}/results")
+        $this->getJson("/api/v1/schools/{$school->id}/portal/parent/children/{$enrollmentId}/results")
             ->assertOk()
             ->assertJsonPath('data.0.grade', 'A+');
 
-        $this->getJson("/api/schools/{$school->id}/portal/parent/children/{$enrollmentId}/invoices")
+        $this->getJson("/api/v1/schools/{$school->id}/portal/parent/children/{$enrollmentId}/invoices")
             ->assertOk()
             ->assertJsonPath('data.0.invoice_no', 'INV-PORTAL-01');
 
-        $this->getJson("/api/schools/{$school->id}/portal/parent/notifications")
+        $this->getJson("/api/v1/schools/{$school->id}/portal/parent/notifications")
             ->assertOk()
             ->assertJsonPath('data.0.type', 'portal.notice');
     }
@@ -323,7 +323,7 @@ class PhaseFiveSaasAdminApiTest extends TestCase
 
         Sanctum::actingAs($manager);
 
-        $response = $this->postJson("/api/schools/{$school->id}/data-export/request", [
+        $response = $this->postJson("/api/v1/schools/{$school->id}/data-export/request", [
             'include_audit_logs' => true,
         ])
             ->assertAccepted()
@@ -334,7 +334,7 @@ class PhaseFiveSaasAdminApiTest extends TestCase
 
         Storage::disk('local')->assertExists($filePath);
 
-        $download = $this->get("/api/schools/{$school->id}/data-export/{$jobId}/download")
+        $download = $this->get("/api/v1/schools/{$school->id}/data-export/{$jobId}/download")
             ->assertOk();
         $downloadedContent = $download->streamedContent();
 
@@ -364,7 +364,7 @@ class PhaseFiveSaasAdminApiTest extends TestCase
 
         Sanctum::actingAs($manager);
 
-        $this->postJson("/api/schools/{$school->id}/students/{$student->id}/anonymize")
+        $this->postJson("/api/v1/schools/{$school->id}/students/{$student->id}/anonymize")
             ->assertOk()
             ->assertJsonPath('data.full_name', 'Anonymized Student')
             ->assertJsonPath('data.email', null)

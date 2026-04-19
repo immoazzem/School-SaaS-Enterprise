@@ -2,6 +2,7 @@
 const auth = useAuth()
 const config = useRuntimeConfig()
 const router = useRouter()
+const apiEndpoint = computed(() => `${config.public.apiBase}/v1`)
 
 const email = ref('test@example.com')
 const password = ref('password')
@@ -33,7 +34,7 @@ async function submitLogin() {
       </p>
       <div class="status-line">
         <span>API</span>
-        <strong>{{ config.public.apiBase }}</strong>
+        <strong>{{ apiEndpoint }}</strong>
       </div>
     </section>
 

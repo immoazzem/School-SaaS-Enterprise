@@ -604,7 +604,7 @@ export function useApi() {
       headers.Authorization = `Bearer ${token.value}`
     }
 
-    return await $fetch<T>(`${config.public.apiBase}${path}`, {
+    return await $fetch<T>(`${config.public.apiBase}/v1${path}`, {
       method: options.method || 'GET',
       body: options.body,
       headers,
