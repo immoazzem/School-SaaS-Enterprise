@@ -291,7 +291,7 @@ onMounted(async () => {
 .catalog-page {
   min-height: 100vh;
   padding: 30px;
-  background: #f6f8f7;
+  background: #f7f3ef;
 }
 
 .catalog-header,
@@ -320,20 +320,20 @@ onMounted(async () => {
 
 .back-link,
 .text-button {
-  color: #0f5f4a;
+  color: #be3455;
   font-weight: 800;
 }
 
 h1 {
   margin: 12px 0 0;
-  color: #16201c;
+  color: #111827;
   font-size: clamp(2.1rem, 5.8vw, 4.4rem);
   line-height: 0.95;
 }
 
 h2 {
   margin: 0;
-  color: #16201c;
+  color: #111827;
 }
 
 p {
@@ -367,7 +367,7 @@ small {
 .summary-item strong {
   display: block;
   margin-top: 8px;
-  color: #16201c;
+  color: #111827;
   font-size: 1.8rem;
 }
 
@@ -405,7 +405,7 @@ textarea {
   border: 1px solid #ccd8d2;
   border-radius: 8px;
   padding: 12px 13px;
-  color: #16201c;
+  color: #111827;
   background: #ffffff;
 }
 
@@ -489,7 +489,7 @@ td small {
 }
 
 .success {
-  color: #0f5f4a;
+  color: #be3455;
   background: #e1f3ec;
 }
 

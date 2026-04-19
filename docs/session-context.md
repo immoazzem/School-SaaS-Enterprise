@@ -287,6 +287,12 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
   - screenshots saved at `docs/browser-checks/phase-4-reports-workspace.png`, `docs/browser-checks/phase-4-calendar-workspace.png`, and `docs/browser-checks/phase-4-documents-workspace.png`
 - Phase 4 status: complete for backend APIs, queued PDFs, analytics, result publication, notifications, calendar, document management, Nuxt workspaces, build, and browser smoke verification.
 - Git note: Phase 4 Nuxt completion checkpoint is ready to commit and push. Next phase is Phase 5 SaaS administration and billing placeholders.
+- Radiant UI correction is complete:
+  - inspected `D:\Development\tailwindui-radiant\radiant-ts`
+  - refreshed Nuxt global UI and dashboard/login shells toward Radiant's warm gradient, plus-grid, black pill-button, translucent-panel visual system
+  - mechanically removed old green theme tokens from app source
+  - `npm run build` passed with existing Nuxt/Nitro warnings
+  - screenshots saved at `docs/browser-checks/radiant-login-refresh.png`, `docs/browser-checks/radiant-dashboard-refresh.png`, and `docs/browser-checks/radiant-reports-refresh.png`
 - API index endpoints now return paginated envelopes with top-level `data`, `meta`, and `links`; frontend list code can continue reading `data` as the record array.
 - Shared audit logging lives in `App\Services\AuditLogger` and `App\Http\Controllers\Controller::recordAudit()`.
 - School show/update endpoints exist at `GET/PATCH /api/schools/{school}` with `school.member` and `schools.manage` enforcement for update.

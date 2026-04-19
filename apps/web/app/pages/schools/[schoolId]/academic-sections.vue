@@ -313,7 +313,7 @@ onMounted(async () => {
 .sections-page {
   min-height: 100vh;
   padding: 30px;
-  background: #f6f8f7;
+  background: #f7f3ef;
 }
 
 .sections-header {
@@ -325,13 +325,13 @@ onMounted(async () => {
 }
 
 .back-link {
-  color: #0f5f4a;
+  color: #be3455;
   font-weight: 800;
 }
 
 h1 {
   margin: 12px 0 0;
-  color: #16201c;
+  color: #111827;
   font-size: clamp(2.1rem, 3.8rem, 4rem);
   line-height: 0.98;
 }
@@ -339,7 +339,7 @@ h1 {
 .sections-header p {
   max-width: 680px;
   margin: 16px 0 0;
-  color: #607169;
+  color: #6b7280;
 }
 
 .filter-panel {
@@ -355,18 +355,18 @@ h1 {
 }
 
 .filter-panel label {
-  color: #40524a;
+  color: #4b5563;
   font-size: 0.88rem;
   font-weight: 700;
 }
 
 .filter-panel select {
   min-height: 46px;
-  border: 1px solid #cbdad4;
+  border: 1px solid rgba(17, 24, 39, 0.1);
   border-radius: 8px;
   padding: 0 14px;
   background: #fff;
-  color: #17231e;
+  color: #111827;
 }
 
 .sections-grid {
@@ -389,7 +389,7 @@ h1 {
 .section-form h2,
 .list-heading h2 {
   margin: 0;
-  color: #16201c;
+  color: #111827;
 }
 
 .form-row {
@@ -413,12 +413,12 @@ h1 {
 }
 
 .list-heading span {
-  color: #607169;
+  color: #6b7280;
   font-weight: 800;
 }
 
 .empty-copy {
-  color: #607169;
+  color: #6b7280;
 }
 
 .table-wrap {
@@ -440,7 +440,7 @@ td {
 }
 
 th {
-  color: #607169;
+  color: #6b7280;
   font-size: 0.84rem;
   text-transform: uppercase;
 }
@@ -452,7 +452,7 @@ td small {
 
 td small {
   margin-top: 4px;
-  color: #607169;
+  color: #6b7280;
 }
 
 .row-actions {
@@ -464,7 +464,7 @@ td small {
 .text-button {
   border: 0;
   background: transparent;
-  color: #0f5f4a;
+  color: #be3455;
   cursor: pointer;
   font-weight: 800;
 }

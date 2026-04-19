@@ -65,6 +65,8 @@ async function submitLogin() {
 
 <style scoped>
 .login-page {
+  position: relative;
+  isolation: isolate;
   display: grid;
   min-height: 100vh;
   grid-template-columns: minmax(0, 1.1fr) minmax(320px, 440px);
@@ -72,18 +74,45 @@ async function submitLogin() {
   align-items: center;
   padding: 56px;
   background:
-    linear-gradient(135deg, rgba(15, 95, 74, 0.12), transparent 34%),
-    #f6f8f7;
+    radial-gradient(circle at 82% 12%, rgba(238, 135, 203, 0.32), transparent 24rem),
+    radial-gradient(circle at 16% 20%, rgba(255, 241, 190, 0.78), transparent 28rem),
+    linear-gradient(180deg, #fffaf4 0%, #f5f0ed 54%, #eceff3 100%);
+  overflow: hidden;
+}
+
+.login-page::before {
+  position: absolute;
+  inset: 18px;
+  z-index: -1;
+  border-radius: 8px;
+  background: linear-gradient(115deg, #fff1be 28%, #ee87cb 70%, #b060ff);
+  box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.06);
+  content: "";
+  opacity: 0.86;
+}
+
+.login-page::after {
+  position: absolute;
+  inset: 26px;
+  z-index: -1;
+  border-radius: 8px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.2)),
+    linear-gradient(rgba(17, 24, 39, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 24, 39, 0.05) 1px, transparent 1px);
+  background-size: auto, 64px 64px, 64px 64px;
+  content: "";
 }
 
 .login-intro {
   max-width: 760px;
+  padding: 26px;
 }
 
 .eyebrow,
 .panel-label {
   margin: 0 0 18px;
-  color: #0f5f4a;
+  color: #7c1938;
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0;
@@ -93,16 +122,17 @@ async function submitLogin() {
 h1 {
   max-width: 780px;
   margin: 0;
-  color: #15221d;
+  color: #111827;
   font-size: clamp(3rem, 8vw, 7.4rem);
-  font-weight: 800;
-  line-height: 0.92;
+  font-weight: 760;
+  letter-spacing: -0.065em;
+  line-height: 0.84;
 }
 
 .intro-copy {
   max-width: 520px;
   margin: 28px 0 0;
-  color: #4d6158;
+  color: rgba(17, 24, 39, 0.72);
   font-size: 1.2rem;
   line-height: 1.6;
 }
@@ -113,28 +143,35 @@ h1 {
   gap: 12px;
   align-items: center;
   margin-top: 38px;
-  border: 1px solid #d4e0dc;
-  border-radius: 8px;
+  border: 1px solid rgba(17, 24, 39, 0.07);
+  border-radius: 999px;
   padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.74);
-  color: #607169;
+  background: rgba(255, 255, 255, 0.42);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 14px 30px rgba(17, 24, 39, 0.08);
+  color: rgba(17, 24, 39, 0.64);
+  backdrop-filter: blur(18px);
 }
 
 .status-line strong {
   overflow-wrap: anywhere;
-  color: #17231e;
+  color: #111827;
 }
 
 .login-panel {
   display: grid;
   gap: 28px;
-  padding: 30px;
+  border-color: rgba(255, 255, 255, 0.42);
+  padding: 34px;
+  background: rgba(255, 255, 255, 0.52);
 }
 
 .login-panel h2 {
   margin: 0;
-  color: #16201c;
+  color: #111827;
   font-size: 2rem;
+  letter-spacing: -0.035em;
 }
 
 .login-form {

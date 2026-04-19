@@ -348,7 +348,7 @@ onMounted(async () => {
 .years-page {
   min-height: 100vh;
   padding: 30px;
-  background: #f6f8f7;
+  background: #f7f3ef;
 }
 
 .years-header {
@@ -360,13 +360,13 @@ onMounted(async () => {
 }
 
 .back-link {
-  color: #0f5f4a;
+  color: #be3455;
   font-weight: 800;
 }
 
 h1 {
   margin: 12px 0 0;
-  color: #16201c;
+  color: #111827;
   font-size: clamp(2.1rem, 5.8vw, 4.4rem);
   line-height: 0.96;
 }
@@ -374,7 +374,7 @@ h1 {
 .years-header p {
   max-width: 720px;
   margin: 16px 0 0;
-  color: #607169;
+  color: #6b7280;
 }
 
 .header-actions {
@@ -397,12 +397,12 @@ h1 {
 }
 
 .summary-item span {
-  color: #607169;
+  color: #6b7280;
   font-weight: 700;
 }
 
 .summary-item strong {
-  color: #16201c;
+  color: #111827;
   font-size: 1.55rem;
 }
 
@@ -426,7 +426,7 @@ h1 {
 .year-form h2,
 .list-heading h2 {
   margin: 0;
-  color: #16201c;
+  color: #111827;
 }
 
 .form-row {
@@ -440,14 +440,14 @@ h1 {
   min-height: 46px;
   align-items: center;
   gap: 10px;
-  color: #40524a;
+  color: #4b5563;
   font-weight: 800;
 }
 
 .check-field input {
   width: 18px;
   height: 18px;
-  accent-color: #0f5f4a;
+  accent-color: #be3455;
 }
 
 .check-field.compact {
@@ -478,11 +478,11 @@ h1 {
 
 .filters select {
   min-height: 42px;
-  border: 1px solid #cbdad4;
+  border: 1px solid rgba(17, 24, 39, 0.1);
   border-radius: 8px;
   padding: 0 12px;
   background: #fff;
-  color: #17231e;
+  color: #111827;
 }
 
 .table-wrap {
@@ -504,7 +504,7 @@ td {
 }
 
 th {
-  color: #607169;
+  color: #6b7280;
   font-size: 0.84rem;
   text-transform: uppercase;
 }
@@ -516,7 +516,7 @@ td small {
 
 td small {
   margin-top: 4px;
-  color: #607169;
+  color: #6b7280;
 }
 
 .status-pill {
@@ -526,14 +526,14 @@ td small {
   border: 1px solid #d6e1dc;
   border-radius: 8px;
   padding: 0 10px;
-  color: #607169;
+  color: #6b7280;
   font-weight: 800;
 }
 
 .status-pill.current {
-  border-color: #0f5f4a;
+  border-color: #be3455;
   background: #eef7f3;
-  color: #0f5f4a;
+  color: #be3455;
 }
 
 .row-actions {
@@ -545,7 +545,7 @@ td small {
 .text-button {
   border: 0;
   background: transparent;
-  color: #0f5f4a;
+  color: #be3455;
   cursor: pointer;
   font-weight: 800;
 }

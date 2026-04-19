@@ -472,3 +472,24 @@ Each page rendered nonblank workspace content with no Vite error overlay. Screen
 Phase 4 status: complete for backend APIs, queued PDFs, analytics, result publication, notifications, calendar, document management, Nuxt workspaces, build, and browser smoke verification.
 
 Next: commit and push this Phase 4 completion checkpoint, then begin Phase 5 SaaS administration and billing placeholders.
+
+### Radiant UI Theme Correction
+
+Current page/module complete: Radiant-inspired UI correction pass across the Nuxt frontend.
+
+Scope: corrected the frontend visual direction to follow the `D:\Development\tailwindui-radiant\radiant-ts` theme reference more closely while keeping the app in Nuxt/Vue. Ported Radiant traits into the existing product UI:
+- warm yellow/fuchsia/purple gradient plane
+- subtle plus-grid style background lines
+- black primary pill buttons
+- translucent secondary controls with warm accent rings
+- softer glass-like panels
+- larger tight-tracked headings
+- Radiant-inspired sidebar and workspace chrome
+- old green color tokens removed from app source
+
+Verification: `npm run build` passed with the existing Nuxt/Nitro warnings. Visible agent-browser screenshots were refreshed at:
+- `docs/browser-checks/radiant-login-refresh.png`
+- `docs/browser-checks/radiant-dashboard-refresh.png`
+- `docs/browser-checks/radiant-reports-refresh.png`
+
+Next: review the refreshed UI in the browser, then continue the next product phase.

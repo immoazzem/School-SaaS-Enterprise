@@ -329,7 +329,7 @@ onMounted(loadWorkspace)
   display: flex;
   gap: 10px;
   align-items: center;
-  color: #40524a;
+  color: #4b5563;
   font-weight: 800;
 }
 
@@ -344,12 +344,12 @@ onMounted(loadWorkspace)
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid #e3ebe7;
-  color: #607169;
+  color: #6b7280;
   gap: 12px;
 }
 
 .document-detail strong {
-  color: #16201c;
+  color: #111827;
   text-align: right;
 }
 
@@ -362,7 +362,7 @@ onMounted(loadWorkspace)
 
 .filter-row select {
   min-height: 38px;
-  border: 1px solid #cbdad4;
+  border: 1px solid rgba(17, 24, 39, 0.1);
   border-radius: 8px;
   padding: 0 10px;
   background: #fff;

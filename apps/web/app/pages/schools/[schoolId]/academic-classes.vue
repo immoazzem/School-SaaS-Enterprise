@@ -182,7 +182,7 @@ onMounted(async () => {
 .classes-page {
   min-height: 100vh;
   padding: 30px;
-  background: #f6f8f7;
+  background: #f7f3ef;
 }
 
 .classes-header {
@@ -194,20 +194,20 @@ onMounted(async () => {
 }
 
 .back-link {
-  color: #0f5f4a;
+  color: #be3455;
   font-weight: 800;
 }
 
 h1 {
   margin: 12px 0 0;
-  color: #16201c;
+  color: #111827;
   font-size: clamp(2.2rem, 6vw, 4.5rem);
   line-height: 0.95;
 }
 
 .classes-header p {
   margin: 18px 0 0;
-  color: #607169;
+  color: #6b7280;
 }
 
 .header-actions {
@@ -236,7 +236,7 @@ h1 {
 .class-form h2,
 .list-heading h2 {
   margin: 0;
-  color: #16201c;
+  color: #111827;
 }
 
 .list-heading {
@@ -248,7 +248,7 @@ h1 {
 }
 
 .list-heading span {
-  color: #607169;
+  color: #6b7280;
   font-weight: 800;
 }
 
@@ -271,7 +271,7 @@ td {
 }
 
 th {
-  color: #607169;
+  color: #6b7280;
   font-size: 0.84rem;
   text-transform: uppercase;
 }
@@ -279,7 +279,7 @@ th {
 .text-button {
   border: 0;
   background: transparent;
-  color: #0f5f4a;
+  color: #be3455;
   cursor: pointer;
   font-weight: 800;
 }

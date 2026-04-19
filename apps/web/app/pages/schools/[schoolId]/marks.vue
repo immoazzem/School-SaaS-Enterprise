@@ -376,14 +376,14 @@ onMounted(loadWorkspace)
   display: grid;
   min-height: 100vh;
   grid-template-columns: 250px minmax(0, 1fr);
-  background: #f6f8f7;
+  background: #f7f3ef;
 }
 
 .operation-nav {
   display: flex;
   flex-direction: column;
   gap: 28px;
-  border-right: 1px solid #dbe5e1;
+  border-right: 1px solid rgba(17, 24, 39, 0.08);
   padding: 24px;
   background: #fff;
 }
@@ -400,7 +400,7 @@ onMounted(loadWorkspace)
   height: 38px;
   place-items: center;
   border-radius: 8px;
-  background: #0f5f4a;
+  background: #be3455;
   color: #fff;
   font-weight: 900;
 }
@@ -413,13 +413,13 @@ nav {
 nav a {
   border-radius: 8px;
   padding: 10px 12px;
-  color: #53665e;
+  color: #4b5563;
   font-weight: 700;
 }
 
 nav a:hover {
-  background: #eef5f1;
-  color: #0f5f4a;
+  background: rgba(255, 255, 255, 0.62);
+  color: #be3455;
 }
 
 .operation-workspace {
@@ -440,14 +440,14 @@ nav a:hover {
 .workspace-header h1 {
   max-width: 780px;
   margin: 0;
-  color: #16201c;
+  color: #111827;
   font-size: clamp(1.8rem, 4vw, 3rem);
   line-height: 1.04;
 }
 
 .eyebrow {
   margin: 0 0 8px;
-  color: #0f5f4a;
+  color: #be3455;
   font-size: 0.76rem;
   font-weight: 900;
   letter-spacing: 0;
@@ -477,12 +477,12 @@ nav a:hover {
 }
 
 .summary-item span {
-  color: #607169;
+  color: #6b7280;
   font-weight: 800;
 }
 
 .summary-item strong {
-  color: #16201c;
+  color: #111827;
   font-size: 2rem;
 }
 
@@ -495,12 +495,12 @@ nav a:hover {
 .record-form h2,
 .record-list h2 {
   margin: 0;
-  color: #16201c;
+  color: #111827;
 }
 
 .record-form p {
   margin: 8px 0 0;
-  color: #607169;
+  color: #6b7280;
 }
 
 .form-row {
@@ -514,7 +514,7 @@ nav a:hover {
   min-height: 46px;
   align-items: center;
   gap: 10px;
-  color: #40524a;
+  color: #4b5563;
   font-weight: 800;
 }
 
@@ -532,12 +532,12 @@ th,
 td {
   border-bottom: 1px solid #e3ebe7;
   padding: 14px 10px;
-  color: #40524a;
+  color: #4b5563;
   text-align: left;
 }
 
 th {
-  color: #16201c;
+  color: #111827;
   font-size: 0.82rem;
   text-transform: uppercase;
 }
@@ -545,8 +545,8 @@ th {
 .status-pill {
   border-radius: 8px;
   padding: 5px 8px;
-  background: #eef5f1;
-  color: #0f5f4a;
+  background: rgba(255, 255, 255, 0.62);
+  color: #be3455;
   font-weight: 800;
   text-transform: capitalize;
 }
@@ -567,7 +567,7 @@ th {
   gap: 12px;
   border-top: 1px solid #e3ebe7;
   padding: 12px 0;
-  color: #40524a;
+  color: #4b5563;
 }
 
 @media (max-width: 900px) {
@@ -581,7 +581,7 @@ th {
 
   .operation-nav {
     border-right: 0;
-    border-bottom: 1px solid #dbe5e1;
+    border-bottom: 1px solid rgba(17, 24, 39, 0.08);
   }
 
   .workspace-header,

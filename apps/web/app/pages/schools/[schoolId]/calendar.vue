@@ -369,7 +369,7 @@ onMounted(loadWorkspace)
   display: flex;
   gap: 10px;
   align-items: center;
-  color: #40524a;
+  color: #4b5563;
   font-weight: 800;
 }
 
@@ -381,7 +381,7 @@ onMounted(loadWorkspace)
 
 .filter-row select {
   min-height: 38px;
-  border: 1px solid #cbdad4;
+  border: 1px solid rgba(17, 24, 39, 0.1);
   border-radius: 8px;
   padding: 0 10px;
   background: #fff;
@@ -394,7 +394,7 @@ td small {
 
 td small {
   margin-top: 4px;
-  color: #607169;
+  color: #6b7280;
 }
 
 @media (max-width: 900px) {

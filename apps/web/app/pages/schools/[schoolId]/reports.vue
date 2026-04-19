@@ -466,17 +466,17 @@ onMounted(loadWorkspace)
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid #e3ebe7;
-  color: #607169;
+  color: #6b7280;
   gap: 12px;
 }
 
 .insight-grid strong,
 .mini-list strong {
-  color: #16201c;
+  color: #111827;
 }
 
 .mini-list em {
-  color: #0f5f4a;
+  color: #be3455;
   font-style: normal;
   font-weight: 800;
 }
