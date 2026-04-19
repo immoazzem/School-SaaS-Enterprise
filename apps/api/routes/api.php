@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CalendarEventController;
 use App\Http\Controllers\Api\ClassSubjectController;
 use App\Http\Controllers\Api\DashboardSummaryController;
+use App\Http\Controllers\Api\DataExportController;
 use App\Http\Controllers\Api\DesignationController;
 use App\Http\Controllers\Api\DiscountPolicyController;
 use App\Http\Controllers\Api\EmployeeAttendanceRecordController;
@@ -40,6 +41,7 @@ use App\Http\Controllers\Api\SchoolDocumentController;
 use App\Http\Controllers\Api\SchoolInvitationController;
 use App\Http\Controllers\Api\SchoolSettingsController;
 use App\Http\Controllers\Api\ShiftController;
+use App\Http\Controllers\Api\StudentAnonymizationController;
 use App\Http\Controllers\Api\StudentAttendanceRecordController;
 use App\Http\Controllers\Api\StudentAttendanceSummaryController;
 use App\Http\Controllers\Api\StudentController;
@@ -99,6 +101,10 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
         ->only(['index', 'store', 'destroy'])
         ->middleware('school.member');
     Route::apiResource('schools.designations', DesignationController::class)
+        ->middleware('school.member');
+    Route::post('schools/{school}/data-export/request', [DataExportController::class, 'request'])
+        ->middleware('school.member');
+    Route::get('schools/{school}/data-export/{jobId}/download', [DataExportController::class, 'download'])
         ->middleware('school.member');
     Route::get('schools/{school}/documents/{document}/download', [SchoolDocumentController::class, 'download'])
         ->middleware(['school.member', 'signed'])
@@ -218,6 +224,8 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->group(function (): void {
     Route::apiResource('schools.shifts', ShiftController::class)
         ->middleware('school.member');
     Route::apiResource('schools.students', StudentController::class)
+        ->middleware('school.member');
+    Route::post('schools/{school}/students/{student}/anonymize', StudentAnonymizationController::class)
         ->middleware('school.member');
     Route::post('schools/{school}/student-attendance/bulk', [StudentAttendanceRecordController::class, 'bulk'])
         ->middleware('school.member');

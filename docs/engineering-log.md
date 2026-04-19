@@ -561,3 +561,21 @@ Verification: `php artisan test --filter=PhaseFiveSaasAdminApiTest` passed with 
 Phase 5 status: SaaS admin foundation, invitations, and parent/student portal backend endpoints are complete. Remaining Phase 5 work includes data export/right-to-erasure, self-hosted deployment docs, and backup/restore artisan commands.
 
 Next: commit and push this portal checkpoint, then continue with data export and right-to-erasure.
+
+### Phase 5 Data Export and Right to Erasure
+
+Current page/module complete: Phase 5 Data Export and Student Anonymization backend.
+
+Scope: implemented v3 data export and right-to-erasure endpoints:
+- `data_export_jobs` table and `DataExportJob` model.
+- `School::dataExportJobs()` and `School::auditLogs()` relationships.
+- `POST /api/schools/{school}/data-export/request` creates a completed JSON export artifact for the school.
+- `GET /api/schools/{school}/data-export/{job_id}/download` downloads the generated JSON artifact.
+- `POST /api/schools/{school}/students/{student}/anonymize` removes personal student fields, detaches guardian linkage, archives the student, and records `student.anonymized` audit logs.
+- Export payload includes school profile, guardians, students with enrollments, employees, invoices with payments, document metadata, and optional capped audit logs.
+
+Verification: `php artisan test --filter=PhaseFiveSaasAdminApiTest` passed with 11 tests / 77 assertions; full `php artisan test` passed with 76 tests / 522 assertions; `vendor\bin\pint --dirty` formatted changed imports; `php artisan migrate --force` applied the data export job migration to local MySQL.
+
+Phase 5 status: SaaS admin foundation, invitations, parent/student portal endpoints, data export, and student anonymization are complete. Remaining Phase 5 work is self-hosted deployment docs plus backup/restore artisan commands.
+
+Next: commit and push this data export checkpoint, then continue with self-hosted deployment and backup/restore commands.

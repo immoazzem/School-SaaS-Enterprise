@@ -70,6 +70,22 @@ class School extends Model
     }
 
     /**
+     * @return HasMany<DataExportJob, $this>
+     */
+    public function dataExportJobs(): HasMany
+    {
+        return $this->hasMany(DataExportJob::class);
+    }
+
+    /**
+     * @return HasMany<AuditLog, $this>
+     */
+    public function auditLogs(): HasMany
+    {
+        return $this->hasMany(AuditLog::class);
+    }
+
+    /**
      * @return HasMany<AcademicClass, $this>
      */
     public function academicClasses(): HasMany

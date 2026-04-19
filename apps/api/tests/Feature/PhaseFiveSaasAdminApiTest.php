@@ -9,6 +9,7 @@ use App\Models\School;
 use App\Models\SchoolInvitation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -304,6 +305,85 @@ class PhaseFiveSaasAdminApiTest extends TestCase
         $this->getJson("/api/schools/{$school->id}/portal/parent/notifications")
             ->assertOk()
             ->assertJsonPath('data.0.type', 'portal.notice');
+    }
+
+    public function test_school_manager_can_request_and_download_data_export(): void
+    {
+        Storage::fake('local');
+        $manager = User::factory()->create();
+        $school = School::query()->create(['name' => 'Export School', 'slug' => 'export-school']);
+        $this->addActiveMember($manager, $school);
+        $this->grantSchoolPermission($manager, $school, 'schools.manage', 'schools');
+        $school->students()->create([
+            'admission_no' => 'ADM-EXPORT-01',
+            'full_name' => 'Export Student',
+            'email' => 'export.student@example.test',
+            'admitted_on' => '2026-01-01',
+        ]);
+
+        Sanctum::actingAs($manager);
+
+        $response = $this->postJson("/api/schools/{$school->id}/data-export/request", [
+            'include_audit_logs' => true,
+        ])
+            ->assertAccepted()
+            ->assertJsonPath('data.status', 'completed');
+
+        $jobId = $response->json('data.job_id');
+        $filePath = $response->json('data.file_path');
+
+        Storage::disk('local')->assertExists($filePath);
+
+        $download = $this->get("/api/schools/{$school->id}/data-export/{$jobId}/download")
+            ->assertOk();
+        $downloadedContent = $download->streamedContent();
+
+        $this->assertStringContainsString('Export Student', $downloadedContent);
+        $this->assertStringContainsString('"students"', $downloadedContent);
+    }
+
+    public function test_student_anonymization_removes_personal_fields_and_audits_change(): void
+    {
+        $manager = User::factory()->create();
+        $school = School::query()->create(['name' => 'Erase School', 'slug' => 'erase-school']);
+        $this->addActiveMember($manager, $school);
+        $this->grantSchoolPermission($manager, $school, 'students.manage', 'people');
+        $guardian = $school->guardians()->create(['full_name' => 'Erase Guardian', 'email' => 'erase.guardian@example.test']);
+        $student = $school->students()->create([
+            'guardian_id' => $guardian->id,
+            'admission_no' => 'ADM-ERASE-01',
+            'full_name' => 'Erase Student',
+            'father_name' => 'Father',
+            'mother_name' => 'Mother',
+            'email' => 'erase.student@example.test',
+            'phone' => '123456',
+            'address' => 'Private address',
+            'medical_notes' => 'Private notes',
+            'admitted_on' => '2026-01-01',
+        ]);
+
+        Sanctum::actingAs($manager);
+
+        $this->postJson("/api/schools/{$school->id}/students/{$student->id}/anonymize")
+            ->assertOk()
+            ->assertJsonPath('data.full_name', 'Anonymized Student')
+            ->assertJsonPath('data.email', null)
+            ->assertJsonPath('data.guardian_id', null)
+            ->assertJsonPath('data.status', 'archived');
+
+        $this->assertDatabaseHas('students', [
+            'id' => $student->id,
+            'admission_no' => "ANON-{$student->id}",
+            'email' => null,
+            'phone' => null,
+            'guardian_id' => null,
+            'status' => 'archived',
+        ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'school_id' => $school->id,
+            'actor_id' => $manager->id,
+            'event' => 'student.anonymized',
+        ]);
     }
 
     private function addActiveMember(User $user, School $school): void

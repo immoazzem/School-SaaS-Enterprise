@@ -315,7 +315,6 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
   - local MySQL migration applied with `php artisan migrate --force`
   - full backend verification passed: `php artisan test` = 70 tests / 469 assertions
 - Phase 5 remaining:
-  - data export and right-to-erasure
   - `docs/self-hosted-deployment.md`
   - `school:backup` and `school:restore` artisan commands
 - Phase 5 User Invitation backend flow is complete:
@@ -347,6 +346,16 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
     - `GET /api/schools/{school}/portal/parent/children/{enrollment}/invoices`
     - `GET /api/schools/{school}/portal/parent/notifications`
   - full backend verification passed: `php artisan test` = 74 tests / 509 assertions
+- Phase 5 Data Export and Student Anonymization backend is complete:
+  - `data_export_jobs` table and `DataExportJob` model
+  - `School::dataExportJobs()` and `School::auditLogs()` relationships
+  - `POST /api/schools/{school}/data-export/request`
+  - `GET /api/schools/{school}/data-export/{job_id}/download`
+  - `POST /api/schools/{school}/students/{student}/anonymize`
+  - data export writes JSON artifacts to local storage with school profile, guardians, students/enrollments, employees, invoices/payments, document metadata, and optional capped audit logs
+  - student anonymization clears personal fields, detaches guardian linkage, archives the student, and writes `student.anonymized`
+  - local MySQL migration applied with `php artisan migrate --force`
+  - full backend verification passed: `php artisan test` = 76 tests / 522 assertions
 - API index endpoints now return paginated envelopes with top-level `data`, `meta`, and `links`; frontend list code can continue reading `data` as the record array.
 - Shared audit logging lives in `App\Services\AuditLogger` and `App\Http\Controllers\Controller::recordAudit()`.
 - School show/update endpoints exist at `GET/PATCH /api/schools/{school}` with `school.member` and `schools.manage` enforcement for update.
