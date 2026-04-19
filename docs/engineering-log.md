@@ -445,3 +445,30 @@ Verification: `php artisan test` passed with 65 tests / 445 assertions; `vendor\
 Phase 4 status: backend is implemented for result publication, cached result summaries, employee/student attendance summaries, in-app notification inbox, school calendar and holidays, payment/leave notification hooks, document management, queued PDF report exports, signed report downloads, and dashboard analytics. Remaining Phase 4 work is the Nuxt Reports, Calendar, Documents, and Publication workspace plus build/browser verification.
 
 Next: commit and push this backend checkpoint, then finish the Phase 4 Nuxt workspace.
+
+### Phase 4 Nuxt Reports, Calendar, and Documents Workspaces
+
+Current page/module complete: Phase 4 Nuxt Reports, Calendar, and Documents workspaces.
+
+Scope: finished the Phase 4 user-facing operations layer:
+- Added typed Nuxt API shapes for result summaries, report exports, report download polling, dashboard summary aggregates, calendar events, school documents, and attendance summary rows.
+- Added `/schools/{schoolId}/reports` for dashboard analytics, result publication, result summary review, attendance summaries, and PDF export queueing.
+- Added `/schools/{schoolId}/calendar` for event entry, school/class scoped calendar records, holiday counts, and holiday bulk import.
+- Added `/schools/{schoolId}/documents` for document upload, visibility filtering, file metadata review, and signed download link retrieval.
+- Updated the dashboard navigation/action strip with Reports, Calendar, and Documents entries.
+- Added shared textarea styling and FormData-compatible API request body typing for document uploads.
+- Guarded empty-state actions so reports are not queued without required exam/student data and holiday imports require an academic year.
+
+Verification: `npm run build` passed with the existing Nuxt/Nitro warnings. A visible agent-browser run logged in, created a local browser-check school after the MySQL refresh, opened:
+- `http://127.0.0.1:3000/schools/1/reports`
+- `http://127.0.0.1:3000/schools/1/calendar`
+- `http://127.0.0.1:3000/schools/1/documents`
+
+Each page rendered nonblank workspace content with no Vite error overlay. Screenshots were saved at:
+- `docs/browser-checks/phase-4-reports-workspace.png`
+- `docs/browser-checks/phase-4-calendar-workspace.png`
+- `docs/browser-checks/phase-4-documents-workspace.png`
+
+Phase 4 status: complete for backend APIs, queued PDFs, analytics, result publication, notifications, calendar, document management, Nuxt workspaces, build, and browser smoke verification.
+
+Next: commit and push this Phase 4 completion checkpoint, then begin Phase 5 SaaS administration and billing placeholders.

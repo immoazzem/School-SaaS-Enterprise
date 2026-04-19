@@ -106,6 +106,24 @@ const navItems = computed(() => [
       || selectedSchool.value?.permissions?.includes('leave.manage')
       || false,
   },
+  {
+    label: 'Reports',
+    active: false,
+    enabled: selectedSchool.value?.permissions?.includes('reports.view') ?? false,
+  },
+  {
+    label: 'Calendar',
+    active: false,
+    enabled:
+      selectedSchool.value?.permissions?.includes('calendar.manage')
+      || selectedSchool.value?.permissions?.includes('reports.view')
+      || false,
+  },
+  {
+    label: 'Documents',
+    active: false,
+    enabled: selectedSchool.value?.permissions?.includes('documents.manage') ?? false,
+  },
 ])
 
 async function loadDashboard() {
@@ -304,6 +322,33 @@ async function openStaffOperations() {
   await router.push(`/schools/${auth.selectedSchoolId.value}/staff-operations`)
 }
 
+async function openReports() {
+  if (!auth.selectedSchoolId.value) {
+    error.value = 'Create or select a school first.'
+    return
+  }
+
+  await router.push(`/schools/${auth.selectedSchoolId.value}/reports`)
+}
+
+async function openCalendar() {
+  if (!auth.selectedSchoolId.value) {
+    error.value = 'Create or select a school first.'
+    return
+  }
+
+  await router.push(`/schools/${auth.selectedSchoolId.value}/calendar`)
+}
+
+async function openDocuments() {
+  if (!auth.selectedSchoolId.value) {
+    error.value = 'Create or select a school first.'
+    return
+  }
+
+  await router.push(`/schools/${auth.selectedSchoolId.value}/documents`)
+}
+
 onMounted(loadDashboard)
 </script>
 
@@ -355,7 +400,13 @@ onMounted(loadDashboard)
                                         ? openFinance()
                                         : item.label === 'Staff Ops'
                                           ? openStaffOperations()
-                                          : undefined
+                                          : item.label === 'Reports'
+                                            ? openReports()
+                                            : item.label === 'Calendar'
+                                              ? openCalendar()
+                                              : item.label === 'Documents'
+                                                ? openDocuments()
+                                                : undefined
           "
         >
           <span>{{ item.label }}</span>
@@ -501,6 +552,9 @@ onMounted(loadDashboard)
           <button class="button secondary" type="button" @click="openMarks">Open marks</button>
           <button class="button secondary" type="button" @click="openFinance">Open finance</button>
           <button class="button secondary" type="button" @click="openStaffOperations">Open staff ops</button>
+          <button class="button secondary" type="button" @click="openReports">Open reports</button>
+          <button class="button secondary" type="button" @click="openCalendar">Open calendar</button>
+          <button class="button secondary" type="button" @click="openDocuments">Open documents</button>
         </div>
       </section>
     </section>

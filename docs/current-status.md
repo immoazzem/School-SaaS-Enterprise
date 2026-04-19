@@ -279,18 +279,19 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Next Step
 
-Continue with Phase 4 implementation:
+Continue with Phase 5 implementation:
 
-1. Commit and push the Phase 4 Reports/PDFs/Dashboard Analytics backend checkpoint.
-2. Add the Phase 4 Nuxt Reports, Calendar, Documents, and Publication workspace, then run build and browser checks.
+1. Commit and push the Phase 4 Nuxt completion checkpoint.
+2. Begin Phase 5 SaaS administration and billing placeholders from `docs/enterprise-plan-v3.md`.
 
-Current page/module complete: Phase 4 Reports, PDFs, and Dashboard Analytics backend.
+Current page/module complete: Phase 4 Nuxt Reports, Calendar, Documents, and Publication workspace.
 Phase 2 status: complete for the current academic setup and people foundation.
 Phase 3 status: complete for backend APIs, Nuxt workspaces, build, and browser smoke checks.
-Phase 4 status: backend implemented for result publication, cached summaries, employee/student attendance summaries, in-app notification inbox, school calendar, holiday import, payment/leave notification hooks, document management, queued PDF exports, signed report downloads, V2-compatible result aliases, and dashboard analytics.
+Phase 4 status: complete for backend APIs, queued PDFs, signed report downloads, analytics, result publication, cached summaries, employee/student attendance summaries, in-app notification inbox, school calendar, holiday import, payment/leave notification hooks, document management, Nuxt workspaces, build, and browser smoke checks.
 Latest Phase 4 backend verification: `php artisan test` passed with 65 tests / 445 assertions; `vendor\bin\pint --test` passed; `composer audit` passed with no advisories; `php artisan route:list --path=api/schools --except-vendor` passed with 190 routes; `php artisan migrate:fresh --seed` passed against MySQL.
-Git status: Phase 4 Reports/PDFs/Dashboard Analytics backend checkpoint is ready to commit and push.
-Next page/module: Phase 4 Nuxt Reports, Calendar, Documents, and Publication workspace.
+Latest Phase 4 frontend verification: `npm run build` passed with existing Nuxt/Nitro warnings; agent-browser rendered `/schools/1/reports`, `/schools/1/calendar`, and `/schools/1/documents` with no Vite error overlay; screenshots are saved under `docs/browser-checks/phase-4-*-workspace.png`.
+Git status: Phase 4 Nuxt completion checkpoint is ready to commit and push.
+Next page/module: Phase 5 SaaS administration and billing placeholders.
 
 ## New Session Startup Prompt
 

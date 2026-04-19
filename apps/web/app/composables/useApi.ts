@@ -426,9 +426,132 @@ export interface LeaveApplication {
   leave_type?: Pick<LeaveType, 'id' | 'name' | 'code'>
 }
 
+export interface ResultSummary {
+  id: number
+  school_id: number
+  exam_id: number
+  student_enrollment_id: number
+  total_marks_obtained: string
+  total_full_marks: string
+  percentage: string
+  gpa: string
+  grade: string | null
+  position_in_class: number | null
+  is_pass: boolean
+  computed_at: string
+  student_enrollment?: Pick<StudentEnrollment, 'id' | 'roll_no'> & {
+    student?: Pick<Student, 'id' | 'admission_no' | 'full_name'>
+    academic_class?: Pick<AcademicClass, 'id' | 'name' | 'code'>
+  }
+}
+
+export interface CalendarEvent {
+  id: number
+  school_id: number
+  academic_year_id: number | null
+  academic_class_id: number | null
+  title: string
+  description: string | null
+  starts_on: string
+  ends_on: string | null
+  starts_at: string | null
+  ends_at: string | null
+  location: string | null
+  is_holiday: boolean
+  recurring_rule: string | null
+  status: 'active' | 'cancelled'
+  academic_year?: Pick<AcademicYear, 'id' | 'name' | 'code'> | null
+  academic_class?: Pick<AcademicClass, 'id' | 'name' | 'code'> | null
+  creator?: Pick<ApiUser, 'id' | 'name' | 'email'> | null
+}
+
+export interface SchoolDocument {
+  id: number
+  school_id: number
+  uploader_id: number
+  category: 'circular' | 'student_document' | 'employee_document' | 'financial_document' | 'other'
+  title: string
+  file_name: string
+  file_size_bytes: number
+  mime_type: string
+  is_public: boolean
+  related_model_type: string | null
+  related_model_id: number | null
+  uploaded_at: string
+  download_url?: string
+  uploader?: Pick<ApiUser, 'id' | 'name' | 'email'> | null
+}
+
+export interface ReportExport {
+  id: number
+  job_id: string
+  school_id: number
+  requested_by: number
+  type: string
+  status: 'pending' | 'processing' | 'completed' | 'failed'
+  target_type: string | null
+  target_id: number | null
+  parameters: Record<string, unknown> | null
+  file_name: string | null
+  completed_at: string | null
+  error: string | null
+}
+
+export interface ReportDownloadStatus {
+  job_id: string
+  type: string
+  status: 'pending' | 'processing' | 'completed' | 'failed'
+  file_name: string | null
+  download_url: string | null
+}
+
+export interface StudentAttendanceSummary {
+  student_enrollment: Pick<StudentEnrollment, 'id' | 'roll_no'> & {
+    student?: Pick<Student, 'id' | 'admission_no' | 'full_name'>
+    academic_class?: Pick<AcademicClass, 'id' | 'name' | 'code'>
+  }
+  present: number
+  absent: number
+  late: number
+  half_day: number
+  total: number
+  attendance_percentage: number
+}
+
+export interface DashboardSummary {
+  admin: {
+    student_count: number
+    employee_count: number
+    today_attendance_rate: number
+    fee_collection_this_month: number
+    fee_collection_last_month: number
+    pending_leave_applications: number
+    upcoming_exams: Pick<Exam, 'id' | 'name' | 'starts_on'>[]
+    attendance_concerns: {
+      student_enrollment?: Pick<StudentEnrollment, 'id' | 'roll_no'> & {
+        student?: Pick<Student, 'id' | 'admission_no' | 'full_name'>
+      }
+      attendance_percentage: number
+    }[]
+  }
+  accountant: {
+    collection_trend: { month: string, total: string }[]
+    outstanding_by_class: { id: number, name: string, outstanding: string }[]
+    unpaid_invoices: number
+    pending_salaries: number
+  }
+  teacher: {
+    pending_marks_entries: number
+    upcoming_exams: Pick<Exam, 'id' | 'name' | 'starts_on'>[]
+  }
+  auditor: {
+    recent_audit_logs: { id: number, event: string, actor_id: number | null, created_at: string }[]
+  }
+}
+
 type RequestOptions = {
   method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'
-  body?: Record<string, unknown>
+  body?: BodyInit | Record<string, unknown>
 }
 
 export function useApi() {

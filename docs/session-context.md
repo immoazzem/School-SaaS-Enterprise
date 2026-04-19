@@ -275,6 +275,18 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
   - `composer audit` passed with no advisories
   - `php artisan route:list --path=api/schools --except-vendor` passed with 190 routes
 - Git note: Phase 3, Phase 4 reporting foundation, Phase 4 calendar/notification hooks, and Phase 4 document management are pushed to GitHub. Phase 4 Reports/PDFs/Dashboard Analytics is ready to commit and push.
+- Phase 4 Nuxt workspaces are complete:
+  - `/schools/{schoolId}/reports`
+  - `/schools/{schoolId}/calendar`
+  - `/schools/{schoolId}/documents`
+  - dashboard navigation/actions for Reports, Calendar, and Documents
+  - typed frontend API shapes for Phase 4 reports, calendar, documents, dashboard analytics, and attendance summaries
+- Latest frontend verification after Phase 4 Nuxt workspaces:
+  - `npm run build` passed with existing Nuxt/Nitro warnings
+  - visible agent-browser rendered Reports, Calendar, and Documents pages with no Vite overlay
+  - screenshots saved at `docs/browser-checks/phase-4-reports-workspace.png`, `docs/browser-checks/phase-4-calendar-workspace.png`, and `docs/browser-checks/phase-4-documents-workspace.png`
+- Phase 4 status: complete for backend APIs, queued PDFs, analytics, result publication, notifications, calendar, document management, Nuxt workspaces, build, and browser smoke verification.
+- Git note: Phase 4 Nuxt completion checkpoint is ready to commit and push. Next phase is Phase 5 SaaS administration and billing placeholders.
 - API index endpoints now return paginated envelopes with top-level `data`, `meta`, and `links`; frontend list code can continue reading `data` as the record array.
 - Shared audit logging lives in `App\Services\AuditLogger` and `App\Http\Controllers\Controller::recordAudit()`.
 - School show/update endpoints exist at `GET/PATCH /api/schools/{school}` with `school.member` and `schools.manage` enforcement for update.
