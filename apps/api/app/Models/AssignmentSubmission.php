@@ -5,29 +5,28 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Subject extends Model
+class AssignmentSubmission extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'school_id',
-        'name',
-        'code',
-        'type',
-        'description',
-        'credit_hours',
-        'sort_order',
+        'assignment_id',
+        'student_enrollment_id',
+        'submitted_at',
+        'attachment_path',
+        'marks_awarded',
+        'feedback',
         'status',
     ];
 
     protected function casts(): array
     {
         return [
-            'credit_hours' => 'integer',
-            'sort_order' => 'integer',
+            'submitted_at' => 'datetime',
+            'marks_awarded' => 'decimal:2',
         ];
     }
 
@@ -40,18 +39,18 @@ class Subject extends Model
     }
 
     /**
-     * @return HasMany<TimetablePeriod, $this>
+     * @return BelongsTo<Assignment, $this>
      */
-    public function timetablePeriods(): HasMany
+    public function assignment(): BelongsTo
     {
-        return $this->hasMany(TimetablePeriod::class);
+        return $this->belongsTo(Assignment::class);
     }
 
     /**
-     * @return HasMany<Assignment, $this>
+     * @return BelongsTo<StudentEnrollment, $this>
      */
-    public function assignments(): HasMany
+    public function studentEnrollment(): BelongsTo
     {
-        return $this->hasMany(Assignment::class);
+        return $this->belongsTo(StudentEnrollment::class);
     }
 }

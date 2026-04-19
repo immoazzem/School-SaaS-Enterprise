@@ -124,6 +124,28 @@ Timetable Periods require `timetable.manage`. Records are tenant-owned and inclu
 
 Lists accept optional `academic_year_id`, `academic_class_id`, `shift_id`, `day_of_week`, and `status` filters. Mutations reject cross-school academic references, reject teacher assignments unless the teacher user is an active school member, block duplicate class slots, block overlapping class periods, and block overlapping teacher bookings.
 
+## Phase 7B Endpoints
+
+Assignments:
+
+- `GET /api/v1/schools/{school}/assignments`
+- `POST /api/v1/schools/{school}/assignments`
+- `GET /api/v1/schools/{school}/assignments/{assignment}`
+- `PUT /api/v1/schools/{school}/assignments/{assignment}`
+- `DELETE /api/v1/schools/{school}/assignments/{assignment}`
+
+Assignment Submissions:
+
+- `GET /api/v1/schools/{school}/assignment-submissions`
+- `POST /api/v1/schools/{school}/assignment-submissions`
+- `GET /api/v1/schools/{school}/assignment-submissions/{assignmentSubmission}`
+- `PUT /api/v1/schools/{school}/assignment-submissions/{assignmentSubmission}`
+- `DELETE /api/v1/schools/{school}/assignment-submissions/{assignmentSubmission}`
+
+Assignments and submissions require `assignments.manage` in the current staff-facing API. Assignment records include class, subject, assigner, title, description, due date, optional attachment path, publication flag, and status. Submission records include assignment, student enrollment, submitted timestamp, optional attachment path, optional marks, feedback, and status.
+
+Submissions reject duplicate assignment/enrollment pairs and reject enrollments that are not in the assignment class.
+
 ## Future API Groups
 
 - `/api/v1/academic/subjects`

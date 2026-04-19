@@ -114,7 +114,24 @@ Current page/module complete: Phase 7A Nuxt Timetable workspace.
 
 Local site link: `http://127.0.0.1:3000/schools/1/timetable`.
 
-Next page/module: Phase 7B Homework and Assignments backend foundation.
+Current page/module complete: Phase 7B Homework and Assignments backend foundation.
+
+- Added `assignments` and `assignment_submissions`.
+- Added `Assignment` and `AssignmentSubmission` models, policies, school/class/subject/enrollment relationships, and audit logging.
+- Added staff-facing assignment REST routes under `/api/v1/schools/{school}/assignments`.
+- Added assignment submission REST routes under `/api/v1/schools/{school}/assignment-submissions`.
+- Seeded `assignments.manage`; teacher, school-admin, principal, school-owner, and super-admin flows can manage assignment workflows.
+- Assignment validation rejects cross-school class/subject references.
+- Submission validation rejects cross-school references, duplicate student submissions, and enrollments outside the assignment class.
+- Added `apps/api/tests/Feature/PhaseSevenAssignmentsApiTest.php`.
+- `php artisan test --filter=PhaseSevenAssignments` passed with 6 tests / 32 assertions.
+- `vendor\bin\pint --dirty` passed.
+- Assignment route checks show 10 REST routes across assignments and assignment submissions.
+- `php artisan migrate --force` applied the assignment migration to the local database.
+- `php artisan db:seed --class=EnterpriseRolePermissionSeeder --force` refreshed local RBAC.
+- `php artisan test` passed with 110 tests / 656 assertions.
+
+Next page/module: Phase 7B Nuxt Homework and Assignments workspace.
 
 ## Completed
 

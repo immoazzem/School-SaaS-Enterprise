@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\Admin\JobStatusController;
 use App\Http\Controllers\Api\Admin\SchoolAdminController;
 use App\Http\Controllers\Api\Admin\SystemController;
 use App\Http\Controllers\Api\Admin\UserAdminController;
+use App\Http\Controllers\Api\AssignmentController;
+use App\Http\Controllers\Api\AssignmentSubmissionController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CalendarEventController;
 use App\Http\Controllers\Api\ClassSubjectController;
@@ -86,6 +88,12 @@ Route::prefix('v1')->group(function (): void {
         Route::apiResource('schools.academic-years', AcademicYearController::class)
             ->middleware('school.member');
         Route::apiResource('schools.academic-sections', AcademicSectionController::class)
+            ->middleware('school.member');
+        Route::apiResource('schools.assignments', AssignmentController::class)
+            ->parameters(['assignments' => 'assignment'])
+            ->middleware('school.member');
+        Route::apiResource('schools.assignment-submissions', AssignmentSubmissionController::class)
+            ->parameters(['assignment-submissions' => 'assignmentSubmission'])
             ->middleware('school.member');
         Route::post('schools/{school}/calendar-events/bulk-import-holidays', [CalendarEventController::class, 'bulkImportHolidays'])
             ->middleware('school.member');

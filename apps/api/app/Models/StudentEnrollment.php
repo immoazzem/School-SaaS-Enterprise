@@ -96,4 +96,12 @@ class StudentEnrollment extends Model
     {
         return $this->hasMany(StudentAttendanceRecord::class);
     }
+
+    /**
+     * @return HasMany<AssignmentSubmission, $this>
+     */
+    public function assignmentSubmissions(): HasMany
+    {
+        return $this->hasMany(AssignmentSubmission::class);
+    }
 }

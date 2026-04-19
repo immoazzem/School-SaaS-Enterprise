@@ -25,6 +25,7 @@ class EnterpriseRolePermissionSeeder extends Seeder
             ['module' => 'academics', 'key' => 'student_groups.manage', 'description' => 'Manage student groups'],
             ['module' => 'academics', 'key' => 'shifts.manage', 'description' => 'Manage shifts'],
             ['module' => 'academics', 'key' => 'timetable.manage', 'description' => 'Manage class timetable and routines'],
+            ['module' => 'academics', 'key' => 'assignments.manage', 'description' => 'Manage homework and assignment workflows'],
             ['module' => 'people', 'key' => 'designations.manage', 'description' => 'Manage staff designations'],
             ['module' => 'people', 'key' => 'employees.manage', 'description' => 'Manage employee records'],
             ['module' => 'people', 'key' => 'students.manage', 'description' => 'Manage student records'],
@@ -85,6 +86,7 @@ class EnterpriseRolePermissionSeeder extends Seeder
                     'student_groups.manage',
                     'shifts.manage',
                     'timetable.manage',
+                    'assignments.manage',
                     'designations.manage',
                     'employees.manage',
                     'students.manage',
@@ -118,6 +120,7 @@ class EnterpriseRolePermissionSeeder extends Seeder
                     'student_groups.manage',
                     'shifts.manage',
                     'timetable.manage',
+                    'assignments.manage',
                     'designations.manage',
                     'employees.manage',
                     'students.manage',
@@ -138,7 +141,7 @@ class EnterpriseRolePermissionSeeder extends Seeder
             ],
             'teacher' => [
                 'name' => 'Teacher',
-                'permissions' => ['students.manage', 'attendance.manage', 'exams.manage', 'marks.enter.own', 'reports.view'],
+                'permissions' => ['students.manage', 'attendance.manage', 'exams.manage', 'assignments.manage', 'marks.enter.own', 'reports.view'],
             ],
             'accountant' => [
                 'name' => 'Accountant',

@@ -150,6 +150,22 @@ class School extends Model
     }
 
     /**
+     * @return HasMany<Assignment, $this>
+     */
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(Assignment::class);
+    }
+
+    /**
+     * @return HasMany<AssignmentSubmission, $this>
+     */
+    public function assignmentSubmissions(): HasMany
+    {
+        return $this->hasMany(AssignmentSubmission::class);
+    }
+
+    /**
      * @return HasMany<ClassSubject, $this>
      */
     public function classSubjects(): HasMany

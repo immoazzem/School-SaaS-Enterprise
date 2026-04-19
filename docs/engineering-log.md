@@ -822,3 +822,26 @@ Verification: `npm run build` from `apps/web` passed with existing classified Nu
 Phase 7A status: backend and Nuxt workspace are complete for timetable/routine scheduling. Teacher assignment is intentionally not exposed yet because the current frontend lacks a school member/user picker; the backend already accepts `teacher_user_id` once a member directory is added.
 
 Next: commit and push this Phase 7A UI checkpoint, then continue with Phase 7B Homework and Assignments backend foundation.
+
+### Phase 7B Assignments Backend Foundation
+
+Current page/module complete: Phase 7B Homework and Assignments backend foundation.
+
+Scope: implemented the v3 homework/assignment backend:
+- added `assignments` and `assignment_submissions`.
+- added `Assignment` and `AssignmentSubmission` models.
+- added relationships from School, AcademicClass, Subject, and StudentEnrollment.
+- added `assignments.manage` permission and granted it to teacher/admin/principal owner flows.
+- added assignment REST routes under `/api/v1/schools/{school}/assignments`.
+- added assignment submission REST routes under `/api/v1/schools/{school}/assignment-submissions`.
+- added policies for assignment and submission management.
+- added audit logs for assignment and submission create/update/delete.
+- validated same-school class, subject, assignment, and enrollment references.
+- rejected duplicate assignment submissions and submissions for enrollments outside the assignment class.
+- added focused coverage in `apps/api/tests/Feature/PhaseSevenAssignmentsApiTest.php`.
+
+Verification: `php artisan test --filter=PhaseSevenAssignments` passed with 6 tests / 32 assertions; `vendor\bin\pint --dirty` passed; route checks showed 5 assignment routes and 5 assignment-submission routes; `php artisan migrate --force` applied the assignment migration locally; `php artisan db:seed --class=EnterpriseRolePermissionSeeder --force` refreshed local RBAC; full `php artisan test` passed with 110 tests / 656 assertions.
+
+Phase 7B status: backend foundation is complete. Remaining Phase 7B work is the Nuxt assignments workspace and browser verification.
+
+Next: commit and push this Phase 7B backend checkpoint, then build the Nuxt homework/assignments workspace.

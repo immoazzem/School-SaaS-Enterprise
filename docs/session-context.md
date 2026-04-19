@@ -599,7 +599,42 @@ Latest verification:
 
 Next page/module:
 
-- Phase 7B Homework and Assignments backend foundation.
+- Phase 7B Nuxt Homework and Assignments workspace.
+
+Current page/module complete: Phase 7B Homework and Assignments backend foundation.
+
+Latest Phase 7B backend status:
+
+- Added `assignments`.
+- Added `assignment_submissions`.
+- Added `Assignment` and `AssignmentSubmission` models.
+- Added assignment/submission policies using `assignments.manage`.
+- Added relationships from School, AcademicClass, Subject, and StudentEnrollment.
+- Seeded `assignments.manage`; teacher, school-admin, principal, school-owner, and super-admin flows can manage assignment workflows.
+- Added routes:
+  - `GET /api/v1/schools/{school}/assignments`
+  - `POST /api/v1/schools/{school}/assignments`
+  - `GET /api/v1/schools/{school}/assignments/{assignment}`
+  - `PATCH /api/v1/schools/{school}/assignments/{assignment}`
+  - `DELETE /api/v1/schools/{school}/assignments/{assignment}`
+  - `GET /api/v1/schools/{school}/assignment-submissions`
+  - `POST /api/v1/schools/{school}/assignment-submissions`
+  - `GET /api/v1/schools/{school}/assignment-submissions/{assignmentSubmission}`
+  - `PATCH /api/v1/schools/{school}/assignment-submissions/{assignmentSubmission}`
+  - `DELETE /api/v1/schools/{school}/assignment-submissions/{assignmentSubmission}`
+- Assignment validation rejects cross-school class/subject references.
+- Submission validation rejects duplicate assignment/enrollment pairs and enrollments outside the assignment class.
+- Audit events include `assignment.created`, `assignment.updated`, `assignment.deleted`, `assignment_submission.created`, `assignment_submission.updated`, and `assignment_submission.deleted`.
+- Added `apps/api/tests/Feature/PhaseSevenAssignmentsApiTest.php`.
+
+Latest Phase 7B backend verification:
+
+- `php artisan test --filter=PhaseSevenAssignments`: 6 tests / 32 assertions passed.
+- `vendor\bin\pint --dirty`: passed.
+- Assignment route checks: 10 REST routes.
+- `php artisan migrate --force`: applied `2026_04_19_060000_create_assignment_tables`.
+- `php artisan db:seed --class=EnterpriseRolePermissionSeeder --force`: refreshed local RBAC.
+- `php artisan test`: 110 tests / 656 assertions passed.
 
 Current page/module complete: Phase 7A Nuxt Timetable workspace.
 
