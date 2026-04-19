@@ -169,6 +169,7 @@ onMounted(async () => {
       </div>
 
       <div class="header-actions">
+        <NuxtLink class="button secondary" :to="`/schools/${schoolId}/timetable`">Timetable</NuxtLink>
         <NuxtLink class="button secondary" :to="`/schools/${schoolId}/student-groups`">Groups</NuxtLink>
         <NuxtLink class="button secondary" :to="`/schools/${schoolId}/subjects`">Subjects</NuxtLink>
       </div>

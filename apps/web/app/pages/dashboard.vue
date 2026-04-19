@@ -55,6 +55,11 @@ const navItems = computed(() => [
     enabled: selectedSchool.value?.permissions?.includes('shifts.manage') ?? false,
   },
   {
+    label: 'Timetable',
+    active: false,
+    enabled: selectedSchool.value?.permissions?.includes('timetable.manage') ?? false,
+  },
+  {
     label: 'People',
     active: false,
     enabled: selectedSchool.value?.permissions?.includes('students.manage') ?? false,
@@ -237,6 +242,15 @@ async function openShifts() {
   await router.push(`/schools/${auth.selectedSchoolId.value}/shifts`)
 }
 
+async function openTimetable() {
+  if (!auth.selectedSchoolId.value) {
+    error.value = 'Create or select a school first.'
+    return
+  }
+
+  await router.push(`/schools/${auth.selectedSchoolId.value}/timetable`)
+}
+
 async function openDesignations() {
   if (!auth.selectedSchoolId.value) {
     error.value = 'Create or select a school first.'
@@ -371,6 +385,7 @@ const navActions: Record<string, () => Promise<void>> = {
   'Class Subjects': openClassSubjects,
   Groups: openStudentGroups,
   Shifts: openShifts,
+  Timetable: openTimetable,
   Designations: openDesignations,
   People: openStudents,
   Enrollments: openEnrollments,
@@ -543,6 +558,7 @@ onMounted(loadDashboard)
           <button class="button secondary" type="button" @click="openClassSubjects">Assign subjects</button>
           <button class="button secondary" type="button" @click="openStudentGroups">Open groups</button>
           <button class="button secondary" type="button" @click="openShifts">Open shifts</button>
+          <button class="button secondary" type="button" @click="openTimetable">Open timetable</button>
           <button class="button secondary" type="button" @click="openDesignations">Open designations</button>
           <button class="button secondary" type="button" @click="openEmployees">Open employees</button>
           <button class="button secondary" type="button" @click="openStudents">Open students</button>

@@ -803,3 +803,22 @@ Verification: `php artisan test --filter=PhaseSevenTimetable` passed with 5 test
 Phase 7 status: timetable backend foundation is complete. Remaining Phase 7A work is the Nuxt timetable workspace and browser verification.
 
 Next: commit and push this Phase 7A backend checkpoint, then build the Nuxt timetable workspace.
+
+### Phase 7A Nuxt Timetable Workspace
+
+Current page/module complete: Phase 7A Nuxt Timetable workspace, route `/schools/{schoolId}/timetable`.
+
+Scope: completed the school-facing timetable UI:
+- added typed `TimetablePeriod` API shape.
+- added dashboard navigation/action access for `timetable.manage`.
+- added `/schools/{schoolId}/timetable` with Radiant-inspired operation shell styling.
+- added filters for academic year, class, shift, day, and status.
+- added create/edit/archive flow for routine periods.
+- added weekly Sunday through Saturday board plus register table.
+- linked Timetable from the Shifts workspace.
+
+Verification: `npm run build` from `apps/web` passed with existing classified Nuxt/Nitro/Node warnings. Local browser smoke used API `http://127.0.0.1:8010/api` and web `http://127.0.0.1:3000`; agent-browser opened `/schools/1/timetable`, confirmed no Vite/Nuxt error overlay, created a Sunday `08:00 to 08:45` Mathematics period for Class One / Morning Shift / Room 204, and saved `docs/browser-checks/timetable-workspace.png`.
+
+Phase 7A status: backend and Nuxt workspace are complete for timetable/routine scheduling. Teacher assignment is intentionally not exposed yet because the current frontend lacks a school member/user picker; the backend already accepts `teacher_user_id` once a member directory is added.
+
+Next: commit and push this Phase 7A UI checkpoint, then continue with Phase 7B Homework and Assignments backend foundation.

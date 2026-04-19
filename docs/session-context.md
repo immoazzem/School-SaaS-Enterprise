@@ -599,7 +599,30 @@ Latest verification:
 
 Next page/module:
 
-- Phase 7A Nuxt Timetable workspace.
+- Phase 7B Homework and Assignments backend foundation.
+
+Current page/module complete: Phase 7A Nuxt Timetable workspace.
+
+Latest Phase 7A frontend status:
+
+- Added `TimetablePeriod` type to `apps/web/app/composables/useApi.ts`.
+- Added `/schools/{schoolId}/timetable`.
+- Dashboard now includes Timetable navigation/action for `timetable.manage`.
+- Shifts workspace links to Timetable.
+- Timetable UI supports filters for academic year, class, shift, day, and status.
+- Timetable UI supports create/edit/archive for periods.
+- Weekly board groups periods Sunday through Saturday.
+- Register table lists visible timetable periods.
+- Teacher assignment is not exposed in the UI yet because there is no school member/user picker in the current frontend; backend already supports `teacher_user_id`.
+
+Latest Phase 7A frontend verification:
+
+- `npm run build` from `apps/web`: passed with existing classified Nuxt/Nitro/Node warnings.
+- Local web server: `http://127.0.0.1:3000`.
+- Local API server: `http://127.0.0.1:8010/api`.
+- Browser smoke opened `http://127.0.0.1:3000/schools/1/timetable`.
+- Browser created a Sunday `08:00 to 08:45` Mathematics period for Class One / Morning Shift / Room 204.
+- Screenshot saved at `docs/browser-checks/timetable-workspace.png`.
 
 Previous checkpoint:
 

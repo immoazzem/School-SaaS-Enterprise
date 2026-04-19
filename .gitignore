@@ -21,9 +21,9 @@ dist/
 
 # Logs and OS files
 *.log
+*.err
 .DS_Store
 Thumbs.db
 
 # Local reference clone; keep it on disk, do not commit it into the rebuild repo.
 legacy-reference/
-

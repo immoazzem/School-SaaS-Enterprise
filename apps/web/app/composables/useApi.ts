@@ -86,6 +86,27 @@ export interface Shift {
   status: string
 }
 
+export interface TimetablePeriod {
+  id: number
+  school_id: number
+  academic_year_id: number
+  academic_class_id: number
+  shift_id: number | null
+  day_of_week: number
+  period_number: number
+  start_time: string
+  end_time: string
+  subject_id: number | null
+  teacher_user_id: number | null
+  room: string | null
+  status: 'active' | 'archived'
+  academic_year?: Pick<AcademicYear, 'id' | 'name' | 'code'>
+  academic_class?: Pick<AcademicClass, 'id' | 'name' | 'code'>
+  shift?: Pick<Shift, 'id' | 'name' | 'code'> | null
+  subject?: Pick<Subject, 'id' | 'name' | 'code' | 'type'> | null
+  teacher_user?: Pick<ApiUser, 'id' | 'name' | 'email'> | null
+}
+
 export interface ClassSubject {
   id: number
   school_id: number

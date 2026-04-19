@@ -98,7 +98,23 @@ Current page/module complete: Phase 7A Timetable / Routine backend foundation.
 - `php artisan db:seed --class=EnterpriseRolePermissionSeeder --force` refreshed local RBAC with `timetable.manage`.
 - `php artisan test` passed with 104 tests / 624 assertions.
 
-Next page/module: Phase 7A Nuxt Timetable workspace.
+Current page/module complete: Phase 7A Nuxt Timetable workspace.
+
+- Added typed Nuxt `TimetablePeriod` API shape.
+- Added dashboard navigation and action access for users with `timetable.manage`.
+- Added `/schools/{schoolId}/timetable`.
+- Added timetable filters for academic year, class, shift, day, and status.
+- Added create/edit/archive flow for routine periods with year, class, optional shift, day, period number, time window, optional subject, room, and status.
+- Added a weekly board grouped by Sunday through Saturday plus a register table.
+- Added Timetable link from the Shifts workspace.
+- `npm run build` from `apps/web` passed with the existing classified Nuxt/Nitro/Node warnings.
+- Local browser verification passed at `http://127.0.0.1:3000/schools/1/timetable`.
+- Browser created a real Sunday `08:00 to 08:45` `Mathematics` period for `Class One`, `Morning Shift`, `Room 204`.
+- Screenshot saved at `docs/browser-checks/timetable-workspace.png`.
+
+Local site link: `http://127.0.0.1:3000/schools/1/timetable`.
+
+Next page/module: Phase 7B Homework and Assignments backend foundation.
 
 ## Completed
 
