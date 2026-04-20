@@ -959,6 +959,29 @@ Next page/module:
 
 - Commit and push the Phase 7E queue foundation checkpoint, then continue Phase 7E hardening: conflict review UI, auth-expiry stop flow, service worker update docs, and queue tests.
 
+Current page/module in progress: Phase 7E queue failure/auth hardening.
+
+Current page/module complete: Phase 7E queue failure/auth hardening.
+
+Latest changes:
+
+- `useOfflineQueue()` now has an `auth_required` status for API `401`.
+- Queue replay stops after the first `401`, keeping the record and avoiding repeated stale-token writes.
+- `syncEntries()` returns attempted/synced/failed/conflict/auth-required summary counts.
+- Attendance and Marks show sync outcome messages from the summary.
+- `OfflineQueuePanel` shows per-status counts, friendly labels, attempt counts, and error messages.
+
+Latest verification:
+
+- `npm run build` from `apps/web` passed with the known classified Nuxt/Nitro/Node warnings.
+- Browser used `http://127.0.0.1:3000` for Nuxt and `http://127.0.0.1:8030/api` for Laravel.
+- Agent-browser queued a duplicate offline Attendance record for `Assignment Demo Student` on `2026-04-20`, synced online, confirmed the queue retained it as `conflict`, confirmed the page showed “1 attendance record need review before they can sync,” and saved `docs/browser-checks/offline-attendance-conflict.png`.
+
+Next immediate steps:
+
+- Commit and push the Phase 7E queue failure/auth hardening checkpoint.
+- Continue Phase 7E with one-click sign-in-again path, richer conflict review UI, service worker update docs, or queue tests.
+
 ## Recommended First Prompt For A New Session
 
 ```text

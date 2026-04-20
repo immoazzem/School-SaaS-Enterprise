@@ -590,6 +590,21 @@ Phase 7E status: PWA, offline drafts, and first queued write replay foundation a
 
 Next page/module: continue Phase 7E hardening or move to the next `enterprise-plan-v3.md` priority after checkpointing this queue foundation.
 
+### Phase 7E Queue Failure/Auth Hardening
+
+Current page/module complete: Phase 7E queue failure/auth hardening, shared by Attendance and Marks.
+
+Scope: tightened the offline queue replay behavior:
+- added `auth_required` queue status for API `401` responses.
+- sync now stops after the first `401` instead of repeatedly sending stale-token writes.
+- sync returns a summary with attempted, synced, failed, conflict, and auth-required counts.
+- Attendance and Marks now show accurate success/error messages based on that summary.
+- `OfflineQueuePanel` now shows ready/failed/conflict/auth-required counts, friendly status labels, attempt counts, and retained error text.
+
+Verification: `npm run build` from `apps/web` passed with the existing classified Nuxt/Nitro/Node warnings. Browser smoke used API `http://127.0.0.1:8030/api` and web `http://127.0.0.1:3000`; agent-browser queued a duplicate offline Attendance record for `Assignment Demo Student` on `2026-04-20`, synced online, confirmed the record stayed in IndexedDB as `conflict` with one attempt and retained error text, confirmed the page showed “1 attendance record need review before they can sync,” and saved `docs/browser-checks/offline-attendance-conflict.png`.
+
+Phase 7E remaining hardening: one-click sign-in-again path from queue records, richer conflict review UI, service worker update deployment notes, and queue-focused automated tests.
+
 ## New Session Startup Prompt
 
 ```text

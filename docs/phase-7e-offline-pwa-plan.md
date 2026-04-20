@@ -32,6 +32,9 @@ This now includes visible queued write replay for Attendance and Marks. The next
 - Queues replay manually through "Sync now" and automatically when the browser returns online.
 - Synced records are removed from IndexedDB; duplicate or validation failures stay visible as `conflict`.
 - Failed network/API records stay visible as `failed` rather than being silently discarded.
+- API `401` responses now mark the current record as `auth_required` and stop replay so stale sessions do not keep sending queued writes.
+- Queue sync returns a summary to the page so users see whether records synced, failed, conflicted, or need a fresh login.
+- The queue panel shows per-status counts, friendly status labels, attempt counts, and retained error messages.
 
 ## Implemented Queue Design
 
@@ -51,8 +54,7 @@ The current queue implementation:
 
 ## Queue Hardening For Next Slice
 
-- Stop replay and ask for login when the API returns `401`.
-- Mark entries as conflict when the API returns `409` or validation errors caused by duplicate attendance/marks records.
+- Add a one-click "sign in again" path from `auth_required` queue records.
 - Show a sync review drawer before deleting local failed/conflicted records.
 - Add richer local-vs-server comparison views for attendance and marks conflicts.
 - Add tests around IndexedDB queue helpers where the Nuxt test harness is in place.
@@ -74,6 +76,6 @@ The current queue implementation:
 - Offline attendance and marks submissions enter a visible queue. Implemented.
 - Queue survives reload and browser restart. Implemented through IndexedDB.
 - Queue replays when the connection returns. Implemented for non-conflicting records.
-- Conflicts are visible and resolvable by a permitted user.
+- Conflicts are visible. Rich resolution UI remains planned.
 - Failed sync records are never silently discarded. Implemented.
 - Service worker update flow is documented for self-hosted deployments.

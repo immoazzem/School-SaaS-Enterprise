@@ -193,13 +193,16 @@ async function queueAttendance(payload: { student_enrollment_id: number, attenda
 }
 
 async function syncAttendanceQueue() {
+  error.value = ''
+  success.value = ''
+
   if (!isOnline.value) {
     success.value = 'The attendance queue will sync when the connection returns.'
 
     return
   }
 
-  await offlineQueue.syncEntries(
+  const summary = await offlineQueue.syncEntries(
     (entry) => entry.schoolId === schoolId.value,
     async (entry) => {
       await api.request(entry.path, {
@@ -208,7 +211,23 @@ async function syncAttendanceQueue() {
       })
     },
   )
-  success.value = 'Attendance queue synced.'
+  const retainedConflicts = attendanceQueueEntries.value.filter((entry) => entry.status === 'conflict').length
+  const retainedFailures = attendanceQueueEntries.value.filter((entry) => entry.status === 'failed').length
+
+  if (summary.authRequired) {
+    error.value = 'Attendance sync paused because your session expired. Sign in again, then sync the remaining queue.'
+  } else if (summary.conflicts || retainedConflicts) {
+    const count = summary.conflicts || retainedConflicts
+    error.value = `${count} attendance record${count === 1 ? '' : 's'} need review before they can sync.`
+  } else if (summary.failed || retainedFailures) {
+    const count = summary.failed || retainedFailures
+    error.value = `${count} attendance record${count === 1 ? '' : 's'} could not sync. Keep them in the queue and try again.`
+  } else if (summary.synced) {
+    success.value = `${summary.synced} attendance record${summary.synced === 1 ? '' : 's'} synced.`
+  } else {
+    success.value = 'No attendance queue records were ready to sync.'
+  }
+
   await loadRecords()
 }
 

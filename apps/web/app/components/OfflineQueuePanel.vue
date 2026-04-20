@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { OfflineQueueEntry } from '~/composables/useOfflineQueue'
 
-defineProps<{
+const props = defineProps<{
   entries: OfflineQueueEntry[]
   syncing: boolean
 }>()
@@ -10,6 +10,33 @@ const emit = defineEmits<{
   sync: []
   discard: [id: string]
 }>()
+
+const queueCounts = computed(() => ({
+  pending: props.entries.filter((entry) => entry.status === 'pending').length,
+  failed: props.entries.filter((entry) => entry.status === 'failed').length,
+  conflict: props.entries.filter((entry) => entry.status === 'conflict').length,
+  authRequired: props.entries.filter((entry) => entry.status === 'auth_required').length,
+}))
+
+function statusLabel(entry: OfflineQueueEntry) {
+  const labels: Record<OfflineQueueEntry['status'], string> = {
+    pending: 'Ready to sync',
+    syncing: 'Syncing',
+    synced: 'Synced',
+    conflict: 'Needs review',
+    failed: 'Sync failed',
+    auth_required: 'Sign in required',
+  }
+
+  return labels[entry.status]
+}
+
+function formattedDate(value: string) {
+  return new Intl.DateTimeFormat('en', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(new Date(value))
+}
 </script>
 
 <template>
@@ -17,7 +44,13 @@ const emit = defineEmits<{
     <div class="queue-header">
       <div>
         <p class="eyebrow">Offline queue</p>
-        <h2>{{ entries.length }} pending item{{ entries.length === 1 ? '' : 's' }}</h2>
+        <h2>{{ entries.length }} local item{{ entries.length === 1 ? '' : 's' }}</h2>
+        <p class="queue-summary">
+          {{ queueCounts.pending }} ready
+          <span v-if="queueCounts.failed">/ {{ queueCounts.failed }} failed</span>
+          <span v-if="queueCounts.conflict">/ {{ queueCounts.conflict }} needs review</span>
+          <span v-if="queueCounts.authRequired">/ sign in required</span>
+        </p>
       </div>
       <button class="button secondary compact" type="button" :disabled="syncing" @click="emit('sync')">
         {{ syncing ? 'Syncing' : 'Sync now' }}
@@ -28,7 +61,8 @@ const emit = defineEmits<{
       <article v-for="entry in entries" :key="entry.id" class="queue-item" :class="entry.status">
         <div>
           <strong>{{ entry.label }}</strong>
-          <span>{{ entry.status }} / {{ entry.method }} / {{ entry.createdAt }}</span>
+          <span>{{ statusLabel(entry) }} / {{ entry.method }} / {{ formattedDate(entry.createdAt) }}</span>
+          <span v-if="entry.attempts">Attempts: {{ entry.attempts }}</span>
           <span v-if="entry.error">{{ entry.error }}</span>
         </div>
         <button class="link-button danger" type="button" @click="emit('discard', entry.id)">Discard</button>
@@ -58,6 +92,13 @@ const emit = defineEmits<{
   margin: 0;
   color: #111827;
   font-size: 1.05rem;
+}
+
+.queue-summary {
+  margin: 6px 0 0;
+  color: #5f6f68;
+  font-size: 0.86rem;
+  font-weight: 800;
 }
 
 .eyebrow {
@@ -95,6 +136,14 @@ const emit = defineEmits<{
   font-weight: 700;
 }
 
+.queue-item.auth_required,
+.queue-item.conflict,
+.queue-item.failed {
+  border-left: 3px solid #a83b32;
+  padding-left: 10px;
+}
+
+.queue-item.auth_required span:last-child,
 .queue-item.conflict span:last-child,
 .queue-item.failed span:last-child {
   color: #a83b32;

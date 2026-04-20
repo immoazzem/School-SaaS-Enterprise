@@ -984,3 +984,18 @@ Scope: implemented the first durable offline write queue:
 Verification: `npm run build` passed from `apps/web`. Browser smoke used Nuxt at `http://127.0.0.1:3000` and API at `http://127.0.0.1:8030/api`; agent-browser verified an Attendance queued record while offline, saved `docs/browser-checks/offline-attendance-queue.png`, returned online, synced successfully, and confirmed IndexedDB queue records were empty afterward. Marks route loaded with queue integration present, but full marks sync was not smoke-tested because the current seeded browser school has no exam/class-subject options.
 
 Phase 7E status: PWA/offline foundation plus first queued write replay foundation are complete. Remaining work: conflict resolution UI, `401` login-expiry stop flow, service worker update documentation, and queue-focused automated tests.
+
+### Phase 7E Queue Failure/Auth Hardening
+
+Current page/module complete: Phase 7E queue failure/auth hardening.
+
+Scope: improved queue replay safety and user feedback:
+- added `auth_required` as an offline queue status.
+- classify API `401` as `auth_required`, keep the affected record, and stop replay.
+- return a sync summary from `useOfflineQueue().syncEntries()`.
+- updated Attendance and Marks to show precise sync outcomes rather than always reporting success.
+- updated `OfflineQueuePanel` to show per-status counts, friendly labels, attempt counts, and retained errors.
+
+Verification: `npm run build` from `apps/web` passed with the known classified Nuxt/Nitro/Node warnings. Browser smoke used API `http://127.0.0.1:8030/api` and web `http://127.0.0.1:3000`; agent-browser queued a duplicate offline Attendance record for `Assignment Demo Student` on `2026-04-20`, synced online, confirmed the queue retained it as `conflict` with one attempt and the API error message, confirmed the page showed the needs-review summary without stale success copy, and saved `docs/browser-checks/offline-attendance-conflict.png`.
+
+Phase 7E status: queue replay now handles success, failed, conflict, and auth-required outcomes with visible retained records. Remaining work: one-click sign-in-again path, richer conflict review UI, service worker update docs, and automated queue tests.

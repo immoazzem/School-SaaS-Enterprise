@@ -183,13 +183,16 @@ async function queueMark(payload: {
 }
 
 async function syncMarksQueue() {
+  error.value = ''
+  success.value = ''
+
   if (!isOnline.value) {
     success.value = 'The marks queue will sync when the connection returns.'
 
     return
   }
 
-  await offlineQueue.syncEntries(
+  const summary = await offlineQueue.syncEntries(
     (entry) => entry.schoolId === schoolId.value,
     async (entry) => {
       await api.request(entry.path, {
@@ -198,7 +201,23 @@ async function syncMarksQueue() {
       })
     },
   )
-  success.value = 'Marks queue synced.'
+  const retainedConflicts = marksQueueEntries.value.filter((entry) => entry.status === 'conflict').length
+  const retainedFailures = marksQueueEntries.value.filter((entry) => entry.status === 'failed').length
+
+  if (summary.authRequired) {
+    error.value = 'Marks sync paused because your session expired. Sign in again, then sync the remaining queue.'
+  } else if (summary.conflicts || retainedConflicts) {
+    const count = summary.conflicts || retainedConflicts
+    error.value = `${count} marks record${count === 1 ? '' : 's'} need review before they can sync.`
+  } else if (summary.failed || retainedFailures) {
+    const count = summary.failed || retainedFailures
+    error.value = `${count} marks record${count === 1 ? '' : 's'} could not sync. Keep them in the queue and try again.`
+  } else if (summary.synced) {
+    success.value = `${summary.synced} marks record${summary.synced === 1 ? '' : 's'} synced.`
+  } else {
+    success.value = 'No marks queue records were ready to sync.'
+  }
+
   await loadWorkspace()
 }
 

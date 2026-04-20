@@ -1,4 +1,4 @@
-export type OfflineQueueStatus = 'pending' | 'syncing' | 'synced' | 'conflict' | 'failed'
+export type OfflineQueueStatus = 'pending' | 'syncing' | 'synced' | 'conflict' | 'failed' | 'auth_required'
 
 export interface OfflineQueueEntry<TPayload = Record<string, unknown>> {
   id: string
@@ -22,6 +22,14 @@ interface QueueInput<TPayload> {
   method: OfflineQueueEntry<TPayload>['method']
   path: string
   payload: TPayload
+}
+
+export interface OfflineQueueSyncSummary {
+  attempted: number
+  synced: number
+  failed: number
+  conflicts: number
+  authRequired: boolean
 }
 
 const dbName = 'school-saas-offline'
@@ -78,6 +86,10 @@ async function withStore<T>(mode: IDBTransactionMode, callback: (store: IDBObjec
 }
 
 function errorMessage(error: unknown) {
+  if (statusCode(error) === 401) {
+    return 'Your session expired. Sign in again before syncing this record.'
+  }
+
   if (error instanceof Error) {
     return error.message
   }
@@ -89,13 +101,31 @@ function errorMessage(error: unknown) {
   return 'Unable to sync queued record.'
 }
 
-function classifyFailure(error: unknown): OfflineQueueStatus {
-  if (typeof error === 'object' && error && 'status' in error) {
-    const status = Number(error.status)
+function statusCode(error: unknown) {
+  if (typeof error !== 'object' || !error) {
+    return null
+  }
 
-    if (status === 409 || status === 422) {
-      return 'conflict'
-    }
+  if ('status' in error) {
+    return Number(error.status)
+  }
+
+  if ('statusCode' in error) {
+    return Number(error.statusCode)
+  }
+
+  return null
+}
+
+function classifyFailure(error: unknown): OfflineQueueStatus {
+  const status = statusCode(error)
+
+  if (status === 401) {
+    return 'auth_required'
+  }
+
+  if (status === 409 || status === 422) {
+    return 'conflict'
   }
 
   return 'failed'
@@ -111,7 +141,10 @@ export function useOfflineQueue(queue: string) {
   const lastSyncedAt = ref<string | null>(null)
 
   const pendingCount = computed(() =>
-    entries.value.filter((entry) => entry.queue === queue && ['pending', 'failed', 'conflict'].includes(entry.status)).length,
+    entries.value.filter((entry) =>
+      entry.queue === queue
+      && ['pending', 'failed', 'conflict', 'auth_required'].includes(entry.status),
+    ).length,
   )
 
   async function refresh() {
@@ -171,9 +204,17 @@ export function useOfflineQueue(queue: string) {
   async function syncEntries(
     predicate: (entry: OfflineQueueEntry) => boolean,
     handler: (entry: OfflineQueueEntry) => Promise<void>,
-  ) {
+  ): Promise<OfflineQueueSyncSummary> {
+    const summary: OfflineQueueSyncSummary = {
+      attempted: 0,
+      synced: 0,
+      failed: 0,
+      conflicts: 0,
+      authRequired: false,
+    }
+
     if (syncing.value) {
-      return
+      return summary
     }
 
     syncing.value = true
@@ -183,12 +224,13 @@ export function useOfflineQueue(queue: string) {
 
       const candidates = entries.value.filter((entry) =>
         entry.queue === queue
-        && ['pending', 'failed'].includes(entry.status)
+        && ['pending', 'failed', 'auth_required'].includes(entry.status)
         && predicate(entry),
       )
 
       for (const entry of candidates) {
         const now = new Date().toISOString()
+        summary.attempted += 1
 
         await put({
           ...entry,
@@ -202,19 +244,35 @@ export function useOfflineQueue(queue: string) {
         try {
           await handler(entry)
           await remove(entry.id)
+          summary.synced += 1
         } catch (syncError) {
+          const status = classifyFailure(syncError)
+
           await put({
             ...entry,
-            status: classifyFailure(syncError),
+            status,
             attempts: entry.attempts + 1,
             lastAttemptAt: now,
             updatedAt: new Date().toISOString(),
             error: errorMessage(syncError),
           })
+
+          if (status === 'auth_required') {
+            summary.authRequired = true
+            break
+          }
+
+          if (status === 'conflict') {
+            summary.conflicts += 1
+          } else {
+            summary.failed += 1
+          }
         }
       }
 
       lastSyncedAt.value = new Date().toISOString()
+
+      return summary
     } finally {
       syncing.value = false
       await refresh()
