@@ -16,7 +16,12 @@ class AcademicClassController extends Controller
     {
         Gate::authorize('viewAny', [AcademicClass::class, $school]);
 
+        $validated = $request->validate([
+            'status' => ['nullable', Rule::in(['active', 'archived'])],
+        ]);
+
         $classes = $school->academicClasses()
+            ->when($validated['status'] ?? null, fn ($query, string $status) => $query->where('status', $status))
             ->orderBy('sort_order')
             ->orderBy('name')
             ->paginate($this->perPage($request));

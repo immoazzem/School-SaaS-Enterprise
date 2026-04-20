@@ -80,7 +80,40 @@ Current page/module complete: Production Stabilization Checkpoint I, Final Stabi
   - `php artisan route:list --path=api/v1 --except-vendor` shows 230 versioned routes.
   - `npm run build` passes with exit code 0.
   - remaining frontend build warnings are the classified Nuxt/Nitro/Node warnings already documented in `docs/KNOWN-BUILD-WARNINGS.md`.
-  - `docs/session-context.md` and root context are refreshed for low-token session startup.
+- `docs/session-context.md` and root context are refreshed for low-token session startup.
+
+Current page/module complete: Post-dashboard QA hardening and full browser workflow smoke.
+
+- Added a reusable Playwright smoke script at `apps/web/scripts/browser-workflow-smoke.mjs`.
+- Added `npm run qa:browser` in `apps/web/package.json`.
+- Browser smoke now covers 10 real workflows:
+  - academic classes
+  - academic sections
+  - academic years
+  - subjects
+  - student groups, shifts, designations
+  - guardians and students
+  - attendance
+  - calendar
+  - finance category/structure/invoice/bulk queue
+  - reports queue/check
+- Latest passing browser artifact: `docs/browser-checks/workflow-smoke-20260420234054.png`.
+- Fixed pagination/status issues that made newly created records disappear from active workspaces:
+  - academic classes
+  - academic sections
+  - academic years
+  - subjects
+  - student groups
+  - shifts
+  - designations
+- Fixed the students workspace so newly created guardians remain selectable for the student form even when guardian tables are paginated.
+- Fixed the attendance workspace button text so edit mode shows `Update attendance`.
+- Fixed finance form accessibility by wiring labels to controls with explicit `for`/`id`.
+- Verification after QA hardening:
+  - `npm run qa:browser` passed with 10 checks.
+  - `npm run build` passed.
+  - `php artisan test` passed with 117 tests / 702 assertions.
+  - `vendor\bin\pint --test` passed.
 
 Current page/module complete: Phase 7A Timetable / Routine backend foundation.
 

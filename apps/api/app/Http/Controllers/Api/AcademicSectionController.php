@@ -24,6 +24,7 @@ class AcademicSectionController extends Controller
                     ->where('school_id', $school->id)
                     ->whereNull('deleted_at'),
             ],
+            'status' => ['nullable', Rule::in(['active', 'archived'])],
         ]);
 
         $sections = $school->academicSections()
@@ -31,6 +32,7 @@ class AcademicSectionController extends Controller
                 $validated['academic_class_id'] ?? null,
                 fn ($query, int $academicClassId) => $query->where('academic_class_id', $academicClassId)
             )
+            ->when($validated['status'] ?? null, fn ($query, string $status) => $query->where('status', $status))
             ->with('academicClass:id,name,code')
             ->orderBy('sort_order')
             ->orderBy('name')

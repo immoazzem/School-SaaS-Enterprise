@@ -243,17 +243,17 @@ onMounted(loadWorkspace)
           </div>
           <div class="form-row">
             <div class="field">
-              <label>Name</label>
-              <input v-model="categoryForm.name" required type="text" placeholder="Monthly Tuition" />
+              <label for="fee-category-name">Name</label>
+              <input id="fee-category-name" v-model="categoryForm.name" required type="text" placeholder="Monthly Tuition" />
             </div>
             <div class="field">
-              <label>Code</label>
-              <input v-model="categoryForm.code" required type="text" placeholder="TUITION" />
+              <label for="fee-category-code">Code</label>
+              <input id="fee-category-code" v-model="categoryForm.code" required type="text" placeholder="TUITION" />
             </div>
           </div>
           <div class="field">
-            <label>Billing type</label>
-            <select v-model="categoryForm.billing_type">
+            <label for="fee-category-billing-type">Billing type</label>
+            <select id="fee-category-billing-type" v-model="categoryForm.billing_type">
               <option value="monthly">Monthly</option>
               <option value="one_time">One time</option>
               <option value="per_exam">Per exam</option>
@@ -269,23 +269,23 @@ onMounted(loadWorkspace)
             <h2>Set amount</h2>
           </div>
           <div class="field">
-            <label>Fee category</label>
-            <select v-model="structureForm.fee_category_id" required>
+            <label for="fee-structure-category">Fee category</label>
+            <select id="fee-structure-category" v-model="structureForm.fee_category_id" required>
               <option value="">Select category</option>
               <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
             </select>
           </div>
           <div class="form-row">
             <div class="field">
-              <label>Academic year</label>
-              <select v-model="structureForm.academic_year_id" required>
+              <label for="fee-structure-year">Academic year</label>
+              <select id="fee-structure-year" v-model="structureForm.academic_year_id" required>
                 <option value="">Select year</option>
                 <option v-for="year in academicYears" :key="year.id" :value="year.id">{{ year.name }}</option>
               </select>
             </div>
             <div class="field">
-              <label>Class</label>
-              <select v-model="structureForm.academic_class_id">
+              <label for="fee-structure-class">Class</label>
+              <select id="fee-structure-class" v-model="structureForm.academic_class_id">
                 <option value="">All classes</option>
                 <option v-for="schoolClass in academicClasses" :key="schoolClass.id" :value="schoolClass.id">{{ schoolClass.name }}</option>
               </select>
@@ -293,12 +293,12 @@ onMounted(loadWorkspace)
           </div>
           <div class="form-row">
             <div class="field">
-              <label>Amount</label>
-              <input v-model="structureForm.amount" required min="0" step="0.01" type="number" />
+              <label for="fee-structure-amount">Amount</label>
+              <input id="fee-structure-amount" v-model="structureForm.amount" required min="0" step="0.01" type="number" />
             </div>
             <div class="field">
-              <label>Due day</label>
-              <input v-model="structureForm.due_day_of_month" min="1" max="31" type="number" />
+              <label for="fee-structure-due-day">Due day</label>
+              <input id="fee-structure-due-day" v-model="structureForm.due_day_of_month" min="1" max="31" type="number" />
             </div>
           </div>
           <button class="button" type="submit" :disabled="savingStructure">{{ savingStructure ? 'Saving structure' : 'Save structure' }}</button>
@@ -312,28 +312,28 @@ onMounted(loadWorkspace)
             <h2>Create invoice</h2>
           </div>
           <div class="field">
-            <label>Student</label>
-            <select v-model="invoiceForm.student_enrollment_id" required>
+            <label for="manual-invoice-student">Student</label>
+            <select id="manual-invoice-student" v-model="invoiceForm.student_enrollment_id" required>
               <option value="">Select student</option>
               <option v-for="enrollment in enrollments" :key="enrollment.id" :value="enrollment.id">{{ enrollmentLabel(enrollment) }}</option>
             </select>
           </div>
           <div class="form-row">
             <div class="field">
-              <label>Academic year</label>
-              <select v-model="invoiceForm.academic_year_id" required>
+              <label for="manual-invoice-year">Academic year</label>
+              <select id="manual-invoice-year" v-model="invoiceForm.academic_year_id" required>
                 <option value="">Select year</option>
                 <option v-for="year in academicYears" :key="year.id" :value="year.id">{{ year.name }}</option>
               </select>
             </div>
             <div class="field">
-              <label>Fee month</label>
-              <input v-model="invoiceForm.fee_month" type="month" />
+              <label for="manual-invoice-month">Fee month</label>
+              <input id="manual-invoice-month" v-model="invoiceForm.fee_month" type="month" />
             </div>
           </div>
           <div class="field">
-            <label>Fee structure</label>
-            <select v-model="invoiceForm.fee_structure_id" required>
+            <label for="manual-invoice-structure">Fee structure</label>
+            <select id="manual-invoice-structure" v-model="invoiceForm.fee_structure_id" required>
               <option value="">Select structure</option>
               <option v-for="structure in structures" :key="structure.id" :value="structure.id">
                 {{ structure.fee_category?.name || structure.fee_category_id }} / {{ structure.amount }}
@@ -350,27 +350,27 @@ onMounted(loadWorkspace)
           </div>
           <div class="form-row">
             <div class="field">
-              <label>Class</label>
-              <select v-model="bulkForm.academic_class_id" required>
+              <label for="bulk-invoice-class">Class</label>
+              <select id="bulk-invoice-class" v-model="bulkForm.academic_class_id" required>
                 <option value="">Select class</option>
                 <option v-for="schoolClass in academicClasses" :key="schoolClass.id" :value="schoolClass.id">{{ schoolClass.name }}</option>
               </select>
             </div>
             <div class="field">
-              <label>Month</label>
-              <input v-model="bulkForm.month" required type="month" />
+              <label for="bulk-invoice-month">Month</label>
+              <input id="bulk-invoice-month" v-model="bulkForm.month" required type="month" />
             </div>
           </div>
           <div class="field">
-            <label>Academic year</label>
-            <select v-model="bulkForm.academic_year_id" required>
+            <label for="bulk-invoice-year">Academic year</label>
+            <select id="bulk-invoice-year" v-model="bulkForm.academic_year_id" required>
               <option value="">Select year</option>
               <option v-for="year in academicYears" :key="year.id" :value="year.id">{{ year.name }}</option>
             </select>
           </div>
           <div class="field">
-            <label>Fee structure</label>
-            <select v-model="bulkForm.fee_structure_id" required>
+            <label for="bulk-invoice-structure">Fee structure</label>
+            <select id="bulk-invoice-structure" v-model="bulkForm.fee_structure_id" required>
               <option value="">Select structure</option>
               <option v-for="structure in structures" :key="structure.id" :value="structure.id">
                 {{ structure.fee_category?.name || structure.fee_category_id }} / {{ structure.amount }}

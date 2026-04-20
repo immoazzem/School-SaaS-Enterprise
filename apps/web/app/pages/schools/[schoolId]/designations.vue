@@ -39,6 +39,7 @@ async function loadDesignations() {
 
   try {
     const query = new URLSearchParams()
+    query.set('per_page', '100')
 
     if (statusFilter.value) {
       query.set('status', statusFilter.value)

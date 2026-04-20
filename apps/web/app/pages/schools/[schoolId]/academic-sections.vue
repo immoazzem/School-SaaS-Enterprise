@@ -44,7 +44,7 @@ const selectedClassName = computed(() => {
 })
 
 async function loadClasses() {
-  const response = await api.request<ClassesResponse>(`/schools/${schoolId.value}/academic-classes`)
+  const response = await api.request<ClassesResponse>(`/schools/${schoolId.value}/academic-classes?status=active&per_page=100`)
   classes.value = response.data
 
   if (!selectedClassId.value && response.data[0]) {
@@ -61,9 +61,17 @@ async function loadSections() {
   error.value = ''
 
   try {
-    const query = selectedClassId.value ? `?academic_class_id=${selectedClassId.value}` : ''
+    const query = new URLSearchParams({
+      per_page: '100',
+      status: 'active',
+    })
+
+    if (selectedClassId.value) {
+      query.set('academic_class_id', String(selectedClassId.value))
+    }
+
     const response = await api.request<SectionsResponse>(
-      `/schools/${schoolId.value}/academic-sections${query}`,
+      `/schools/${schoolId.value}/academic-sections?${query.toString()}`,
     )
     sections.value = response.data
   } catch (sectionError) {

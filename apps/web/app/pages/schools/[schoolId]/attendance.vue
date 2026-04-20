@@ -414,7 +414,9 @@ onMounted(() => {
           <textarea id="remarks" v-model="form.remarks" rows="4" placeholder="Morning homeroom." />
 
           <div class="form-actions">
-            <button class="button" type="submit" :disabled="saving">{{ saving ? 'Saving...' : 'Save attendance' }}</button>
+            <button class="button" type="submit" :disabled="saving">
+              {{ saving ? 'Saving...' : editingId ? 'Update attendance' : 'Save attendance' }}
+            </button>
             <button class="button secondary" type="button" @click="saveDraft">Save offline draft</button>
             <button v-if="editingId" class="button secondary" type="button" @click="resetForm">Cancel</button>
           </div>

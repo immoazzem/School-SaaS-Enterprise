@@ -114,6 +114,21 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 
 ## Current Implementation Checkpoints
 
+- Latest checkpoint: Post-dashboard QA hardening and full browser workflow smoke.
+- Reusable browser QA script now lives at `apps/web/scripts/browser-workflow-smoke.mjs`.
+- Run `cd apps/web && npm run qa:browser` to replay the 10-step workflow smoke.
+- Latest passing browser artifact: `docs/browser-checks/workflow-smoke-20260420234054.png`.
+- Recent hardening fixes:
+  - active-list visibility and pagination cleanup for academic classes, sections, years, subjects, groups, shifts, and designations
+  - guardian select options decoupled from paginated guardian table in Students
+  - attendance edit button now says `Update attendance`
+  - finance form labels are explicitly associated to inputs/selects
+- Latest verification:
+  - `npm run qa:browser` passed with 10 checks
+  - `npm run build` passed
+  - `php artisan test` passed with 117 tests / 702 assertions
+  - `vendor\\bin\\pint --test` passed
+
 - Phase 0 legacy audit docs are complete and committed.
 - Laravel API scaffold exists in `D:\Development\School-SaaS-Enterprise\apps\api`.
 - Nuxt web scaffold exists in `D:\Development\School-SaaS-Enterprise\apps\web`.

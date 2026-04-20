@@ -24,6 +24,7 @@ const { t, locale } = useI18n()
 useSchoolLocale()
 
 const guardians = ref<Guardian[]>([])
+const guardianOptions = ref<Guardian[]>([])
 const students = ref<Student[]>([])
 const loading = ref(false)
 const savingGuardian = ref(false)
@@ -66,7 +67,7 @@ const studentForm = reactive({
 })
 
 const schoolId = computed(() => Number(route.params.schoolId))
-const activeGuardians = computed(() => guardians.value.filter((guardian) => guardian.status === 'active'))
+const activeGuardians = computed(() => guardianOptions.value.filter((guardian) => guardian.status === 'active'))
 const activeStudents = computed(() => students.value.filter((student) => student.status === 'active').length)
 
 function toDateInput(value: string | null) {
@@ -87,6 +88,11 @@ async function loadGuardians() {
   const suffix = query.toString() ? `?${query.toString()}` : ''
   const response = await api.request<GuardiansResponse>(`/schools/${schoolId.value}/guardians${suffix}`)
   guardians.value = response.data
+}
+
+async function loadGuardianOptions() {
+  const response = await api.request<GuardiansResponse>(`/schools/${schoolId.value}/guardians?status=active&per_page=100`)
+  guardianOptions.value = response.data
 }
 
 async function loadStudents() {
@@ -110,7 +116,7 @@ async function loadWorkspace() {
   error.value = ''
 
   try {
-    await Promise.all([loadGuardians(), loadStudents()])
+    await Promise.all([loadGuardians(), loadGuardianOptions(), loadStudents()])
   } catch (workspaceError) {
     error.value = workspaceError instanceof Error ? workspaceError.message : 'Unable to load students.'
   } finally {
@@ -194,22 +200,30 @@ async function saveGuardian() {
   }
 
   try {
+    let savedGuardian: Guardian | null = null
+
     if (editingGuardianId.value) {
-      await api.request<GuardianResponse>(`/schools/${schoolId.value}/guardians/${editingGuardianId.value}`, {
+      const response = await api.request<GuardianResponse>(`/schools/${schoolId.value}/guardians/${editingGuardianId.value}`, {
         method: 'PATCH',
         body: payload,
       })
+      savedGuardian = response.data
       success.value = 'Guardian updated.'
     } else {
-      await api.request<GuardianResponse>(`/schools/${schoolId.value}/guardians`, {
+      const response = await api.request<GuardianResponse>(`/schools/${schoolId.value}/guardians`, {
         method: 'POST',
         body: payload,
       })
+      savedGuardian = response.data
       success.value = 'Guardian saved.'
     }
 
     resetGuardianForm()
-    await loadGuardians()
+    await Promise.all([loadGuardians(), loadGuardianOptions()])
+
+    if (savedGuardian?.status === 'active' && !guardianOptions.value.some((guardian) => guardian.id === savedGuardian.id)) {
+      guardianOptions.value = [savedGuardian, ...guardianOptions.value]
+    }
   } catch (guardianError) {
     error.value = guardianError instanceof Error ? guardianError.message : 'Unable to save guardian.'
   } finally {
@@ -256,8 +270,7 @@ async function saveStudent() {
     }
 
     resetStudentForm()
-    await loadStudents()
-    await loadGuardians()
+    await Promise.all([loadStudents(), loadGuardians(), loadGuardianOptions()])
   } catch (studentError) {
     error.value = studentError instanceof Error ? studentError.message : 'Unable to save student.'
   } finally {
@@ -271,7 +284,7 @@ async function archiveGuardian(guardian: Guardian) {
     body: { status: 'archived' },
   })
   success.value = 'Guardian archived.'
-  await loadGuardians()
+  await Promise.all([loadGuardians(), loadGuardianOptions()])
 }
 
 async function archiveStudent(student: Student) {

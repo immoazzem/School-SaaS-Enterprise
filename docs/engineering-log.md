@@ -12,6 +12,41 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 - Mention the current page/module in progress and phase completion notes.
 - Use visible agent-browser checks during UI phases when the dev server is available.
 
+## 2026-04-21
+
+### Pending Checkpoint - Post-Dashboard QA Hardening
+
+Current page/module complete: cross-module browser workflow smoke, pagination hardening, and form accessibility cleanup.
+
+Scope:
+- added `apps/web/scripts/browser-workflow-smoke.mjs` as a reusable Playwright-driven QA pass.
+- added `npm run qa:browser`.
+- covered 10 workflows end to end: academic classes, academic sections, academic years, subjects, groups/shifts/designations, guardians/students, attendance, calendar, finance, and reports.
+- fixed active-list visibility issues by requesting larger active datasets and adding active-status filtering where the UI is meant to show current operational rows:
+  - `apps/api/app/Http/Controllers/Api/AcademicClassController.php`
+  - `apps/api/app/Http/Controllers/Api/AcademicSectionController.php`
+  - `apps/web/app/pages/schools/[schoolId]/academic-classes.vue`
+  - `apps/web/app/pages/schools/[schoolId]/academic-sections.vue`
+  - `apps/web/app/pages/schools/[schoolId]/academic-years.vue`
+  - `apps/web/app/pages/schools/[schoolId]/subjects.vue`
+  - `apps/web/app/pages/schools/[schoolId]/student-groups.vue`
+  - `apps/web/app/pages/schools/[schoolId]/shifts.vue`
+  - `apps/web/app/pages/schools/[schoolId]/designations.vue`
+- fixed student/guardian workflow scalability in `apps/web/app/pages/schools/[schoolId]/students.vue` by separating guardian select options from the paginated guardian table.
+- fixed attendance edit-state button text in `apps/web/app/pages/schools/[schoolId]/attendance.vue`.
+- fixed finance form label/input associations in `apps/web/app/pages/schools/[schoolId]/finance.vue`.
+
+Verification:
+- `npm run qa:browser`: passed with 10 checks.
+- `npm run build`: passed.
+- `php artisan test`: passed with 117 tests / 702 assertions.
+- `vendor\bin\pint --test`: passed.
+- browser artifact saved at `docs/browser-checks/workflow-smoke-20260420234054.png`.
+
+Next:
+- commit and push this QA hardening checkpoint.
+- continue with deeper module-by-module mutation coverage or the next `enterprise-plan-v3.md` slice.
+
 ## 2026-04-17
 
 ### `9ed9d92` - Legacy Audit Docs

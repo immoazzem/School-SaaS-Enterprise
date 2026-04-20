@@ -29,7 +29,7 @@ async function loadClasses() {
 
   try {
     const response = await api.request<ClassesResponse>(
-      `/schools/${schoolId.value}/academic-classes`,
+      `/schools/${schoolId.value}/academic-classes?status=active&per_page=100`,
     )
     classes.value = response.data
   } catch (classError) {
