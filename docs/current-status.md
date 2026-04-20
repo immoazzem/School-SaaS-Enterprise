@@ -658,6 +658,29 @@ Verification:
 Known environment note:
 - `php artisan serve` could not bind to tested local ports in this shell, but Laravel Herd served the API correctly at `https://school-api.test`.
 
+### Five-Year Demo Data And Dashboard QA Checkpoint
+
+Current page/module complete: five-year operating data simulation, dashboard layout/menu refresh, and full module route smoke.
+
+Scope:
+- Expanded `apps/api/database/seeders/DemoDataSeeder.php` from one-record-per-module data into a deterministic five-year school dataset.
+- The demo school now has academic years 2022-2026, five classes, section mapping, student groups, shifts, subjects, class-subject assignments, employees, teacher profiles, guardians, students, enrollments, attendance history, timetable periods, assignments/submissions, exams/schedules, marks/results, invoices/payments, salary records, leave, promotions, calendar events, documents, and audit logs.
+- Rebuilt `apps/web/app/pages/dashboard.vue` into a command-center dashboard with grouped module navigation, live dashboard-summary KPIs, collections trend, attention counters, and a cleaner tenant setup area.
+
+Verification:
+- `php artisan db:seed --class=DemoDataSeeder --force`: passed against local MySQL/Herd.
+- Demo data count spot check after seeding included 5 academic years, 5 classes, 50 students, 241 enrollments, 4,322 student attendance records, 8 employees, 10 exams, 4,801 marks, 1,561 invoices, 416 salary records, 96 promotion records, and 21 calendar events.
+- Agent-browser loaded the new dashboard at `http://127.0.0.1:3000/dashboard`; final screenshot saved at `docs/browser-checks/dashboard-after-five-year-loaded.png`.
+- Agent-browser route smoke loaded every current module page without visible error copy:
+  - dashboard
+  - academic years, classes, sections, subjects, class subjects, groups, shifts
+  - timetable, assignments, students, enrollments, teacher profiles, attendance
+  - designations, employees, exams, marks, reports, promotions, calendar, documents
+  - finance, payment gateways, staff operations
+- `vendor\bin\pint --test`: passed.
+- `php artisan test`: passed with 117 tests / 702 assertions.
+- `npm run build`: passed with the existing classified Nuxt/Nitro/Node warnings.
+
 ## New Session Startup Prompt
 
 ```text

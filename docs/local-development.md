@@ -59,7 +59,7 @@ Run migrations and seeders:
 php artisan migrate:fresh --seed
 ```
 
-For a fuller local browser demo across exams, marks, finance, staff operations, reports, calendar, and documents, run:
+For the full five-year local browser demo across academics, people, exams, marks, finance, payroll, promotions, reports, calendar, and documents, run:
 
 ```bash
 php artisan db:seed --class=DemoDataSeeder --force

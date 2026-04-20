@@ -1037,6 +1037,23 @@ Environment note:
 - Laravel Herd is the working local API path for this machine: `https://school-api.test/api`.
 - In this shell, `php artisan serve` could not bind to tested local ports, so browser testing used Herd.
 
+Current checkpoint: five-year demo data and dashboard QA.
+
+Latest changes:
+
+- Expanded `apps/api/database/seeders/DemoDataSeeder.php` into a deterministic 2022-2026 school simulation.
+- Rebuilt `apps/web/app/pages/dashboard.vue` into a grouped command-center dashboard with live dashboard-summary KPIs and cleaner module navigation.
+- Saved final browser evidence at `docs/browser-checks/dashboard-after-five-year-loaded.png`.
+
+Latest verification:
+
+- `php artisan db:seed --class=DemoDataSeeder --force`: passed against local MySQL/Herd.
+- Data spot check after seeding: 5 academic years, 5 classes, 50 students, 241 enrollments, 4,322 student attendance records, 8 employees, 10 exams, 4,801 marks, 1,561 invoices, 416 salary records, and 96 promotion records.
+- Agent-browser route smoke loaded all current school workspace routes without visible error copy.
+- `vendor\bin\pint --test`: passed.
+- `php artisan test`: passed with 117 tests / 702 assertions.
+- `npm run build`: passed with the existing classified Nuxt/Nitro/Node warnings.
+
 ## Recommended First Prompt For A New Session
 
 ```text

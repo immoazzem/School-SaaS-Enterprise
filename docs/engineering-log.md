@@ -1039,3 +1039,11 @@ Scope: added `apps/api/database/seeders/DemoDataSeeder.php` so full local browse
 Verification: `php artisan db:seed --class=DemoDataSeeder --force` passed against local MySQL/Herd; agent-browser logged into Nuxt at `http://127.0.0.1:3000` using Herd API `https://school-api.test/api`, smoke-tested every school workspace route, fixed the demo data gaps that left sections/groups/class-subjects/exams/marks/finance/staff/reports/calendar/documents underpopulated, and saved `docs/browser-checks/demo-data-reports.png`. `vendor\bin\pint --test` passed; full `php artisan test` passed with 117 tests / 702 assertions; `npm run build` passed with the known classified Nuxt/Nitro/Node warnings.
 
 Local note: PHP's built-in `artisan serve` could not bind to local ports from this shell, so browser/API verification used Laravel Herd at `https://school-api.test`.
+
+### Five-Year Demo Data And Dashboard QA Checkpoint
+
+Scope: expanded `DemoDataSeeder` into a deterministic five-year school simulation for 2022-2026 and rebuilt `apps/web/app/pages/dashboard.vue` into a grouped command-center layout. The dashboard now uses the live `/dashboard/summary` API for KPIs, collection trends, attention counts, and grouped module navigation instead of a long flat setup menu.
+
+Demo data volume after seeding: 5 academic years, 5 classes, 50 students, 241 enrollments, 4,322 student attendance records, 8 employees, 961 staff attendance records, 51 assignments, 10 exams, 101 schedules, 4,801 marks, 481 result summaries, 1,561 invoices, 1,524 payments, 416 salary records, 40 leave applications, 96 promotion records, 21 calendar events, and 6 documents.
+
+Verification: `php artisan db:seed --class=DemoDataSeeder --force` passed; agent-browser verified the loaded dashboard and saved `docs/browser-checks/dashboard-after-five-year-loaded.png`; agent-browser route smoke loaded every current school workspace route without visible error copy; `vendor\bin\pint --test` passed; `php artisan test` passed with 117 tests / 702 assertions; `npm run build` passed with the existing classified Nuxt/Nitro/Node warnings.
