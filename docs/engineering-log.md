@@ -967,3 +967,20 @@ Verification: `npm run build` from `apps/web` passed and generated `sw.js`; `npm
 Phase 7E status: PWA and offline draft foundation is complete. Full automatic queued write replay remains planned because it needs conflict handling, auth expiry behavior, and user-visible sync recovery before it is safe.
 
 Next: commit and push this Phase 7E foundation checkpoint, then continue with queued sync or the next v3 priority.
+
+### Phase 7E IndexedDB Offline Queue Foundation
+
+Current page/module complete: Phase 7E queued offline sync foundation, routes `/schools/{schoolId}/attendance` and `/schools/{schoolId}/marks`.
+
+Scope: implemented the first durable offline write queue:
+- added `apps/web/app/composables/useOfflineQueue.ts` backed by IndexedDB.
+- added `apps/web/app/components/OfflineQueuePanel.vue`.
+- wired Attendance offline saves into queued `POST /schools/{school}/student-attendance-records` requests.
+- wired Marks offline saves into queued `POST /schools/{school}/marks-entries` requests.
+- added manual "Sync now" replay and automatic replay when the browser returns online.
+- retained failed/conflicted records for review instead of silently discarding them.
+- updated Phase 7E docs to distinguish implemented queue behavior from remaining conflict-review hardening.
+
+Verification: `npm run build` passed from `apps/web`. Browser smoke used Nuxt at `http://127.0.0.1:3000` and API at `http://127.0.0.1:8030/api`; agent-browser verified an Attendance queued record while offline, saved `docs/browser-checks/offline-attendance-queue.png`, returned online, synced successfully, and confirmed IndexedDB queue records were empty afterward. Marks route loaded with queue integration present, but full marks sync was not smoke-tested because the current seeded browser school has no exam/class-subject options.
+
+Phase 7E status: PWA/offline foundation plus first queued write replay foundation are complete. Remaining work: conflict resolution UI, `401` login-expiry stop flow, service worker update documentation, and queue-focused automated tests.

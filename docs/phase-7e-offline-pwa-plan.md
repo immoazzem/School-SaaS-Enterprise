@@ -2,7 +2,7 @@
 
 **Last updated:** April 20, 2026  
 **Active plan:** `docs/enterprise-plan-v3.md`  
-**Current status:** Foundation slice implemented; full sync queue remains planned.
+**Current status:** PWA foundation and first IndexedDB queue slice implemented; richer conflict review remains planned.
 
 ## Scope
 
@@ -11,7 +11,7 @@ Phase 7E exists for schools with unreliable connectivity. The first slice keeps 
 - Attendance
 - Marks entry
 
-This does not yet implement automatic queued write replay. That needs conflict handling, permission expiry handling, and user-visible sync review before it is safe for production.
+This now includes visible queued write replay for Attendance and Marks. The next hardening slice should improve conflict resolution, permission expiry handling, and user-visible recovery for failed records.
 
 ## Implemented Foundation
 
@@ -25,13 +25,20 @@ This does not yet implement automatic queued write replay. That needs conflict h
 - Attendance form can save, restore, and clear a local draft.
 - Marks form can save, restore, and clear a local draft.
 - Attendance and Marks save actions preserve a draft instead of attempting API writes while offline.
+- Shared `useOfflineQueue()` composable backed by IndexedDB.
+- Shared `OfflineQueuePanel` component for queued, failed, and conflicted records.
+- Attendance offline submissions are queued with endpoint, method, payload, attempts, and status metadata.
+- Marks offline submissions are queued with endpoint, method, payload, attempts, and status metadata.
+- Queues replay manually through "Sync now" and automatically when the browser returns online.
+- Synced records are removed from IndexedDB; duplicate or validation failures stay visible as `conflict`.
+- Failed network/API records stay visible as `failed` rather than being silently discarded.
 
-## Queue Design For Next Slice
+## Implemented Queue Design
 
-The next implementation should move from drafts to a real write queue:
+The current queue implementation:
 
-- Use IndexedDB rather than `localStorage` for durable queued writes.
-- Store queue entries with:
+- uses IndexedDB rather than `localStorage` for durable queued writes.
+- stores queue entries with:
   - generated client UUID.
   - school id.
   - endpoint path.
@@ -40,14 +47,15 @@ The next implementation should move from drafts to a real write queue:
   - created timestamp.
   - last attempt timestamp.
   - attempt count.
-  - sync status: `draft`, `queued`, `syncing`, `synced`, `conflict`, `failed`.
-- Replay only when:
-  - browser is online.
-  - auth token exists.
-  - selected school has the required permission.
+  - sync status: `pending`, `syncing`, `conflict`, `failed`.
+
+## Queue Hardening For Next Slice
+
 - Stop replay and ask for login when the API returns `401`.
 - Mark entries as conflict when the API returns `409` or validation errors caused by duplicate attendance/marks records.
 - Show a sync review drawer before deleting local failed/conflicted records.
+- Add richer local-vs-server comparison views for attendance and marks conflicts.
+- Add tests around IndexedDB queue helpers where the Nuxt test harness is in place.
 
 ## Conflict Rules
 
@@ -63,9 +71,9 @@ The next implementation should move from drafts to a real write queue:
 
 ## Acceptance Criteria For Full Phase 7E
 
-- Offline attendance and marks submissions enter a visible queue.
-- Queue survives reload and browser restart.
-- Queue replays when the connection returns.
+- Offline attendance and marks submissions enter a visible queue. Implemented.
+- Queue survives reload and browser restart. Implemented through IndexedDB.
+- Queue replays when the connection returns. Implemented for non-conflicting records.
 - Conflicts are visible and resolvable by a permitted user.
-- Failed sync records are never silently discarded.
+- Failed sync records are never silently discarded. Implemented.
 - Service worker update flow is documented for self-hosted deployments.

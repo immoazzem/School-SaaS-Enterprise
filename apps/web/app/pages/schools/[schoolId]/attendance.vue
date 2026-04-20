@@ -19,6 +19,7 @@ interface AttendanceDraft {
 const api = useApi()
 const route = useRoute()
 const { isOnline } = useNetworkStatus()
+const offlineQueue = useOfflineQueue('attendance')
 
 const records = ref<StudentAttendanceRecord[]>([])
 const enrollments = ref<StudentEnrollment[]>([])
@@ -60,6 +61,9 @@ const form = reactive({
 const schoolId = computed(() => Number(route.params.schoolId))
 const attendanceDraft = useOfflineDraft<AttendanceDraft>(
   computed(() => `school-saas:offline:attendance:${schoolId.value}`),
+)
+const attendanceQueueEntries = computed(() =>
+  offlineQueue.entries.value.filter((entry) => entry.schoolId === schoolId.value),
 )
 
 const attendanceSummary = computed(() => {
@@ -171,6 +175,43 @@ function clearDraft() {
   success.value = 'Local attendance draft cleared.'
 }
 
+function attendanceQueueLabel(payload: { student_enrollment_id: number, attendance_date: string }) {
+  const enrollment = enrollments.value.find((item) => item.id === payload.student_enrollment_id)
+
+  return `Attendance / ${enrollment?.student?.full_name || `Enrollment ${payload.student_enrollment_id}`} / ${payload.attendance_date}`
+}
+
+async function queueAttendance(payload: { student_enrollment_id: number, attendance_date: string, status: StudentAttendanceRecord['status'], remarks: string | null }) {
+  await offlineQueue.enqueue({
+    schoolId: schoolId.value,
+    label: attendanceQueueLabel(payload),
+    method: 'POST',
+    path: `/schools/${schoolId.value}/student-attendance-records`,
+    payload,
+  })
+  attendanceDraft.clear()
+}
+
+async function syncAttendanceQueue() {
+  if (!isOnline.value) {
+    success.value = 'The attendance queue will sync when the connection returns.'
+
+    return
+  }
+
+  await offlineQueue.syncEntries(
+    (entry) => entry.schoolId === schoolId.value,
+    async (entry) => {
+      await api.request(entry.path, {
+        method: entry.method,
+        body: entry.payload,
+      })
+    },
+  )
+  success.value = 'Attendance queue synced.'
+  await loadRecords()
+}
+
 function editRecord(record: StudentAttendanceRecord) {
   editingId.value = record.id
   form.student_enrollment_id = String(record.student_enrollment_id)
@@ -193,8 +234,9 @@ async function saveRecord() {
 
   try {
     if (!isOnline.value) {
-      attendanceDraft.save(draftPayload())
-      success.value = 'Offline attendance draft saved. Submit it when the connection returns.'
+      await queueAttendance(payload)
+      success.value = 'Offline attendance queued. It will sync when the connection returns.'
+      resetForm()
 
       return
     }
@@ -235,6 +277,12 @@ async function deleteRecord(record: StudentAttendanceRecord) {
   await loadRecords()
 }
 
+watch(isOnline, (online) => {
+  if (online && attendanceQueueEntries.value.length) {
+    syncAttendanceQueue()
+  }
+})
+
 watch(selectedDate, (value) => {
   if (!editingId.value) {
     form.attendance_date = value
@@ -243,6 +291,7 @@ watch(selectedDate, (value) => {
 
 onMounted(() => {
   restoreDraft()
+  offlineQueue.refresh()
   loadWorkspace()
 })
 </script>
@@ -286,6 +335,13 @@ onMounted(() => {
           Clear draft
         </button>
       </OfflineNotice>
+
+      <OfflineQueuePanel
+        :entries="attendanceQueueEntries"
+        :syncing="offlineQueue.syncing.value"
+        @discard="offlineQueue.remove"
+        @sync="syncAttendanceQueue"
+      />
 
       <section class="summary-grid">
         <article>

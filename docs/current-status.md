@@ -572,6 +572,24 @@ Local server note: Herd Desktop was not running in this Codex shell, so the brow
 Git status: Phase 6 Promotion workflow UI checkpoint is ready to commit and push.
 Next page/module: Phase 6 promotion hardening for large batches/job dispatch, lifecycle guardrails, and fuller browser execution demo data.
 
+### Phase 7E IndexedDB Offline Queue Foundation
+
+Current page/module complete: Phase 7E queued offline sync foundation, routes `/schools/{schoolId}/attendance` and `/schools/{schoolId}/marks`.
+
+Scope: extended the PWA/offline slice from local drafts into a visible IndexedDB-backed write queue:
+- added `useOfflineQueue()` for durable queued writes with status, attempts, timestamps, endpoint, method, and payload metadata.
+- added `OfflineQueuePanel` for pending, failed, and conflicted local records.
+- Attendance now queues offline submissions and can replay them manually or when the browser returns online.
+- Marks now queues offline submissions and can replay them manually or when the browser returns online.
+- successful sync removes queue records; validation/duplicate failures remain visible as conflicts; other sync errors remain visible as failed records.
+- updated `docs/phase-7e-offline-pwa-plan.md` from planned queue design to implemented queue foundation plus remaining hardening.
+
+Verification: `npm run build` from `apps/web` passed with the existing classified Nuxt/Nitro/Node warnings. Browser smoke used API `http://127.0.0.1:8030/api` and web `http://127.0.0.1:3000`; agent-browser opened `/schools/1/attendance`, queued an offline attendance record for `Assignment Demo Student` on `2026-04-21`, saved `docs/browser-checks/offline-attendance-queue.png`, returned online, synced the queue, and confirmed IndexedDB queue records were cleared. The Marks page loaded with queue wiring present; the current seeded school has no exam/class-subject options for a complete marks submission smoke test.
+
+Phase 7E status: PWA, offline drafts, and first queued write replay foundation are complete for Attendance and Marks. Remaining Phase 7E hardening: login-expiry stop flow, richer local-vs-server conflict review, service worker update deployment notes, and automated queue tests.
+
+Next page/module: continue Phase 7E hardening or move to the next `enterprise-plan-v3.md` priority after checkpointing this queue foundation.
+
 ## New Session Startup Prompt
 
 ```text

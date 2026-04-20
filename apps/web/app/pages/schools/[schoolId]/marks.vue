@@ -22,6 +22,7 @@ interface MarksDraft {
 const api = useApi()
 const route = useRoute()
 const { isOnline } = useNetworkStatus()
+const offlineQueue = useOfflineQueue('marks')
 const schoolId = computed(() => Number(route.params.schoolId))
 
 const exams = ref<Exam[]>([])
@@ -37,6 +38,9 @@ const error = ref('')
 const success = ref('')
 const marksDraft = useOfflineDraft<MarksDraft>(
   computed(() => `school-saas:offline:marks:${schoolId.value}`),
+)
+const marksQueueEntries = computed(() =>
+  offlineQueue.entries.value.filter((entry) => entry.schoolId === schoolId.value),
 )
 
 const markForm = reactive({
@@ -150,30 +154,81 @@ function clearMarksDraft() {
   success.value = 'Local marks draft cleared.'
 }
 
+function markQueueLabel(payload: { exam_id: number, class_subject_id: number, student_enrollment_id: number }) {
+  const enrollment = enrollments.value.find((item) => item.id === payload.student_enrollment_id)
+  const exam = exams.value.find((item) => item.id === payload.exam_id)
+  const classSubject = classSubjects.value.find((item) => item.id === payload.class_subject_id)
+  const subjectName = classSubject?.subject?.name || `Subject ${payload.class_subject_id}`
+
+  return `Marks / ${enrollment?.student?.full_name || `Enrollment ${payload.student_enrollment_id}`} / ${exam?.name || `Exam ${payload.exam_id}`} / ${subjectName}`
+}
+
+async function queueMark(payload: {
+  exam_id: number
+  class_subject_id: number
+  student_enrollment_id: number
+  marks_obtained: number | null
+  is_absent: boolean
+  absent_reason: string | null
+  remarks: string | null
+}) {
+  await offlineQueue.enqueue({
+    schoolId: schoolId.value,
+    label: markQueueLabel(payload),
+    method: 'POST',
+    path: `/schools/${schoolId.value}/marks-entries`,
+    payload,
+  })
+  marksDraft.clear()
+}
+
+async function syncMarksQueue() {
+  if (!isOnline.value) {
+    success.value = 'The marks queue will sync when the connection returns.'
+
+    return
+  }
+
+  await offlineQueue.syncEntries(
+    (entry) => entry.schoolId === schoolId.value,
+    async (entry) => {
+      await api.request(entry.path, {
+        method: entry.method,
+        body: entry.payload,
+      })
+    },
+  )
+  success.value = 'Marks queue synced.'
+  await loadWorkspace()
+}
+
 async function saveMark() {
   savingMark.value = true
   error.value = ''
   success.value = ''
 
+  const payload = {
+    exam_id: Number(markForm.exam_id),
+    class_subject_id: Number(markForm.class_subject_id),
+    student_enrollment_id: Number(markForm.student_enrollment_id),
+    marks_obtained: markForm.is_absent || markForm.marks_obtained === '' ? null : Number(markForm.marks_obtained),
+    is_absent: markForm.is_absent,
+    absent_reason: markForm.is_absent ? markForm.absent_reason || null : null,
+    remarks: markForm.remarks || null,
+  }
+
   try {
     if (!isOnline.value) {
-      marksDraft.save(marksDraftPayload())
-      success.value = 'Offline marks draft saved. Submit it when the connection returns.'
+      await queueMark(payload)
+      success.value = 'Offline marks entry queued. It will sync when the connection returns.'
+      resetMarkForm()
 
       return
     }
 
     await api.request<ItemResponse<MarksEntry>>(`/schools/${schoolId.value}/marks-entries`, {
       method: 'POST',
-      body: {
-        exam_id: Number(markForm.exam_id),
-        class_subject_id: Number(markForm.class_subject_id),
-        student_enrollment_id: Number(markForm.student_enrollment_id),
-        marks_obtained: markForm.is_absent || markForm.marks_obtained === '' ? null : Number(markForm.marks_obtained),
-        is_absent: markForm.is_absent,
-        absent_reason: markForm.is_absent ? markForm.absent_reason || null : null,
-        remarks: markForm.remarks || null,
-      },
+      body: payload,
     })
     success.value = 'Marks entry saved.'
     marksDraft.clear()
@@ -234,8 +289,15 @@ async function verifyEntry(entry: MarksEntry, status: 'verified' | 'rejected') {
   }
 }
 
+watch(isOnline, (online) => {
+  if (online && marksQueueEntries.value.length) {
+    syncMarksQueue()
+  }
+})
+
 onMounted(() => {
   restoreMarksDraft()
+  offlineQueue.refresh()
   loadWorkspace()
 })
 </script>
@@ -279,6 +341,13 @@ onMounted(() => {
           Clear draft
         </button>
       </OfflineNotice>
+
+      <OfflineQueuePanel
+        :entries="marksQueueEntries"
+        :syncing="offlineQueue.syncing.value"
+        @discard="offlineQueue.remove"
+        @sync="syncMarksQueue"
+      />
 
       <section class="summary-grid">
         <article class="surface summary-item">

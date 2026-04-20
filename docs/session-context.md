@@ -935,6 +935,30 @@ Next page/module:
 
 - Phase 6 production hardening for large promotion batches/job dispatch, lifecycle guardrails, and richer seeded/demo data for full browser execution checks.
 
+Current page/module complete: Phase 7E queued offline sync foundation.
+
+Latest Phase 7E status:
+
+- PWA install/service-worker/offline draft foundation is already complete.
+- Added durable IndexedDB queue support through `apps/web/app/composables/useOfflineQueue.ts`.
+- Added visible queue review/sync UI through `apps/web/app/components/OfflineQueuePanel.vue`.
+- Attendance offline submissions now queue locally, replay on "Sync now" or when online, and remove themselves after successful sync.
+- Marks offline submissions now use the same queue foundation.
+- Queue records keep school id, label, method, endpoint path, payload, status, attempts, timestamps, and sync errors.
+- Failed and conflicted queue records remain visible; they are not silently deleted.
+- `docs/phase-7e-offline-pwa-plan.md` now tracks implemented queue behavior plus remaining hardening.
+
+Latest verification:
+
+- `npm run build` from `apps/web` passed with the known classified Nuxt/Nitro/Node warnings.
+- Browser used `http://127.0.0.1:3000` for Nuxt and `http://127.0.0.1:8030/api` for Laravel.
+- Agent-browser queued Attendance offline for `Assignment Demo Student` on `2026-04-21`, saved `docs/browser-checks/offline-attendance-queue.png`, returned online, synced, and confirmed IndexedDB queue records were empty.
+- Marks route loaded with queue integration present; complete marks sync was not smoke-tested because the current seeded school has no exam/class-subject options in that page.
+
+Next page/module:
+
+- Commit and push the Phase 7E queue foundation checkpoint, then continue Phase 7E hardening: conflict review UI, auth-expiry stop flow, service worker update docs, and queue tests.
+
 ## Recommended First Prompt For A New Session
 
 ```text
