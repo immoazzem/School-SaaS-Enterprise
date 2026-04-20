@@ -631,6 +631,33 @@ Last verified checkpoint before handoff:
 
 Next frontend/design owner: Antigravity.
 
+### Demo Data Verification Checkpoint
+
+Current page/module complete: full local demo-data smoke foundation and live browser audit.
+
+Scope:
+- Added `apps/api/database/seeders/DemoDataSeeder.php`.
+- The seeder is idempotent and fills the local demo tenant with active records for academic setup, sections, groups, shifts, class subjects, employee/teacher profile, student/enrollment, attendance, timetable, assignments, exams/schedules, verified marks, grade scale, finance, payment gateway, salary, staff attendance, leave, calendar, documents, and report summaries.
+- Updated `docs/local-development.md` with the demo seeder command.
+
+Verification:
+- `php artisan db:seed --class=DemoDataSeeder --force`: passed against local MySQL/Herd.
+- Live API login passed at `https://school-api.test/api/v1/auth/login` with `test@example.com` / `password`.
+- Agent-browser logged into `http://127.0.0.1:3000` and smoke-tested every Nuxt page under the demo school:
+  - dashboard
+  - academic classes, sections, years, subjects, class subjects, groups, shifts
+  - timetable, assignments, students, enrollments, teacher profiles, attendance
+  - exams, marks, designations, employees, finance, payment gateways, staff operations
+  - reports, promotions, calendar, documents
+- Empty-module gaps found in the first smoke were fixed by demo data; re-smoke confirmed records render in the data-dependent modules.
+- Screenshot saved: `docs/browser-checks/demo-data-reports.png`.
+- `vendor\bin\pint --test`: passed.
+- `php artisan test`: passed with 117 tests / 702 assertions.
+- `npm run build` from `apps/web`: passed with the existing classified Nuxt/Nitro/Node warnings.
+
+Known environment note:
+- `php artisan serve` could not bind to tested local ports in this shell, but Laravel Herd served the API correctly at `https://school-api.test`.
+
 ## New Session Startup Prompt
 
 ```text

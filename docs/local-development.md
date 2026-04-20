@@ -59,6 +59,12 @@ Run migrations and seeders:
 php artisan migrate:fresh --seed
 ```
 
+For a fuller local browser demo across exams, marks, finance, staff operations, reports, calendar, and documents, run:
+
+```bash
+php artisan db:seed --class=DemoDataSeeder --force
+```
+
 ## Herd Setup
 
 The API app folder is:
@@ -156,4 +162,3 @@ Frontend:
 cd D:\Development\School-SaaS-Enterprise\apps\web
 npm run build
 ```
-

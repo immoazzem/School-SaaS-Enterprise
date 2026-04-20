@@ -1013,6 +1013,30 @@ Next Codex resume options:
 - Continue Phase 7E remaining hardening.
 - Continue the next `enterprise-plan-v3.md` priority.
 
+Current checkpoint: demo-data browser verification.
+
+Latest changes:
+
+- Added `apps/api/database/seeders/DemoDataSeeder.php`.
+- Added local dev docs for running `php artisan db:seed --class=DemoDataSeeder --force`.
+- Demo data now covers the local school across academic setup, people, attendance, timetable, assignments, exams, marks, finance, payment gateways, staff operations, reports, calendar, and documents.
+
+Latest verification:
+
+- `php artisan db:seed --class=DemoDataSeeder --force`: passed.
+- Live API login through Herd passed at `https://school-api.test/api/v1/auth/login`.
+- Agent-browser logged into `http://127.0.0.1:3000` and smoke-tested all current school workspace routes.
+- Re-smoke confirmed the data-dependent modules render populated demo records after adding the seeder.
+- Screenshot saved at `docs/browser-checks/demo-data-reports.png`.
+- `vendor\bin\pint --test`: passed.
+- `php artisan test`: passed with 117 tests / 702 assertions.
+- `npm run build`: passed with the existing classified Nuxt/Nitro/Node warnings.
+
+Environment note:
+
+- Laravel Herd is the working local API path for this machine: `https://school-api.test/api`.
+- In this shell, `php artisan serve` could not bind to tested local ports, so browser testing used Herd.
+
 ## Recommended First Prompt For A New Session
 
 ```text

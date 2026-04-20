@@ -1031,3 +1031,11 @@ Latest verification inherited by this handoff:
 - `npm run build` passed.
 - `npm audit --audit-level=high` returned `found 0 vulnerabilities`.
 - Browser queue conflict smoke passed on Attendance.
+
+### Demo Data Verification Checkpoint
+
+Scope: added `apps/api/database/seeders/DemoDataSeeder.php` so full local browser checks can run from repeatable data instead of hand-created fragments. The seeder creates or updates the demo school, owner membership, academic year/class/section/group/shift/subject/class-subject, employee/teacher, student/enrollment, attendance, timetable, assignment/submission, exam type/exam/schedule, verified marks, grade scale/result summary, fee category/structure, paid invoice/payment, payment gateway config, salary, employee attendance, leave setup/application, calendar event, and public demo document.
+
+Verification: `php artisan db:seed --class=DemoDataSeeder --force` passed against local MySQL/Herd; agent-browser logged into Nuxt at `http://127.0.0.1:3000` using Herd API `https://school-api.test/api`, smoke-tested every school workspace route, fixed the demo data gaps that left sections/groups/class-subjects/exams/marks/finance/staff/reports/calendar/documents underpopulated, and saved `docs/browser-checks/demo-data-reports.png`. `vendor\bin\pint --test` passed; full `php artisan test` passed with 117 tests / 702 assertions; `npm run build` passed with the known classified Nuxt/Nitro/Node warnings.
+
+Local note: PHP's built-in `artisan serve` could not bind to local ports from this shell, so browser/API verification used Laravel Herd at `https://school-api.test`.
