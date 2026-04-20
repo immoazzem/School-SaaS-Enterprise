@@ -982,6 +982,37 @@ Next immediate steps:
 - Commit and push the Phase 7E queue failure/auth hardening checkpoint.
 - Continue Phase 7E with one-click sign-in-again path, richer conflict review UI, service worker update docs, or queue tests.
 
+Current checkpoint: frontend dashboard/design handoff to Antigravity.
+
+Handoff status:
+
+- Codex product work is paused after Phase 7E queue failure/auth hardening.
+- Latest pushed code checkpoint before handoff: `f95a4bd`.
+- Antigravity will now work on frontend design and dashboard refinement.
+
+Important frontend files for Antigravity:
+
+- Dashboard: `apps/web/app/pages/dashboard.vue`.
+- Shared CSS/theme entry: `apps/web/app/assets/css/main.css`.
+- Typed API client: `apps/web/app/composables/useApi.ts`.
+- Auth facade/store: `apps/web/app/composables/useAuth.ts`, `apps/web/app/stores/auth.ts`.
+- Offline queue: `apps/web/app/composables/useOfflineQueue.ts`, `apps/web/app/components/OfflineQueuePanel.vue`.
+- Queue-enabled pages: `apps/web/app/pages/schools/[schoolId]/attendance.vue`, `apps/web/app/pages/schools/[schoolId]/marks.vue`.
+- Theme reference: `D:\Development\tailwindui-radiant\radiant-ts`.
+
+Design handoff guardrails:
+
+- Keep `NUXT_PUBLIC_API_BASE` at `/api`; `useApi()` appends `/v1`.
+- Preserve bearer token and `Accept-Language` headers in `useApi()`.
+- Preserve visible offline queue behavior. Failed, conflicted, and auth-required records must remain visible and must not be silently discarded.
+- Keep route paths stable unless backend/API docs are updated.
+
+Next Codex resume options:
+
+- Review Antigravity frontend/dashboard changes.
+- Continue Phase 7E remaining hardening.
+- Continue the next `enterprise-plan-v3.md` priority.
+
 ## Recommended First Prompt For A New Session
 
 ```text

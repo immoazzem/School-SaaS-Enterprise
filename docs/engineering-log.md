@@ -999,3 +999,35 @@ Scope: improved queue replay safety and user feedback:
 Verification: `npm run build` from `apps/web` passed with the known classified Nuxt/Nitro/Node warnings. Browser smoke used API `http://127.0.0.1:8030/api` and web `http://127.0.0.1:3000`; agent-browser queued a duplicate offline Attendance record for `Assignment Demo Student` on `2026-04-20`, synced online, confirmed the queue retained it as `conflict` with one attempt and the API error message, confirmed the page showed the needs-review summary without stale success copy, and saved `docs/browser-checks/offline-attendance-conflict.png`.
 
 Phase 7E status: queue replay now handles success, failed, conflict, and auth-required outcomes with visible retained records. Remaining work: one-click sign-in-again path, richer conflict review UI, service worker update docs, and automated queue tests.
+
+### Frontend Design Handoff Checkpoint
+
+Current checkpoint: frontend dashboard/design handoff to Antigravity.
+
+Status:
+- Codex work is paused after Phase 7E queue failure/auth hardening.
+- Latest pushed checkpoint before this handoff is `f95a4bd`.
+- Antigravity will take over frontend visual design and dashboard refinement.
+
+Handoff notes:
+- Main dashboard file: `apps/web/app/pages/dashboard.vue`.
+- Shared CSS/theme entry: `apps/web/app/assets/css/main.css`.
+- API client and typed contracts: `apps/web/app/composables/useApi.ts`.
+- Auth state and bearer token path: `apps/web/app/composables/useAuth.ts` and `apps/web/app/stores/auth.ts`.
+- Offline queue surfaces to preserve during redesign:
+  - `apps/web/app/composables/useOfflineQueue.ts`
+  - `apps/web/app/components/OfflineQueuePanel.vue`
+  - `apps/web/app/pages/schools/[schoolId]/attendance.vue`
+  - `apps/web/app/pages/schools/[schoolId]/marks.vue`
+- Theme reference: `D:\Development\tailwindui-radiant\radiant-ts`.
+
+Guardrails:
+- Keep `NUXT_PUBLIC_API_BASE` at the `/api` level; `useApi()` appends `/v1`.
+- Do not hide or silently delete failed, conflicted, or auth-required offline queue records.
+- Keep `Accept-Language` and bearer token headers in `useApi()`.
+- Keep route names/paths stable unless the backend/API docs are updated with the change.
+
+Latest verification inherited by this handoff:
+- `npm run build` passed.
+- `npm audit --audit-level=high` returned `found 0 vulnerabilities`.
+- Browser queue conflict smoke passed on Attendance.

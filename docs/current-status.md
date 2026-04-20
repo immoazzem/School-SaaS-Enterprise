@@ -605,6 +605,32 @@ Verification: `npm run build` from `apps/web` passed with the existing classifie
 
 Phase 7E remaining hardening: one-click sign-in-again path from queue records, richer conflict review UI, service worker update deployment notes, and queue-focused automated tests.
 
+### Frontend Design Handoff Checkpoint
+
+Current checkpoint: frontend dashboard/design handoff to Antigravity.
+
+Scope:
+- Codex backend/product work is paused after Phase 7E queue failure/auth hardening.
+- The current Nuxt frontend has working routes, API wiring, Radiant-inspired styling, PWA/offline support, i18n foundation, and many school workspaces.
+- Antigravity will now take over frontend design and dashboard refinement.
+- Preserve existing API contracts in `apps/web/app/composables/useApi.ts` unless a coordinated backend change is made.
+- Preserve auth/session behavior through `useAuth()`, Pinia auth store, and `useApi()` bearer token injection.
+- Preserve the Phase 7E queue behavior in Attendance and Marks while redesigning UI surfaces:
+  - queued writes are stored in IndexedDB.
+  - conflicts and auth-required records must remain visible.
+  - records must not be silently discarded.
+- Dashboard design entry point: `apps/web/app/pages/dashboard.vue`.
+- Shared frontend CSS entry point: `apps/web/app/assets/css/main.css`.
+- Theme reference remains `D:\Development\tailwindui-radiant\radiant-ts`.
+
+Last verified checkpoint before handoff:
+- Git commit: `f95a4bd`.
+- `npm run build` from `apps/web`: passed with known classified Nuxt/Nitro/Node warnings.
+- `npm audit --audit-level=high`: `found 0 vulnerabilities`.
+- Browser queue conflict smoke passed at `http://127.0.0.1:3000/schools/1/attendance` using API `http://127.0.0.1:8030/api`.
+
+Next frontend/design owner: Antigravity.
+
 ## New Session Startup Prompt
 
 ```text
