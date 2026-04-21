@@ -316,8 +316,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="shell">
-    <SchoolWorkspaceRail
+  <SchoolWorkspaceTemplate>
+    <template #navigation>
+      <SchoolWorkspaceRail
       :school-id="schoolId"
       aria-label="Attendance navigation"
       context-title="Attendance tools"
@@ -327,9 +328,9 @@ onMounted(() => {
         { label: 'Teachers', to: `/schools/${schoolId}/teacher-profiles` },
       ]"
     />
+    </template>
 
-    <section class="workspace">
-      <header class="workspace-header">
+    <header class="workspace-header">
         <div>
           <p class="eyebrow">Daily register</p>
           <h1>Attendance</h1>
@@ -476,8 +477,7 @@ onMounted(() => {
           </table>
         </section>
       </section>
-    </section>
-  </main>
+</SchoolWorkspaceTemplate>
 </template>
 
 

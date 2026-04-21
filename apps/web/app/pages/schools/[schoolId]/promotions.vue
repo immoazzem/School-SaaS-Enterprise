@@ -260,8 +260,9 @@ onMounted(loadOptions)
 </script>
 
 <template>
-  <main class="operation-shell">
-    <SchoolWorkspaceRail
+  <SchoolWorkspaceTemplate>
+    <template #navigation>
+      <SchoolWorkspaceRail
       :school-id="schoolId"
       aria-label="Promotion navigation"
       context-title="Promotion tools"
@@ -272,9 +273,9 @@ onMounted(loadOptions)
         { label: 'Reports', to: `/schools/${schoolId}/reports` },
       ]"
     />
+    </template>
 
-    <section class="operation-workspace">
-      <header class="workspace-header">
+    <header class="workspace-header">
         <div>
           <p class="eyebrow">Promotion</p>
           <h1>Move students into the next academic year.</h1>
@@ -466,8 +467,7 @@ onMounted(loadOptions)
 
         <p v-if="!previewRows.length && !currentBatch" class="muted">Select a year and class to preview promotion candidates.</p>
       </section>
-    </section>
-  </main>
+</SchoolWorkspaceTemplate>
 </template>
 
 

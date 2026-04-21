@@ -241,8 +241,9 @@ onMounted(loadWorkspace)
 </script>
 
 <template>
-  <main class="shell">
-    <SchoolWorkspaceRail
+  <SchoolWorkspaceTemplate>
+    <template #navigation>
+      <SchoolWorkspaceRail
       :school-id="schoolId"
       aria-label="Exam navigation"
       context-title="Exam tools"
@@ -252,9 +253,9 @@ onMounted(loadWorkspace)
         { label: 'Attendance', to: `/schools/${schoolId}/attendance` },
       ]"
     />
+    </template>
 
-    <section class="workspace">
-      <header class="workspace-header">
+    <header class="workspace-header">
         <div>
           <p class="eyebrow">Exam operations</p>
           <h1>Exams</h1>
@@ -476,8 +477,7 @@ onMounted(loadWorkspace)
           </table>
         </section>
       </section>
-    </section>
-  </main>
+</SchoolWorkspaceTemplate>
 </template>
 
 

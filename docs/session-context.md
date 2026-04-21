@@ -114,6 +114,23 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 
 ## Current Implementation Checkpoints
 
+- Latest checkpoint: compact enterprise shell refactor using Salient as the design resource.
+- Added `apps/web/app/components/SchoolWorkspaceTemplate.vue` as the shared authenticated scaffold.
+- Dashboard and all pages in `apps/web/app/pages/schools/[schoolId]` now use the shared scaffold rather than repeated shell wrappers.
+- `apps/web/app/assets/css/main.css` was rewritten toward a compact enterprise UI:
+  - tighter spacing
+  - flatter surfaces
+  - denser forms and tables
+  - calmer module tiles
+  - compact sidebar/mobile top bar
+- `apps/web/app/components/SchoolWorkspaceRail.vue` was refined so the desktop sidebar no longer overlays page content.
+- Verification after the compact-shell pass:
+  - `npm run build` passed
+  - `npm run qa:browser` passed with 10 workflow checks
+- Latest browser artifacts:
+  - `docs/browser-checks/workflow-smoke-20260421043826.png`
+- Local frontend remains available at `http://127.0.0.1:3000`.
+
 - Latest checkpoint: Antigravity frontend refresh reviewed and QA-verified.
 - Antigravity refreshed the shared shell, login page, dashboard, and many school workspaces using the blue/slate design pass.
 - The shared rail still lives at `apps/web/app/components/SchoolWorkspaceRail.vue`.

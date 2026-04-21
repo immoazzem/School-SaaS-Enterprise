@@ -317,8 +317,9 @@ onMounted(loadOptions)
 </script>
 
 <template>
-  <main class="operation-shell">
-    <SchoolWorkspaceRail
+  <SchoolWorkspaceTemplate>
+    <template #navigation>
+      <SchoolWorkspaceRail
       :school-id="schoolId"
       aria-label="Assignments navigation"
       context-title="Assignment tools"
@@ -330,9 +331,9 @@ onMounted(loadOptions)
         { label: 'Reports', to: `/schools/${schoolId}/reports` },
       ]"
     />
+    </template>
 
-    <section class="operation-workspace">
-      <header class="workspace-header">
+    <header class="workspace-header">
         <div>
           <p class="eyebrow">Assignments</p>
           <h1>Track homework from issue to grading.</h1>
@@ -617,8 +618,7 @@ onMounted(loadOptions)
           </div>
         </section>
       </section>
-    </section>
-  </main>
+</SchoolWorkspaceTemplate>
 </template>
 
 

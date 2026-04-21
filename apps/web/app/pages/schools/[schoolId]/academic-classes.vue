@@ -83,8 +83,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="operation-shell">
-    <SchoolWorkspaceRail
+  <SchoolWorkspaceTemplate>
+    <template #navigation>
+      <SchoolWorkspaceRail
       :school-id="schoolId"
       aria-label="Academic classes navigation"
       context-title="Academics setup"
@@ -95,9 +96,9 @@ onMounted(async () => {
         { label: 'Class Subjects', to: `/schools/${schoolId}/class-subjects` },
       ]"
     />
+    </template>
 
-    <section class="operation-workspace">
-      <header class="workspace-header">
+    <header class="workspace-header">
         <div>
           <p class="eyebrow">Academics</p>
           <h1>Academic Classes</h1>
@@ -181,8 +182,7 @@ onMounted(async () => {
           </div>
         </section>
       </section>
-    </section>
-  </main>
+</SchoolWorkspaceTemplate>
 </template>
 
 

@@ -242,8 +242,9 @@ watch(locale, async () => {
 </script>
 
 <template>
-  <main class="operation-shell">
-    <SchoolWorkspaceRail
+  <SchoolWorkspaceTemplate>
+    <template #navigation>
+      <SchoolWorkspaceRail
       :school-id="schoolId"
       aria-label="Employees navigation"
       context-title="People setup"
@@ -254,9 +255,9 @@ watch(locale, async () => {
         { label: 'Teacher Profiles', to: `/schools/${schoolId}/teacher-profiles` },
       ]"
     />
+    </template>
 
-    <section class="operation-workspace">
-      <header class="workspace-header">
+    <header class="workspace-header">
         <div>
           <p class="eyebrow">People</p>
           <h1>{{ $t('employees.title') }}</h1>
@@ -475,8 +476,7 @@ watch(locale, async () => {
           </div>
         </section>
       </section>
-    </section>
-  </main>
+</SchoolWorkspaceTemplate>
 </template>
 
 

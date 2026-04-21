@@ -223,8 +223,9 @@ onMounted(loadWorkspace)
 </script>
 
 <template>
-  <main class="operation-shell">
-    <SchoolWorkspaceRail
+  <SchoolWorkspaceTemplate>
+    <template #navigation>
+      <SchoolWorkspaceRail
       :school-id="schoolId"
       aria-label="Reports navigation"
       context-title="Reporting tools"
@@ -236,9 +237,9 @@ onMounted(loadWorkspace)
         { label: 'Finance', to: `/schools/${schoolId}/finance` },
       ]"
     />
+    </template>
 
-    <section class="operation-workspace">
-      <header class="workspace-header">
+    <header class="workspace-header">
         <div>
           <p class="eyebrow">Reports</p>
           <h1>Publish results, review summaries, and queue official PDFs.</h1>
@@ -443,9 +444,7 @@ onMounted(loadWorkspace)
         </div>
         <p v-if="!resultSummaries.length" class="muted">No result summaries are available for this exam yet.</p>
       </section>
-    </section>
-  </main>
+</SchoolWorkspaceTemplate>
 </template>
-
 
 

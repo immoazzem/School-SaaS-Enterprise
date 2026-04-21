@@ -171,8 +171,9 @@ onMounted(loadConfigs)
 </script>
 
 <template>
-  <main class="operation-shell">
-    <SchoolWorkspaceRail
+  <SchoolWorkspaceTemplate>
+    <template #navigation>
+      <SchoolWorkspaceRail
       :school-id="schoolId"
       aria-label="Payment gateway navigation"
       context-title="Payment tools"
@@ -182,9 +183,9 @@ onMounted(loadConfigs)
         { label: 'Documents', to: `/schools/${schoolId}/documents` },
       ]"
     />
+    </template>
 
-    <section class="operation-workspace">
-      <header class="workspace-header">
+    <header class="workspace-header">
         <div>
           <p class="eyebrow">Payment gateways</p>
           <h1>Connect collection channels without exposing secrets.</h1>
@@ -298,8 +299,7 @@ onMounted(loadConfigs)
           </div>
         </section>
       </section>
-    </section>
-  </main>
+</SchoolWorkspaceTemplate>
 </template>
 
 

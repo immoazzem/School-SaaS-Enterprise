@@ -177,8 +177,9 @@ onMounted(loadWorkspace)
 </script>
 
 <template>
-  <main class="operation-shell">
-    <SchoolWorkspaceRail
+  <SchoolWorkspaceTemplate>
+    <template #navigation>
+      <SchoolWorkspaceRail
       :school-id="schoolId"
       aria-label="Calendar navigation"
       context-title="Calendar tools"
@@ -189,9 +190,9 @@ onMounted(loadWorkspace)
         { label: 'Exams', to: `/schools/${schoolId}/exams` },
       ]"
     />
+    </template>
 
-    <section class="operation-workspace">
-      <header class="workspace-header">
+    <header class="workspace-header">
         <div>
           <p class="eyebrow">Calendar</p>
           <h1>Plan holidays, exams, class events, and school operations.</h1>
@@ -359,8 +360,7 @@ onMounted(loadWorkspace)
         </div>
         <p v-if="!events.length" class="muted">No calendar events match the current filters.</p>
       </section>
-    </section>
-  </main>
+</SchoolWorkspaceTemplate>
 </template>
 
 

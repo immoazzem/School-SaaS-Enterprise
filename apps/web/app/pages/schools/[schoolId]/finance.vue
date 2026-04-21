@@ -193,8 +193,9 @@ onMounted(loadWorkspace)
 </script>
 
 <template>
-  <main class="operation-shell">
-    <SchoolWorkspaceRail
+  <SchoolWorkspaceTemplate>
+    <template #navigation>
+      <SchoolWorkspaceRail
       :school-id="schoolId"
       aria-label="Finance navigation"
       context-title="Finance tools"
@@ -205,9 +206,9 @@ onMounted(loadWorkspace)
         { label: 'Students', to: `/schools/${schoolId}/students` },
       ]"
     />
+    </template>
 
-    <section class="operation-workspace">
-      <header class="workspace-header">
+    <header class="workspace-header">
         <div>
           <p class="eyebrow">Finance</p>
           <h1>Configure fees, create invoices, and queue class billing.</h1>
@@ -416,6 +417,7 @@ onMounted(loadWorkspace)
           </table>
         </div>
       </section>
-    </section>
-  </main>
+</SchoolWorkspaceTemplate>
 </template>
+
+

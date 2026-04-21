@@ -322,8 +322,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="operation-shell">
-    <SchoolWorkspaceRail
+  <SchoolWorkspaceTemplate>
+    <template #navigation>
+      <SchoolWorkspaceRail
       :school-id="schoolId"
       aria-label="Marks navigation"
       context-title="Marks tools"
@@ -333,9 +334,9 @@ onMounted(() => {
         { label: 'Finance', to: `/schools/${schoolId}/finance` },
       ]"
     />
+    </template>
 
-    <section class="operation-workspace">
-      <header class="workspace-header">
+    <header class="workspace-header">
         <div>
           <p class="eyebrow">Marks and grades</p>
           <h1>Enter marks, verify results, and maintain grading rules.</h1>
@@ -536,8 +537,7 @@ onMounted(() => {
           </article>
         </div>
       </section>
-    </section>
-  </main>
+</SchoolWorkspaceTemplate>
 </template>
 
 

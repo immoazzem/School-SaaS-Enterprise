@@ -250,8 +250,9 @@ onMounted(loadWorkspace)
 </script>
 
 <template>
-  <main class="operation-shell">
-    <SchoolWorkspaceRail
+  <SchoolWorkspaceTemplate>
+    <template #navigation>
+      <SchoolWorkspaceRail
       :school-id="schoolId"
       aria-label="Staff operations navigation"
       context-title="Staff tools"
@@ -261,9 +262,9 @@ onMounted(loadWorkspace)
         { label: 'Student Attendance', to: `/schools/${schoolId}/attendance` },
       ]"
     />
+    </template>
 
-    <section class="operation-workspace">
-      <header class="workspace-header">
+    <header class="workspace-header">
         <div>
           <p class="eyebrow">Staff operations</p>
           <h1>Run payroll, record attendance, and approve leave.</h1>
@@ -523,6 +524,7 @@ onMounted(loadWorkspace)
           </table>
         </div>
       </section>
-    </section>
-  </main>
+</SchoolWorkspaceTemplate>
 </template>
+
+

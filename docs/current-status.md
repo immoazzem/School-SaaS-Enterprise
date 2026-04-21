@@ -4,6 +4,25 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Production Stabilization Status
 
+Current page/module complete: Compact enterprise frontend shell refactor with Salient-informed workspace system.
+
+- Used `D:\Development\tailwindui-salient` as the visual reference for a denser, calmer enterprise shell rather than a marketing-style port.
+- Added a shared page scaffold at `apps/web/app/components/SchoolWorkspaceTemplate.vue`.
+- Migrated the dashboard and all school workspace pages to the shared scaffold so the authenticated app now uses one shell component instead of repeated `<main>/<section>` wrappers.
+- Reworked `apps/web/app/assets/css/main.css` into a compact workspace system:
+  - tighter spacing
+  - flatter surfaces
+  - denser forms and tables
+  - reduced card bloat
+  - compact sidebar and mobile top bar
+- Refined `apps/web/app/components/SchoolWorkspaceRail.vue` so desktop uses a true column layout and mobile uses the drawer cleanly without overlaying the workspace.
+- Verification after the compact-shell refactor:
+  - `npm run build` passed
+  - `npm run qa:browser` passed with 10 workflow checks
+- Latest useful browser artifacts:
+  - `docs/browser-checks/workflow-smoke-20260421043826.png`
+- Current local frontend URL: `http://127.0.0.1:3000`
+
 Current page/module complete: Antigravity frontend refresh review and QA checkpoint.
 
 - Antigravity refreshed the authenticated frontend visual system across the shared shell, dashboard, login page, and core school workspaces.

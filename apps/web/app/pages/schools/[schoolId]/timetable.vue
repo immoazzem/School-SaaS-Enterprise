@@ -246,8 +246,9 @@ onMounted(loadOptions)
 </script>
 
 <template>
-  <main class="operation-shell">
-    <SchoolWorkspaceRail
+  <SchoolWorkspaceTemplate>
+    <template #navigation>
+      <SchoolWorkspaceRail
       :school-id="schoolId"
       aria-label="Timetable navigation"
       context-title="Timetable tools"
@@ -260,9 +261,9 @@ onMounted(loadOptions)
         { label: 'Promotions', to: `/schools/${schoolId}/promotions` },
       ]"
     />
+    </template>
 
-    <section class="operation-workspace">
-      <header class="workspace-header">
+    <header class="workspace-header">
         <div>
           <p class="eyebrow">Timetable</p>
           <h1>Plan the weekly class routine.</h1>
@@ -509,8 +510,7 @@ onMounted(loadOptions)
           </table>
         </div>
       </section>
-    </section>
-  </main>
+</SchoolWorkspaceTemplate>
 </template>
 
 

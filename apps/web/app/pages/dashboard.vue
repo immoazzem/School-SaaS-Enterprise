@@ -178,26 +178,26 @@ onMounted(loadDashboard)
 </script>
 
 <template>
-  <main class="operation-shell">
-    <SchoolWorkspaceRail :school-id="selectedSchool?.id ?? null" aria-label="Main navigation" />
+  <SchoolWorkspaceTemplate content-class="pb-24">
+    <template #navigation>
+      <SchoolWorkspaceRail :school-id="selectedSchool?.id ?? null" aria-label="Main navigation" />
+    </template>
 
-    <section class="operation-workspace pb-24">
       <div class="workspace-content-inner">
-        <!-- Header -->
         <header class="workspace-header">
           <div class="flex flex-col">
             <p class="eyebrow">Command Center</p>
             <h1>{{ selectedSchool?.name || 'No tenant selected' }}</h1>
-            <p v-if="selectedSchool" class="text-slate-500 font-medium mt-1.5 flex items-center gap-2">
-              <span class="inline-block w-2h h-2 rounded-full bg-emerald-400"></span>
+            <p v-if="selectedSchool" class="mt-1.5 flex items-center gap-2 font-medium text-slate-500">
+              <span class="inline-block h-2 w-2 rounded-full bg-emerald-400" />
               {{ selectedSchool.slug }} · {{ selectedSchool.roles?.[0]?.name || 'Member' }}
             </p>
           </div>
 
-          <div class="flex flex-wrap items-center gap-3 mt-4 md:mt-0">
+          <div class="header-actions">
             <LocaleSwitcher />
-            <span v-if="auth.user?.email" class="hidden sm:inline-flex items-center px-3 py-1.5 ring-1 ring-inset ring-slate-200 rounded-full bg-white text-xs font-semibold text-slate-700 shadow-sm cursor-default">
-              <svg class="w-4 h-4 mr-1.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            <span v-if="auth.user?.email" class="hidden cursor-default items-center rounded-md bg-white px-3 py-2 text-xs font-semibold text-slate-700 ring-1 ring-inset ring-slate-300 sm:inline-flex">
+              <svg class="mr-1.5 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
               {{ auth.user?.email }}
             </span>
             <button class="button secondary compact" type="button" @click="auth.logout()">
@@ -214,27 +214,22 @@ onMounted(loadDashboard)
           Loading workspace data…
         </div>
 
-        <!-- KPI row -->
-        <section v-if="selectedSchool" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 fade-in" aria-label="School metrics">
-          <article v-for="metric in kpis" :key="metric.eyebrow" class="summary-item group">
-            <div class="absolute top-0 right-0 p-4 opacity-10 transform translate-x-2 -translate-y-2 group-hover:scale-110 transition-transform">
-              <svg class="w-20 h-20 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path opacity="0.4" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z"/><path d="M16.293 8.293a1 1 0 00-1.414 0L12 11.586l-2.879-2.879a1 1 0 10-1.414 1.414l3.586 3.586a1 1 0 001.414 0l4.293-4.293a1 1 0 000-1.414z"/></svg>
-            </div>
+        <section v-if="selectedSchool" class="summary-grid fade-in" aria-label="School metrics">
+          <article v-for="metric in kpis" :key="metric.eyebrow" class="summary-item">
             <span>{{ metric.eyebrow }}</span>
-            <div class="flex items-baseline gap-2 mt-1">
+            <div class="mt-1 flex items-baseline gap-2">
               <strong>
                 {{ metric.isRate || metric.isMoney ? metric.label : metric.value }}
               </strong>
-              <span class="!mb-0 inline-flex items-center text-xs font-bold text-emerald-700 bg-emerald-100/50 px-2 py-0.5 rounded-full">
-                <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+              <span class="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
+                <svg class="mr-0.5 h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
                 {{ metric.trend }}
               </span>
             </div>
-            <p class="text-sm text-slate-500 m-0 mt-3 font-medium">{{ metric.detail }}</p>
+            <p class="m-0 mt-2 text-sm text-slate-500">{{ metric.detail }}</p>
           </article>
         </section>
 
-        <!-- Trend + Attention -->
         <section v-if="selectedSchool" class="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-5 fade-in" style="animation-delay: 50ms;">
           <article class="surface flex flex-col gap-4 p-5 lg:p-6">
             <div class="flex items-start justify-between gap-4">
@@ -283,10 +278,9 @@ onMounted(loadDashboard)
           </article>
         </section>
 
-        <!-- Module grid grouped by section -->
         <section v-if="selectedSchool" class="flex flex-col gap-8 fade-in mt-2" style="animation-delay: 100ms;">
           <div v-for="group in groupedModules.filter(g => g.items.length)" :key="group.title" class="flex flex-col gap-3">
-            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest border-b border-slate-200 pb-2">{{ group.title }}</h3>
+            <h3 class="border-b border-slate-200 pb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">{{ group.title }}</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               <button
                 v-for="item in group.items"
@@ -295,9 +289,9 @@ onMounted(loadDashboard)
                 type="button"
                 @click="openModule(item)"
               >
-                <div class="flex items-center gap-3 mb-1">
-                  <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                <div class="mb-1 flex items-center gap-3">
+                  <div class="flex h-8 w-8 items-center justify-center rounded-md bg-brand-50 text-brand-600">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                   </div>
                   <strong>{{ item.label }}</strong>
                 </div>
@@ -307,7 +301,6 @@ onMounted(loadDashboard)
           </div>
         </section>
 
-        <!-- Create school + school list -->
         <section class="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-5 mt-8 border-t border-slate-200 pt-8">
           <form class="surface flex flex-col gap-5 p-5 lg:p-6" @submit.prevent="createSchool">
             <div>
@@ -375,6 +368,6 @@ onMounted(loadDashboard)
           </article>
         </section>
       </div>
-    </section>
-  </main>
+  </SchoolWorkspaceTemplate>
 </template>
+

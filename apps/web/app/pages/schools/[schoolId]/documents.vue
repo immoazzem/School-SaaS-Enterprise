@@ -146,8 +146,9 @@ onMounted(loadWorkspace)
 </script>
 
 <template>
-  <main class="operation-shell">
-    <SchoolWorkspaceRail
+  <SchoolWorkspaceTemplate>
+    <template #navigation>
+      <SchoolWorkspaceRail
       :school-id="schoolId"
       aria-label="Documents navigation"
       context-title="Document tools"
@@ -158,9 +159,9 @@ onMounted(loadWorkspace)
         { label: 'Staff Operations', to: `/schools/${schoolId}/staff-operations` },
       ]"
     />
+    </template>
 
-    <section class="operation-workspace">
-      <header class="workspace-header">
+    <header class="workspace-header">
         <div>
           <p class="eyebrow">Documents</p>
           <h1>Store circulars, student files, employee records, and finance papers.</h1>
@@ -319,8 +320,7 @@ onMounted(loadWorkspace)
         </div>
         <p v-if="!documents.length" class="muted">No documents match the current filters.</p>
       </section>
-    </section>
-  </main>
+</SchoolWorkspaceTemplate>
 </template>
 
 

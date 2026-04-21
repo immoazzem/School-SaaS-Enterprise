@@ -14,6 +14,38 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 
 ## 2026-04-21
 
+### Pending Checkpoint - Compact Salient-Informed Workspace Shell
+
+Current page/module complete: shared compact enterprise shell, compact surfaces, and full school-page scaffold migration.
+
+Scope:
+- used `D:\Development\tailwindui-salient` as the design resource for spacing, restraint, and calmer visual hierarchy.
+- added `apps/web/app/components/SchoolWorkspaceTemplate.vue` as the shared authenticated page scaffold.
+- migrated the dashboard plus every page in `apps/web/app/pages/schools/[schoolId]` onto the shared scaffold.
+- rebuilt `apps/web/app/assets/css/main.css` around a compact enterprise UI system:
+  - denser button sizing
+  - flatter cards/surfaces
+  - tighter forms
+  - cleaner tables
+  - calmer module tiles
+  - compact mobile/desktop shell behavior
+- refined `apps/web/app/components/SchoolWorkspaceRail.vue` so the sidebar behaves as a desktop column and a mobile drawer without intercepting workspace interactions.
+- fixed a regression found by browser QA where the sidebar overlay blocked form clicks on desktop.
+
+Verification:
+- `cd apps/web && npm run build`: passed.
+- `cd apps/web && npm run qa:browser`: passed with 10 workflow checks.
+- local frontend reachable at `http://127.0.0.1:3000`.
+- latest browser artifact: `docs/browser-checks/workflow-smoke-20260421043826.png`.
+
+Notes:
+- this pass intentionally improved structure first, not decorative styling. The frontend is now on a stronger shared shell for future visual polish.
+- Nuxt still reports the same pre-existing build warnings already known in `docs/KNOWN-BUILD-WARNINGS.md`.
+
+Next:
+- review the compact shell visually with the user’s next design direction.
+- make a clean checkpoint commit once this frontend pass is approved.
+
 ### Pending Checkpoint - Antigravity Frontend Refresh Review
 
 Current page/module complete: Antigravity dashboard and workspace visual refresh with verified browser QA.
