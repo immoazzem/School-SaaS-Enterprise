@@ -351,7 +351,10 @@ watch(locale, async () => {
 
       <p v-if="error" class="error">{{ error }}</p>
       <p v-if="success" class="success">{{ success }}</p>
-      <p v-if="loading" class="muted">{{ $t('common.loading') }}</p>
+      <div v-if="loading" class="surface flex max-w-sm items-center gap-3 p-4 text-sm font-medium text-slate-500">
+        <svg class="h-5 w-5 animate-spin text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
+        {{ $t('common.loading') }}
+      </div>
 
       <section class="workspace-grid">
         <form class="surface record-form" @submit.prevent="saveGuardian">
@@ -474,38 +477,45 @@ watch(locale, async () => {
               <h2>Guardians</h2>
             </div>
             <form class="filters" @submit.prevent="loadGuardians">
+              <select v-model="guardianStatus" aria-label="Filter guardians by status">
+                <option value="active">Active</option>
+                <option value="archived">Archived</option>
+                <option value="">All statuses</option>
+              </select>
               <input v-model="guardianSearch" aria-label="Search guardians" placeholder="Search" />
               <button class="button secondary" type="submit">Search</button>
             </form>
           </div>
 
-          <table>
-            <thead>
-              <tr>
-                <th>Guardian</th>
-                <th>Contact</th>
-                <th>Students</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="guardian in guardians" :key="guardian.id">
-                <td>
-                  <strong>{{ guardian.full_name }}</strong>
-                  <small>{{ guardian.relationship }}</small>
-                </td>
-                <td>{{ guardian.phone || guardian.email || 'No contact' }}</td>
-                <td>{{ guardian.students_count || 0 }}</td>
-                <td>
-                  <button class="text-button" type="button" @click="editGuardian(guardian)">Edit</button>
-                  <button class="text-button" type="button" @click="archiveGuardian(guardian)">Archive</button>
-                </td>
-              </tr>
-              <tr v-if="guardians.length === 0">
-                <td colspan="4">No guardians yet.</td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Guardian</th>
+                  <th>Contact</th>
+                  <th>Students</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="guardian in guardians" :key="guardian.id">
+                  <td>
+                    <strong>{{ guardian.full_name }}</strong>
+                    <small>{{ guardian.relationship }}</small>
+                  </td>
+                  <td>{{ guardian.phone || guardian.email || 'No contact' }}</td>
+                  <td>{{ guardian.students_count || 0 }}</td>
+                  <td>
+                    <button class="text-button" type="button" @click="editGuardian(guardian)">Edit</button>
+                    <button class="text-button" type="button" @click="archiveGuardian(guardian)">Archive</button>
+                  </td>
+                </tr>
+                <tr v-if="guardians.length === 0">
+                  <td colspan="4">No guardians yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
 
         <section class="surface record-list">
@@ -515,6 +525,11 @@ watch(locale, async () => {
               <h2>{{ $t('students.title') }}</h2>
             </div>
             <form class="filters" @submit.prevent="loadStudents">
+              <select v-model="studentStatus" aria-label="Filter students by status">
+                <option value="active">Active</option>
+                <option value="archived">Archived</option>
+                <option value="">All statuses</option>
+              </select>
               <input v-model="studentSearch" aria-label="Search students" placeholder="Search" />
               <button class="button secondary" type="submit">{{ $t('actions.search') }}</button>
             </form>

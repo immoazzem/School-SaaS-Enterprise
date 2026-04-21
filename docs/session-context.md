@@ -114,6 +114,26 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 
 ## Current Implementation Checkpoints
 
+- Latest checkpoint: high-traffic workspace polish for Students, Finance, Reports, and Attendance.
+- Added shared utility layout rules in `apps/web/app/assets/css/main.css` for filters, search forms, strip actions, insight grids, and mini lists.
+- `apps/web/app/pages/schools/[schoolId]/students.vue` now exposes guardian/student status filters and uses the shared loading/table treatment.
+- `apps/web/app/pages/schools/[schoolId]/finance.vue` now has clearer header actions and shared loading treatment.
+- `apps/web/app/pages/schools/[schoolId]/reports.vue` now has clearer header actions and shared loading treatment.
+- `apps/web/app/pages/schools/[schoolId]/attendance.vue` now uses the shared `record-form` / `record-list` / `summary-item` layout and includes a direct queue sync action.
+- Latest verification:
+  - `npm run build` passed
+  - agent-browser verified:
+    - `http://127.0.0.1:3000/schools/1/students`
+    - `http://127.0.0.1:3000/schools/1/finance`
+    - `http://127.0.0.1:3000/schools/1/reports`
+    - `http://127.0.0.1:3000/schools/1/attendance`
+  - screenshots saved at:
+    - `docs/browser-checks/students-polish-20260421.png`
+    - `docs/browser-checks/finance-polish-20260421.png`
+    - `docs/browser-checks/reports-polish-20260421.png`
+    - `docs/browser-checks/attendance-polish-20260421.png`
+- Local frontend remains available at `http://127.0.0.1:3000`.
+
 - Latest checkpoint: dashboard command-center polish and restore point after markdown cleanup.
 - Removed stale markdown files that were not part of the active delivery path:
   - `apps/api/README.md`

@@ -14,6 +14,57 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 
 ## 2026-04-21
 
+### Pending Checkpoint - High-Traffic Workspace Polish
+
+Current page/module complete: Students, Finance, Reports, and Attendance frontend polish.
+
+Scope:
+- added shared utility layout rules in `apps/web/app/assets/css/main.css` for:
+  - `filters`
+  - `search-form`
+  - `strip-actions`
+  - `insight-grid`
+  - `mini-list`
+- updated `apps/web/app/pages/schools/[schoolId]/students.vue`:
+  - loading state now uses a shared surface
+  - guardian list moved into the shared `table-wrap`
+  - surfaced actual status filters for guardians and students
+- updated `apps/web/app/pages/schools/[schoolId]/finance.vue`:
+  - improved header actions
+  - added supporting header copy
+  - moved loading into the shared surface treatment
+  - made outstanding totals read as BDT
+- updated `apps/web/app/pages/schools/[schoolId]/reports.vue`:
+  - improved header actions
+  - added supporting header copy
+  - moved loading into the shared surface treatment
+- updated `apps/web/app/pages/schools/[schoolId]/attendance.vue`:
+  - replaced older `panel`/`table-header` usage with `record-form`, `record-list`, and `list-header`
+  - upgraded summary cards to the shared `summary-item` treatment
+  - added a direct queue sync action in the header
+  - moved the records table into the shared `table-wrap`
+
+Verification:
+- `cd apps/web && npm run build`: passed.
+- agent-browser verified:
+  - `http://127.0.0.1:3000/schools/1/students`
+  - `http://127.0.0.1:3000/schools/1/finance`
+  - `http://127.0.0.1:3000/schools/1/reports`
+  - `http://127.0.0.1:3000/schools/1/attendance`
+- screenshots saved at:
+  - `docs/browser-checks/students-polish-20260421.png`
+  - `docs/browser-checks/finance-polish-20260421.png`
+  - `docs/browser-checks/reports-polish-20260421.png`
+  - `docs/browser-checks/attendance-polish-20260421.png`
+
+Notes:
+- this pass stayed focused on consistency, operator clarity, and shared layout rules rather than introducing a fresh visual system.
+- the existing classified Nuxt/Nitro/Node warnings remain unchanged.
+
+Next:
+- commit and push this page-polish checkpoint.
+- continue with the next workspace polish slice: enrollments, exams, and staff operations.
+
 ### Pending Checkpoint - Dashboard Command Center Polish
 
 Current page/module complete: dashboard command-center polish and restore point after markdown cleanup.

@@ -25,6 +25,43 @@ Current page/module complete: dashboard command-center polish and restore point 
   - `docs/browser-checks/dashboard-polish-20260421-110839.png`
 - Current local frontend URL: `http://127.0.0.1:3000`
 
+Current page/module complete: high-traffic workspace polish for Students, Finance, Reports, and Attendance.
+
+- Added shared utility styles in `apps/web/app/assets/css/main.css` for:
+  - filters
+  - search bars
+  - strip actions
+  - insight grids
+  - mini lists
+- Updated `apps/web/app/pages/schools/[schoolId]/students.vue`:
+  - loading state now uses the shared surface style
+  - guardian and student tables now use the shared table container
+  - exposed real status filters for guardians and students
+- Updated `apps/web/app/pages/schools/[schoolId]/finance.vue`:
+  - added clearer header actions and supporting copy
+  - loading state now uses the shared surface style
+  - outstanding amount now reads as BDT
+- Updated `apps/web/app/pages/schools/[schoolId]/reports.vue`:
+  - added clearer header actions and supporting copy
+  - loading state now uses the shared surface style
+  - executive summary and attendance summary now sit on shared utility layout rules
+- Updated `apps/web/app/pages/schools/[schoolId]/attendance.vue`:
+  - aligned the page to `record-form` / `record-list` / `summary-item`
+  - added a direct queue sync action in the header
+  - moved the record table into the shared table container and filter layout
+- Verification after this pass:
+  - `npm run build` passed
+  - browser QA passed on:
+    - `http://127.0.0.1:3000/schools/1/students`
+    - `http://127.0.0.1:3000/schools/1/finance`
+    - `http://127.0.0.1:3000/schools/1/reports`
+    - `http://127.0.0.1:3000/schools/1/attendance`
+- Latest useful browser artifacts:
+  - `docs/browser-checks/students-polish-20260421.png`
+  - `docs/browser-checks/finance-polish-20260421.png`
+  - `docs/browser-checks/reports-polish-20260421.png`
+  - `docs/browser-checks/attendance-polish-20260421.png`
+
 ## Latest Production Stabilization Status
 
 Current page/module complete: Compact enterprise frontend shell refactor with Salient-informed workspace system.

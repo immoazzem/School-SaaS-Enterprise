@@ -336,7 +336,12 @@ onMounted(() => {
           <h1>Attendance</h1>
           <p class="muted">Record daily attendance from active enrollments and keep the day searchable.</p>
         </div>
-        <NuxtLink class="button secondary" to="/dashboard">Dashboard</NuxtLink>
+        <div class="header-actions">
+          <button class="button secondary" type="button" :disabled="offlineQueue.syncing.value" @click="syncAttendanceQueue">
+            {{ offlineQueue.syncing.value ? 'Syncing queue' : 'Sync queue' }}
+          </button>
+          <NuxtLink class="button secondary" to="/dashboard">Dashboard</NuxtLink>
+        </div>
       </header>
 
       <div v-if="error" class="alert error">{{ error }}</div>
@@ -363,26 +368,26 @@ onMounted(() => {
       />
 
       <section class="summary-grid">
-        <article>
+        <article class="surface summary-item">
           <span>Present</span>
           <strong>{{ attendanceSummary.present }}</strong>
         </article>
-        <article>
+        <article class="surface summary-item">
           <span>Late</span>
           <strong>{{ attendanceSummary.late }}</strong>
         </article>
-        <article>
+        <article class="surface summary-item">
           <span>Absent</span>
           <strong>{{ attendanceSummary.absent }}</strong>
         </article>
-        <article>
+        <article class="surface summary-item">
           <span>Excused</span>
           <strong>{{ attendanceSummary.excused }}</strong>
         </article>
       </section>
 
-      <section class="grid two-columns">
-        <form class="panel" @submit.prevent="saveRecord">
+      <section class="workspace-grid">
+        <form class="record-form surface" @submit.prevent="saveRecord">
           <p class="muted">{{ editingId ? 'Editing attendance' : 'New attendance' }}</p>
           <h2>{{ editingId ? 'Update record' : 'Add record' }}</h2>
 
@@ -422,13 +427,13 @@ onMounted(() => {
           </div>
         </form>
 
-        <section class="panel">
-          <div class="table-header">
+        <section class="record-list surface">
+          <div class="list-header">
             <div>
               <p class="muted">Attendance list</p>
               <h2>{{ records.length }} records</h2>
             </div>
-            <form class="search-form" @submit.prevent="loadRecords">
+            <form class="filters" @submit.prevent="loadRecords">
               <input v-model="selectedDate" type="date">
               <select v-model="statusFilter">
                 <option value="">All statuses</option>
@@ -442,39 +447,44 @@ onMounted(() => {
             </form>
           </div>
 
-          <div v-if="loading" class="muted">Loading attendance...</div>
-          <table v-else>
-            <thead>
-              <tr>
-                <th>Student</th>
-                <th>Class</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="record in records" :key="record.id">
-                <td>
-                  <strong>{{ record.student_enrollment?.student?.full_name }}</strong>
-                  <span>{{ record.student_enrollment?.student?.admission_no }}</span>
-                </td>
-                <td>
-                  <strong>{{ record.student_enrollment?.academic_class?.name || '-' }}</strong>
-                  <span>{{ record.student_enrollment?.roll_no ? `Roll ${record.student_enrollment.roll_no}` : 'No roll' }}</span>
-                </td>
-                <td>{{ record.attendance_date }}</td>
-                <td><span class="status-pill" :class="record.status">{{ record.status }}</span></td>
-                <td class="table-actions">
-                  <button class="link-button" type="button" @click="editRecord(record)">Edit</button>
-                  <button class="link-button danger" type="button" @click="deleteRecord(record)">Delete</button>
-                </td>
-              </tr>
-              <tr v-if="!records.length">
-                <td colspan="5">No attendance records for this view.</td>
-              </tr>
-            </tbody>
-          </table>
+          <div v-if="loading" class="surface flex max-w-sm items-center gap-3 p-4 text-sm font-medium text-slate-500">
+            <svg class="h-5 w-5 animate-spin text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
+            Loading attendance...
+          </div>
+          <div v-else class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Class</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="record in records" :key="record.id">
+                  <td>
+                    <strong>{{ record.student_enrollment?.student?.full_name }}</strong>
+                    <span>{{ record.student_enrollment?.student?.admission_no }}</span>
+                  </td>
+                  <td>
+                    <strong>{{ record.student_enrollment?.academic_class?.name || '-' }}</strong>
+                    <span>{{ record.student_enrollment?.roll_no ? `Roll ${record.student_enrollment.roll_no}` : 'No roll' }}</span>
+                  </td>
+                  <td>{{ record.attendance_date }}</td>
+                  <td><span class="status-pill" :class="record.status">{{ record.status }}</span></td>
+                  <td class="table-actions">
+                    <button class="link-button" type="button" @click="editRecord(record)">Edit</button>
+                    <button class="link-button danger" type="button" @click="deleteRecord(record)">Delete</button>
+                  </td>
+                </tr>
+                <tr v-if="!records.length">
+                  <td colspan="5">No attendance records for this view.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </section>
       </section>
 </SchoolWorkspaceTemplate>

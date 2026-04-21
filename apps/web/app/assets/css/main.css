@@ -345,6 +345,50 @@
     @apply mb-1 flex flex-col justify-between gap-3 sm:flex-row sm:items-center;
   }
 
+  .filters,
+  .search-form {
+    @apply flex flex-wrap items-center gap-2;
+  }
+
+  .filters input,
+  .filters select,
+  .search-form input,
+  .search-form select {
+    @apply min-h-[38px] rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-700 outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-100;
+  }
+
+  .strip-actions {
+    @apply flex flex-wrap gap-2;
+  }
+
+  .insight-grid {
+    @apply grid grid-cols-1 gap-2 sm:grid-cols-2;
+  }
+
+  .insight-grid span {
+    @apply flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600;
+  }
+
+  .insight-grid strong {
+    @apply text-sm font-semibold text-slate-900;
+  }
+
+  .mini-list {
+    @apply flex flex-col gap-2;
+  }
+
+  .mini-list span {
+    @apply flex flex-col gap-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-3;
+  }
+
+  .mini-list strong {
+    @apply text-sm font-semibold text-slate-900;
+  }
+
+  .mini-list em {
+    @apply not-italic text-sm text-slate-500;
+  }
+
   .table-wrap {
     @apply w-full overflow-x-auto rounded-lg border border-slate-200 bg-white;
   }
