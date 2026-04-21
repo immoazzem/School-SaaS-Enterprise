@@ -247,20 +247,19 @@ onMounted(loadOptions)
 
 <template>
   <main class="operation-shell">
-    <aside class="operation-nav">
-      <NuxtLink class="brand" to="/dashboard">
-        <span>EA</span>
-        <strong>School SaaS</strong>
-      </NuxtLink>
-      <nav aria-label="Timetable navigation">
-        <NuxtLink :to="`/schools/${schoolId}/academic-years`">Academic Years</NuxtLink>
-        <NuxtLink :to="`/schools/${schoolId}/academic-classes`">Classes</NuxtLink>
-        <NuxtLink :to="`/schools/${schoolId}/subjects`">Subjects</NuxtLink>
-        <NuxtLink :to="`/schools/${schoolId}/shifts`">Shifts</NuxtLink>
-        <NuxtLink :to="`/schools/${schoolId}/assignments`">Assignments</NuxtLink>
-        <NuxtLink :to="`/schools/${schoolId}/promotions`">Promotions</NuxtLink>
-      </nav>
-    </aside>
+    <SchoolWorkspaceRail
+      :school-id="schoolId"
+      aria-label="Timetable navigation"
+      context-title="Timetable tools"
+      :context-links="[
+        { label: 'Academic Years', to: `/schools/${schoolId}/academic-years` },
+        { label: 'Classes', to: `/schools/${schoolId}/academic-classes` },
+        { label: 'Subjects', to: `/schools/${schoolId}/subjects` },
+        { label: 'Shifts', to: `/schools/${schoolId}/shifts` },
+        { label: 'Assignments', to: `/schools/${schoolId}/assignments` },
+        { label: 'Promotions', to: `/schools/${schoolId}/promotions` },
+      ]"
+    />
 
     <section class="operation-workspace">
       <header class="workspace-header">

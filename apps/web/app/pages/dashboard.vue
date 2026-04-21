@@ -1,16 +1,9 @@
 <script setup lang="ts">
 import type { DashboardSummary } from '~/composables/useApi'
+import { schoolWorkspaceModules } from '~/utils/schoolWorkspaceNav'
 
 interface ItemResponse<T> {
   data: T
-}
-
-type ModuleLink = {
-  label: string
-  description: string
-  route: string
-  permissions: string[]
-  tone: 'academic' | 'people' | 'finance' | 'operations'
 }
 
 const auth = useAuth()
@@ -36,42 +29,8 @@ const selectedSchool = computed(() =>
   auth.schools.value.find((school) => school.id === auth.selectedSchoolId.value) ?? null,
 )
 
-const modules: ModuleLink[] = [
-  { label: 'Academic Years', description: 'Sessions and current year', route: 'academic-years', permissions: ['academic_years.manage'], tone: 'academic' },
-  { label: 'Classes', description: 'Class levels and order', route: 'academic-classes', permissions: ['academic_classes.manage'], tone: 'academic' },
-  { label: 'Sections', description: 'Rooms, capacity, class mapping', route: 'academic-sections', permissions: ['sections.manage'], tone: 'academic' },
-  { label: 'Subjects', description: 'Core and co-curricular subjects', route: 'subjects', permissions: ['subjects.manage'], tone: 'academic' },
-  { label: 'Class Subjects', description: 'Marks and subject assignment', route: 'class-subjects', permissions: ['class_subjects.manage'], tone: 'academic' },
-  { label: 'Groups', description: 'Science and general tracks', route: 'student-groups', permissions: ['student_groups.manage'], tone: 'academic' },
-  { label: 'Shifts', description: 'Morning and day operations', route: 'shifts', permissions: ['shifts.manage'], tone: 'academic' },
-  { label: 'Timetable', description: 'Periods, rooms, teachers', route: 'timetable', permissions: ['timetable.manage'], tone: 'academic' },
-  { label: 'Assignments', description: 'Class work and submissions', route: 'assignments', permissions: ['assignments.manage'], tone: 'academic' },
-  { label: 'Students', description: 'Admissions and profiles', route: 'students', permissions: ['students.manage'], tone: 'people' },
-  { label: 'Enrollments', description: 'Year, class, roll, section', route: 'enrollments', permissions: ['enrollments.manage'], tone: 'people' },
-  { label: 'Teachers', description: 'Teaching profiles', route: 'teacher-profiles', permissions: ['teachers.manage'], tone: 'people' },
-  { label: 'Attendance', description: 'Student daily records', route: 'attendance', permissions: ['attendance.manage'], tone: 'people' },
-  { label: 'Designations', description: 'Staff role catalog', route: 'designations', permissions: ['designations.manage'], tone: 'people' },
-  { label: 'Employees', description: 'Staff records and salary base', route: 'employees', permissions: ['employees.manage'], tone: 'people' },
-  { label: 'Exams', description: 'Schedules and publication', route: 'exams', permissions: ['exams.manage'], tone: 'operations' },
-  { label: 'Marks', description: 'Entry and verification', route: 'marks', permissions: ['marks.enter.any', 'marks.enter.own'], tone: 'operations' },
-  { label: 'Reports', description: 'Results, PDFs, attendance', route: 'reports', permissions: ['reports.view'], tone: 'operations' },
-  { label: 'Promotions', description: 'Year-end progression', route: 'promotions', permissions: ['promotions.manage'], tone: 'operations' },
-  { label: 'Calendar', description: 'Events and holidays', route: 'calendar', permissions: ['calendar.manage', 'reports.view'], tone: 'operations' },
-  { label: 'Documents', description: 'Circulars and files', route: 'documents', permissions: ['documents.manage'], tone: 'operations' },
-  { label: 'Finance', description: 'Fees, invoices, payments', route: 'finance', permissions: ['finance.manage'], tone: 'finance' },
-  { label: 'Payment Gateways', description: 'bKash, Nagad, cards', route: 'payment-gateways', permissions: ['payment_gateways.manage'], tone: 'finance' },
-  { label: 'Staff Ops', description: 'Payroll, attendance, leave', route: 'staff-operations', permissions: ['payroll.manage', 'employee_attendance.manage', 'leave.manage'], tone: 'finance' },
-]
-
-const navGroups = computed(() => [
-  { title: 'Academics', items: modules.filter((item) => item.tone === 'academic') },
-  { title: 'People', items: modules.filter((item) => item.tone === 'people') },
-  { title: 'Operations', items: modules.filter((item) => item.tone === 'operations') },
-  { title: 'Finance', items: modules.filter((item) => item.tone === 'finance') },
-])
-
 const featuredModules = computed(() =>
-  modules.filter((item) => canOpen(item)).slice(0, 8),
+  schoolWorkspaceModules.filter((item) => canOpen(item)).slice(0, 8),
 )
 
 const currencyFormatter = new Intl.NumberFormat('en-BD', {
@@ -114,7 +73,7 @@ function formatMoney(value: number | string) {
   return currencyFormatter.format(Number(value))
 }
 
-function canOpen(module: ModuleLink) {
+function canOpen(module: { permissions: string[] }) {
   const permissions = selectedSchool.value?.permissions ?? []
 
   return module.permissions.some((permission) => permissions.includes(permission))
@@ -155,11 +114,6 @@ async function loadSummary() {
   }
 }
 
-function chooseSchool(event: Event) {
-  const value = Number((event.target as HTMLSelectElement).value)
-  auth.selectSchool(value)
-}
-
 async function createSchool() {
   creatingSchool.value = true
   error.value = ''
@@ -184,7 +138,7 @@ async function createSchool() {
   }
 }
 
-async function openModule(module: ModuleLink) {
+async function openModule(module: { label: string, route: string, permissions: string[] }) {
   if (!selectedSchool.value) {
     error.value = 'Create or select a school first.'
     return
@@ -210,33 +164,7 @@ onMounted(loadDashboard)
 
 <template>
   <main class="dashboard-shell">
-    <aside class="dashboard-sidebar">
-      <NuxtLink class="brand" to="/dashboard">
-        <span>EA</span>
-        <strong>School SaaS</strong>
-      </NuxtLink>
-
-      <div v-if="selectedSchool" class="school-chip">
-        <small>Selected school</small>
-        <strong>{{ selectedSchool.name }}</strong>
-      </div>
-
-      <nav aria-label="Main navigation" class="module-nav">
-        <section v-for="group in navGroups" :key="group.title" class="nav-group">
-          <h2>{{ group.title }}</h2>
-          <button
-            v-for="item in group.items"
-            :key="item.label"
-            class="nav-link"
-            type="button"
-            :disabled="!canOpen(item)"
-            @click="openModule(item)"
-          >
-            <span>{{ item.label }}</span>
-          </button>
-        </section>
-      </nav>
-    </aside>
+    <SchoolWorkspaceRail :school-id="selectedSchool?.id ?? null" aria-label="Main navigation" />
 
     <section class="dashboard-main">
       <header class="dashboard-header">
@@ -248,17 +176,6 @@ onMounted(loadDashboard)
 
         <div class="header-actions">
           <LocaleSwitcher />
-          <select
-            v-if="auth.schools.value.length"
-            class="school-select"
-            :value="auth.selectedSchoolId.value || ''"
-            aria-label="Select school"
-            @change="chooseSchool"
-          >
-            <option v-for="school in auth.schools.value" :key="school.id" :value="school.id">
-              {{ school.name }}
-            </option>
-          </select>
           <button class="dash-btn ghost" type="button" @click="auth.logout()">{{ $t('actions.signOut') }}</button>
         </div>
       </header>
@@ -426,100 +343,15 @@ onMounted(loadDashboard)
   color: #18201d;
 }
 
-.dashboard-sidebar {
-  position: sticky;
-  top: 0;
-  display: flex;
-  height: 100vh;
-  flex-direction: column;
-  gap: 20px;
-  overflow-y: auto;
-  border-right: 1px solid #d9e1df;
-  padding: 22px;
-  background: #ffffff;
-}
-
-.brand {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.brand span {
-  display: grid;
-  width: 38px;
-  height: 38px;
-  place-items: center;
-  border-radius: 8px;
-  background: #1f6f5b;
-  color: #fff;
-  font-weight: 900;
-}
-
-.brand strong,
-.school-chip strong,
 .panel h2,
 .dashboard-header h1 {
   color: #18201d;
 }
 
-.school-chip {
-  display: grid;
-  gap: 4px;
-  border: 1px solid #d9e1df;
-  border-radius: 8px;
-  padding: 12px;
-  background: #f8fbfa;
-}
-
-.school-chip small,
 .eyebrow {
   color: #a33d4f;
   font-weight: 900;
   text-transform: uppercase;
-}
-
-.module-nav {
-  display: grid;
-  gap: 18px;
-}
-
-.nav-group {
-  display: grid;
-  gap: 6px;
-}
-
-.nav-group h2 {
-  margin: 0 0 4px;
-  color: #687370;
-  font-size: 0.78rem;
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-
-.nav-link {
-  display: flex;
-  width: 100%;
-  min-height: 36px;
-  align-items: center;
-  border: 0;
-  border-radius: 8px;
-  padding: 0 10px;
-  background: transparent;
-  color: #34423e;
-  cursor: pointer;
-  font-weight: 760;
-  text-align: left;
-}
-
-.nav-link:hover {
-  background: #edf6f2;
-  color: #1f6f5b;
-}
-
-.nav-link:disabled {
-  cursor: not-allowed;
-  opacity: 0.42;
 }
 
 .dashboard-main {
@@ -558,16 +390,6 @@ onMounted(loadDashboard)
   display: flex;
   gap: 10px;
   align-items: center;
-}
-
-.school-select {
-  min-height: 42px;
-  max-width: 260px;
-  border: 1px solid #cad6d3;
-  border-radius: 8px;
-  padding: 0 12px;
-  background: #fff;
-  color: #18201d;
 }
 
 .dash-btn {
@@ -823,15 +645,6 @@ onMounted(loadDashboard)
     grid-template-columns: 1fr;
   }
 
-  .dashboard-sidebar {
-    position: static;
-    height: auto;
-  }
-
-  .module-nav {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .dashboard-header,
   .header-actions {
     align-items: stretch;
@@ -844,12 +657,10 @@ onMounted(loadDashboard)
 }
 
 @media (max-width: 680px) {
-  .dashboard-main,
-  .dashboard-sidebar {
+  .dashboard-main {
     padding: 16px;
   }
 
-  .module-nav,
   .form-row,
   .trend-row {
     grid-template-columns: 1fr;

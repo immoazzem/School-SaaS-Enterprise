@@ -4,6 +4,36 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Production Stabilization Status
 
+Current page/module complete: Frontend shell stabilization checkpoint before Antigravity dashboard redesign.
+
+- Added a shared workspace rail component at `apps/web/app/components/SchoolWorkspaceRail.vue`.
+- Extracted the cross-module school navigation model to `apps/web/app/utils/schoolWorkspaceNav.ts`.
+- Moved the dashboard onto the shared rail so the left side now matches the main school workspaces.
+- Replaced per-page sidebar markup across the main operational school pages with the shared rail:
+  - assignments
+  - attendance
+  - calendar
+  - documents
+  - enrollments
+  - exams
+  - finance
+  - marks
+  - payment gateways
+  - promotions
+  - reports
+  - staff operations
+  - teacher profiles
+  - timetable
+- The rail now preserves one module map across dashboard and school workspaces, includes school switching, and routes same-module school changes when already inside a school workspace.
+- Browser verification:
+  - dashboard shell loaded successfully at `http://127.0.0.1:3000/dashboard`
+  - no error overlay detected
+  - screenshot artifact saved: `docs/browser-checks/dashboard-shell-20260421.png`
+- Verification after shell stabilization:
+  - `npm run build` passed
+  - local frontend reachable at `http://127.0.0.1:3000`
+- Restore point intent: pause here, hand off visual redesign direction to Antigravity, then resume UI refinement from this unified shell base.
+
 Current page/module complete: Production Stabilization Checkpoint I, Final Stabilization Review.
 
 - Checkpoint A roadmap is complete and pushed as `933a920 docs: add production stabilization roadmap`.

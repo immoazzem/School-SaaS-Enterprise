@@ -172,17 +172,16 @@ onMounted(loadConfigs)
 
 <template>
   <main class="operation-shell">
-    <aside class="operation-nav">
-      <NuxtLink class="brand" to="/dashboard">
-        <span>EA</span>
-        <strong>School SaaS</strong>
-      </NuxtLink>
-      <nav aria-label="Payment gateway navigation">
-        <NuxtLink :to="`/schools/${schoolId}/finance`">Finance</NuxtLink>
-        <NuxtLink :to="`/schools/${schoolId}/reports`">Reports</NuxtLink>
-        <NuxtLink :to="`/schools/${schoolId}/documents`">Documents</NuxtLink>
-      </nav>
-    </aside>
+    <SchoolWorkspaceRail
+      :school-id="schoolId"
+      aria-label="Payment gateway navigation"
+      context-title="Payment tools"
+      :context-links="[
+        { label: 'Finance', to: `/schools/${schoolId}/finance` },
+        { label: 'Reports', to: `/schools/${schoolId}/reports` },
+        { label: 'Documents', to: `/schools/${schoolId}/documents` },
+      ]"
+    />
 
     <section class="operation-workspace">
       <header class="workspace-header">

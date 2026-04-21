@@ -323,17 +323,16 @@ onMounted(() => {
 
 <template>
   <main class="operation-shell">
-    <aside class="operation-nav">
-      <NuxtLink class="brand" to="/dashboard">
-        <span>EA</span>
-        <strong>School SaaS</strong>
-      </NuxtLink>
-      <nav aria-label="Marks navigation">
-        <NuxtLink :to="`/schools/${schoolId}/exams`">Exams</NuxtLink>
-        <NuxtLink :to="`/schools/${schoolId}/class-subjects`">Class Subjects</NuxtLink>
-        <NuxtLink :to="`/schools/${schoolId}/finance`">Finance</NuxtLink>
-      </nav>
-    </aside>
+    <SchoolWorkspaceRail
+      :school-id="schoolId"
+      aria-label="Marks navigation"
+      context-title="Marks tools"
+      :context-links="[
+        { label: 'Exams', to: `/schools/${schoolId}/exams` },
+        { label: 'Class Subjects', to: `/schools/${schoolId}/class-subjects` },
+        { label: 'Finance', to: `/schools/${schoolId}/finance` },
+      ]"
+    />
 
     <section class="operation-workspace">
       <header class="workspace-header">

@@ -14,6 +14,49 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 
 ## 2026-04-21
 
+### Pending Checkpoint - Frontend Shell Stabilization Before Antigravity
+
+Current page/module complete: dashboard and workspace navigation shell unification.
+
+Scope:
+- added `apps/web/app/components/SchoolWorkspaceRail.vue` as the shared left navigation rail for authenticated workspaces.
+- added `apps/web/app/utils/schoolWorkspaceNav.ts` to centralize enterprise module definitions and grouping.
+- updated `apps/web/app/pages/dashboard.vue` to use the shared rail instead of its old bespoke sidebar.
+- updated the main school workspace pages to use the same rail with contextual links:
+  - assignments
+  - attendance
+  - calendar
+  - documents
+  - enrollments
+  - exams
+  - finance
+  - marks
+  - payment gateways
+  - promotions
+  - reports
+  - staff operations
+  - teacher profiles
+  - timetable
+- improved school switching behavior inside the shared rail so changing schools from a school workspace keeps the user in the same module path.
+
+Verification:
+- `cd apps/web && npm run build`: passed.
+- local frontend reachable at `http://127.0.0.1:3000`.
+- browser checks:
+  - sign-in to dashboard succeeded.
+  - dashboard shell rendered with the shared rail and module groups.
+  - no browser error overlay detected.
+  - screenshot artifact saved at `docs/browser-checks/dashboard-shell-20260421.png`.
+
+Notes:
+- the known Nuxt/Nitro warnings from `docs/KNOWN-BUILD-WARNINGS.md` still appear on build and were not introduced by this checkpoint.
+- this is intended as the restore point before Antigravity begins the visual redesign pass.
+- a direct browser jump to `/schools/1/finance` in the current session returned to dashboard, so only the dashboard shell is claimed as visually verified in this checkpoint.
+
+Next:
+- create the git restore-point commit and push it.
+- hand the stabilized shell to Antigravity for dashboard and design-system improvements.
+
 ### Pending Checkpoint - Post-Dashboard QA Hardening
 
 Current page/module complete: cross-module browser workflow smoke, pagination hardening, and form accessibility cleanup.

@@ -224,19 +224,18 @@ onMounted(loadWorkspace)
 
 <template>
   <main class="operation-shell">
-    <aside class="operation-nav">
-      <NuxtLink class="brand" to="/dashboard">
-        <span>EA</span>
-        <strong>School SaaS</strong>
-      </NuxtLink>
-      <nav aria-label="Reports navigation">
-        <NuxtLink :to="`/schools/${schoolId}/calendar`">Calendar</NuxtLink>
-        <NuxtLink :to="`/schools/${schoolId}/documents`">Documents</NuxtLink>
-        <NuxtLink :to="`/schools/${schoolId}/exams`">Exams</NuxtLink>
-        <NuxtLink :to="`/schools/${schoolId}/marks`">Marks</NuxtLink>
-        <NuxtLink :to="`/schools/${schoolId}/finance`">Finance</NuxtLink>
-      </nav>
-    </aside>
+    <SchoolWorkspaceRail
+      :school-id="schoolId"
+      aria-label="Reports navigation"
+      context-title="Reporting tools"
+      :context-links="[
+        { label: 'Calendar', to: `/schools/${schoolId}/calendar` },
+        { label: 'Documents', to: `/schools/${schoolId}/documents` },
+        { label: 'Exams', to: `/schools/${schoolId}/exams` },
+        { label: 'Marks', to: `/schools/${schoolId}/marks` },
+        { label: 'Finance', to: `/schools/${schoolId}/finance` },
+      ]"
+    />
 
     <section class="operation-workspace">
       <header class="workspace-header">

@@ -318,19 +318,18 @@ onMounted(loadOptions)
 
 <template>
   <main class="operation-shell">
-    <aside class="operation-nav">
-      <NuxtLink class="brand" to="/dashboard">
-        <span>EA</span>
-        <strong>School SaaS</strong>
-      </NuxtLink>
-      <nav aria-label="Assignments navigation">
-        <NuxtLink :to="`/schools/${schoolId}/academic-classes`">Classes</NuxtLink>
-        <NuxtLink :to="`/schools/${schoolId}/subjects`">Subjects</NuxtLink>
-        <NuxtLink :to="`/schools/${schoolId}/enrollments`">Enrollments</NuxtLink>
-        <NuxtLink :to="`/schools/${schoolId}/timetable`">Timetable</NuxtLink>
-        <NuxtLink :to="`/schools/${schoolId}/reports`">Reports</NuxtLink>
-      </nav>
-    </aside>
+    <SchoolWorkspaceRail
+      :school-id="schoolId"
+      aria-label="Assignments navigation"
+      context-title="Assignment tools"
+      :context-links="[
+        { label: 'Classes', to: `/schools/${schoolId}/academic-classes` },
+        { label: 'Subjects', to: `/schools/${schoolId}/subjects` },
+        { label: 'Enrollments', to: `/schools/${schoolId}/enrollments` },
+        { label: 'Timetable', to: `/schools/${schoolId}/timetable` },
+        { label: 'Reports', to: `/schools/${schoolId}/reports` },
+      ]"
+    />
 
     <section class="operation-workspace">
       <header class="workspace-header">

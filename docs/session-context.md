@@ -114,6 +114,14 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 
 ## Current Implementation Checkpoints
 
+- Latest checkpoint: Frontend shell stabilization before Antigravity dashboard redesign.
+- Shared authenticated navigation now lives in `apps/web/app/components/SchoolWorkspaceRail.vue`.
+- Module definitions for the rail live in `apps/web/app/utils/schoolWorkspaceNav.ts`.
+- Dashboard and the main school workspace pages now share the same left navigation model.
+- Latest shell verification artifact: `docs/browser-checks/dashboard-shell-20260421.png`
+- Local frontend remains available at `http://127.0.0.1:3000`.
+- This checkpoint is the intended restore point before Antigravity starts the design pass.
+
 - Latest checkpoint: Post-dashboard QA hardening and full browser workflow smoke.
 - Reusable browser QA script now lives at `apps/web/scripts/browser-workflow-smoke.mjs`.
 - Run `cd apps/web && npm run qa:browser` to replay the 10-step workflow smoke.
