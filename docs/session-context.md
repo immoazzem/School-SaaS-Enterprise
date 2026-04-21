@@ -114,6 +114,26 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 
 ## Current Implementation Checkpoints
 
+- Latest checkpoint: dashboard command-center polish and restore point after markdown cleanup.
+- Removed stale markdown files that were not part of the active delivery path:
+  - `apps/api/README.md`
+  - `apps/web/README.md`
+  - `docs/IMPROVEMENT-ROADMAP.md`
+- `docs/session-context.md` now points new sessions to `docs/current-status.md` and `docs/engineering-log.md` instead of the removed roadmap file.
+- `apps/web/app/pages/dashboard.vue` was polished into a tighter operator command center with:
+  - workspace overview
+  - access summary
+  - quick-action launchpad
+  - collections trend
+  - attention-required queue
+  - grouped workspace map
+  - cleaner tenant create/access section
+- Latest dashboard verification:
+  - `npm run build` passed
+  - agent-browser verified `http://127.0.0.1:3000/dashboard`
+  - screenshot saved at `docs/browser-checks/dashboard-polish-20260421-110839.png`
+- Local frontend remains available at `http://127.0.0.1:3000`.
+
 - Latest checkpoint: compact enterprise shell refactor using Salient as the design resource.
 - Added `apps/web/app/components/SchoolWorkspaceTemplate.vue` as the shared authenticated scaffold.
 - Dashboard and all pages in `apps/web/app/pages/schools/[schoolId]` now use the shared scaffold rather than repeated shell wrappers.

@@ -14,6 +14,37 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 
 ## 2026-04-21
 
+### Pending Checkpoint - Dashboard Command Center Polish
+
+Current page/module complete: dashboard command-center polish and restore point after markdown cleanup.
+
+Scope:
+- removed stale markdown files that were not part of the active execution path:
+  - `apps/api/README.md`
+  - `apps/web/README.md`
+  - `docs/IMPROVEMENT-ROADMAP.md`
+- updated `docs/session-context.md` so new sessions use the durable status/log files instead of the removed roadmap.
+- refined `apps/web/app/pages/dashboard.vue` into a clearer operator dashboard:
+  - top overview surface with tenant context
+  - access summary counts
+  - quick-action launchpad for the highest-frequency work
+  - collections trend and attention-required queue
+  - grouped domain map for the full workspace
+  - cleaner tenant creation and access management area
+
+Verification:
+- `cd apps/web && npm run build`: passed.
+- agent-browser verified `http://127.0.0.1:3000/dashboard`.
+- screenshot saved at `docs/browser-checks/dashboard-polish-20260421-110839.png`.
+
+Notes:
+- this pass stayed within the shared compact shell rather than introducing a one-off dashboard style.
+- the same classified Nuxt/Nitro/Node build warnings remain and were not changed by this checkpoint.
+
+Next:
+- commit and push this dashboard restore point.
+- continue with page-level UI polish on the highest-traffic workspaces after the dashboard baseline.
+
 ### Pending Checkpoint - Compact Salient-Informed Workspace Shell
 
 Current page/module complete: shared compact enterprise shell, compact surfaces, and full school-page scaffold migration.

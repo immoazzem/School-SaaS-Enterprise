@@ -2,6 +2,29 @@
 
 Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 mentions v2, it means `docs/enterprise-plan-v2.md`. All v2 baseline rules remain primary, and v3 adds to and extends them unless a section explicitly says otherwise.
 
+## Latest Frontend Checkpoint
+
+Current page/module complete: dashboard command-center polish and restore point after markdown cleanup.
+
+- Removed stale markdown files that were no longer helping execution:
+  - `apps/api/README.md`
+  - `apps/web/README.md`
+  - `docs/IMPROVEMENT-ROADMAP.md`
+- Updated `docs/session-context.md` so new sessions now point to `docs/current-status.md` and `docs/engineering-log.md` as the durable source of truth.
+- Polished `apps/web/app/pages/dashboard.vue` into a tighter command-center layout:
+  - stronger top-level overview
+  - access summary for current operator scope
+  - quick-action launchpad for the most-used modules
+  - collections trend and attention queue side by side
+  - grouped domain map for the full workspace
+  - cleaner tenant create/access section
+- Verification after the dashboard pass:
+  - `npm run build` passed
+  - browser QA passed on `http://127.0.0.1:3000/dashboard`
+- Latest useful browser artifact:
+  - `docs/browser-checks/dashboard-polish-20260421-110839.png`
+- Current local frontend URL: `http://127.0.0.1:3000`
+
 ## Latest Production Stabilization Status
 
 Current page/module complete: Compact enterprise frontend shell refactor with Salient-informed workspace system.
