@@ -447,48 +447,5 @@ onMounted(loadWorkspace)
   </main>
 </template>
 
-<style scoped>
-.insight-grid,
-.mini-list {
-  display: grid;
-  gap: 10px;
-}
 
-.insight-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
 
-.insight-grid span,
-.mini-list span {
-  display: flex;
-  min-height: 52px;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid #e3ebe7;
-  color: #6b7280;
-  gap: 12px;
-}
-
-.insight-grid strong,
-.mini-list strong {
-  color: #111827;
-}
-
-.mini-list em {
-  color: #be3455;
-  font-style: normal;
-  font-weight: 800;
-}
-
-.strip-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-@media (max-width: 900px) {
-  .insight-grid {
-    grid-template-columns: 1fr;
-  }
-}
-</style>

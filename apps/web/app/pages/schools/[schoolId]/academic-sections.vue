@@ -168,339 +168,153 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="sections-page">
-    <header class="sections-header">
-      <div>
-        <NuxtLink class="back-link" :to="`/schools/${schoolId}/academic-classes`">Academic Classes</NuxtLink>
-        <h1>Academic Sections</h1>
-        <p>Organize class groups, rooms, capacity, and status for the selected school.</p>
-      </div>
+  <main class="operation-shell">
+    <SchoolWorkspaceRail
+      :school-id="schoolId"
+      aria-label="Academic sections navigation"
+      context-title="Academics setup"
+      :context-links="[
+        { label: 'Classes', to: `/schools/${schoolId}/academic-classes` },
+        { label: 'Years', to: `/schools/${schoolId}/academic-years` },
+        { label: 'Class Subjects', to: `/schools/${schoolId}/class-subjects` },
+      ]"
+    />
 
-      <div class="header-tools">
-        <NuxtLink class="button secondary" :to="`/schools/${schoolId}/academic-years`">
-          Manage years
-        </NuxtLink>
-
-        <div class="filter-panel">
-          <label for="class-filter">Class filter</label>
-          <select id="class-filter" :value="selectedClassId || ''" @change="chooseClass">
-            <option value="">All classes</option>
-            <option v-for="academicClass in classes" :key="academicClass.id" :value="academicClass.id">
-              {{ academicClass.name }} · {{ academicClass.code }}
-            </option>
-          </select>
-        </div>
-      </div>
-    </header>
-
-    <section class="sections-grid">
-      <form class="surface section-form" @submit.prevent="saveSection">
+    <section class="operation-workspace">
+      <header class="workspace-header">
         <div>
-          <p class="muted">{{ editingSectionId ? 'Edit section' : 'New section' }}</p>
-          <h2>{{ editingSectionId ? 'Update section' : 'Add section' }}</h2>
+          <p class="eyebrow">Academics</p>
+          <h1>Academic Sections</h1>
+          <p>Organize class groups, rooms, capacity, and status for the selected school.</p>
         </div>
-
-        <div class="field">
-          <label for="section-class">Class</label>
-          <select id="section-class" v-model="form.academic_class_id" required>
-            <option disabled value="">Select class</option>
-            <option v-for="academicClass in classes" :key="academicClass.id" :value="academicClass.id">
-              {{ academicClass.name }} · {{ academicClass.code }}
-            </option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="section-name">Name</label>
-          <input id="section-name" v-model="form.name" required placeholder="Section A" />
-        </div>
-
-        <div class="form-row">
-          <div class="field">
-            <label for="section-code">Code</label>
-            <input id="section-code" v-model="form.code" required placeholder="A" />
-          </div>
-          <div class="field">
-            <label for="section-order">Order</label>
-            <input id="section-order" v-model="form.sort_order" min="0" type="number" />
+        <div class="header-actions">
+          <NuxtLink class="button secondary" :to="`/schools/${schoolId}/academic-years`">Manage years</NuxtLink>
+          <div class="filter-panel">
+            <label for="class-filter">Class filter</label>
+            <select id="class-filter" :value="selectedClassId || ''" @change="chooseClass">
+              <option value="">All classes</option>
+              <option v-for="academicClass in classes" :key="academicClass.id" :value="academicClass.id">
+                {{ academicClass.name }} · {{ academicClass.code }}
+              </option>
+            </select>
           </div>
         </div>
+      </header>
 
-        <div class="form-row">
-          <div class="field">
-            <label for="section-capacity">Capacity</label>
-            <input id="section-capacity" v-model="form.capacity" min="1" type="number" placeholder="35" />
-          </div>
-          <div class="field">
-            <label for="section-room">Room</label>
-            <input id="section-room" v-model="form.room" placeholder="101" />
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="section-status">Status</label>
-          <select id="section-status" v-model="form.status">
-            <option value="active">Active</option>
-            <option value="archived">Archived</option>
-          </select>
-        </div>
-
-        <p v-if="error" class="error">{{ error }}</p>
-        <p v-if="success" class="success">{{ success }}</p>
-
-        <div class="form-actions">
-          <button class="button" type="submit" :disabled="saving || classes.length === 0">
-            {{ saving ? 'Saving' : editingSectionId ? 'Update section' : 'Save section' }}
-          </button>
-          <button v-if="editingSectionId" class="button secondary" type="button" @click="resetForm">
-            Cancel
-          </button>
-        </div>
-      </form>
-
-      <section class="surface section-list">
-        <div class="list-heading">
+      <section class="workspace-grid">
+        <form class="surface record-form" @submit.prevent="saveSection">
           <div>
-            <p class="muted">{{ selectedClassName }}</p>
-            <h2>Section register</h2>
+            <p class="muted">{{ editingSectionId ? 'Edit section' : 'New section' }}</p>
+            <h2>{{ editingSectionId ? 'Update section' : 'Add section' }}</h2>
           </div>
-          <span>{{ sections.length }} records</span>
-        </div>
 
-        <p v-if="classes.length === 0" class="empty-copy">Create an Academic Class before adding sections.</p>
-        <p v-else-if="loading" class="muted">Loading sections</p>
+          <div class="field">
+            <label for="section-class">Class</label>
+            <select id="section-class" v-model="form.academic_class_id" required>
+              <option disabled value="">Select class</option>
+              <option v-for="academicClass in classes" :key="academicClass.id" :value="academicClass.id">
+                {{ academicClass.name }} · {{ academicClass.code }}
+              </option>
+            </select>
+          </div>
 
-        <div v-else class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Section</th>
-                <th>Class</th>
-                <th>Capacity</th>
-                <th>Room</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="section in sections" :key="section.id">
-                <td>
-                  <strong>{{ section.name }}</strong>
-                  <small>{{ section.code }}</small>
-                </td>
-                <td>{{ section.academic_class?.name || 'Class' }}</td>
-                <td>{{ section.capacity || 'Open' }}</td>
-                <td>{{ section.room || 'Unassigned' }}</td>
-                <td>{{ section.status }}</td>
-                <td>
-                  <div class="row-actions">
-                    <button class="text-button" type="button" @click="editSection(section)">Edit</button>
-                    <button
-                      class="text-button"
-                      type="button"
-                      :disabled="section.status === 'archived'"
-                      @click="archiveSection(section)"
-                    >
-                      Archive
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr v-if="sections.length === 0">
-                <td colspan="6">No sections yet.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+          <div class="field">
+            <label for="section-name">Name</label>
+            <input id="section-name" v-model="form.name" required placeholder="Section A" />
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="section-code">Code</label>
+              <input id="section-code" v-model="form.code" required placeholder="A" />
+            </div>
+            <div class="field">
+              <label for="section-order">Order</label>
+              <input id="section-order" v-model="form.sort_order" min="0" type="number" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="section-capacity">Capacity</label>
+              <input id="section-capacity" v-model="form.capacity" min="1" type="number" placeholder="35" />
+            </div>
+            <div class="field">
+              <label for="section-room">Room</label>
+              <input id="section-room" v-model="form.room" placeholder="101" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="section-status">Status</label>
+            <select id="section-status" v-model="form.status">
+              <option value="active">Active</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+
+          <p v-if="error" class="error">{{ error }}</p>
+          <p v-if="success" class="success">{{ success }}</p>
+
+          <div class="form-actions">
+            <button class="button" type="submit" :disabled="saving || classes.length === 0">
+              {{ saving ? 'Saving' : editingSectionId ? 'Update section' : 'Save section' }}
+            </button>
+            <button v-if="editingSectionId" class="button secondary" type="button" @click="resetForm">Cancel</button>
+          </div>
+        </form>
+
+        <section class="surface record-list">
+          <div class="list-header">
+            <div>
+              <p class="muted">{{ selectedClassName }}</p>
+              <h2>Section register</h2>
+            </div>
+            <span class="muted">{{ sections.length }} records</span>
+          </div>
+
+          <p v-if="classes.length === 0" class="muted">Create an Academic Class before adding sections.</p>
+          <p v-else-if="loading" class="muted">Loading sections</p>
+
+          <div v-else class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Section</th>
+                  <th>Class</th>
+                  <th>Capacity</th>
+                  <th>Room</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="section in sections" :key="section.id">
+                  <td>
+                    <strong>{{ section.name }}</strong>
+                    <small>{{ section.code }}</small>
+                  </td>
+                  <td>{{ section.academic_class?.name || 'Class' }}</td>
+                  <td>{{ section.capacity || 'Open' }}</td>
+                  <td>{{ section.room || 'Unassigned' }}</td>
+                  <td>{{ section.status }}</td>
+                  <td>
+                    <div class="row-actions">
+                      <button class="text-button" type="button" @click="editSection(section)">Edit</button>
+                      <button class="text-button" type="button" :disabled="section.status === 'archived'" @click="archiveSection(section)">Archive</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr v-if="sections.length === 0">
+                  <td colspan="6">No sections yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
       </section>
     </section>
   </main>
 </template>
 
-<style scoped>
-.sections-page {
-  min-height: 100vh;
-  padding: 30px;
-  background: #f7f3ef;
-}
 
-.sections-header {
-  display: flex;
-  gap: 20px;
-  align-items: end;
-  justify-content: space-between;
-  margin-bottom: 24px;
-}
-
-.back-link {
-  color: #be3455;
-  font-weight: 800;
-}
-
-h1 {
-  margin: 12px 0 0;
-  color: #111827;
-  font-size: clamp(2.1rem, 3.8rem, 4rem);
-  line-height: 0.98;
-}
-
-.sections-header p {
-  max-width: 680px;
-  margin: 16px 0 0;
-  color: #6b7280;
-}
-
-.filter-panel {
-  display: grid;
-  gap: 8px;
-  min-width: 250px;
-}
-
-.header-tools {
-  display: flex;
-  gap: 12px;
-  align-items: end;
-}
-
-.filter-panel label {
-  color: #4b5563;
-  font-size: 0.88rem;
-  font-weight: 700;
-}
-
-.filter-panel select {
-  min-height: 46px;
-  border: 1px solid rgba(17, 24, 39, 0.1);
-  border-radius: 8px;
-  padding: 0 14px;
-  background: #fff;
-  color: #111827;
-}
-
-.sections-grid {
-  display: grid;
-  grid-template-columns: minmax(300px, 390px) minmax(0, 1fr);
-  gap: 18px;
-}
-
-.section-form,
-.section-list {
-  padding: 22px;
-}
-
-.section-form {
-  display: grid;
-  align-content: start;
-  gap: 16px;
-}
-
-.section-form h2,
-.list-heading h2 {
-  margin: 0;
-  color: #111827;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.form-actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.list-heading {
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-  align-items: center;
-  margin-bottom: 18px;
-}
-
-.list-heading span {
-  color: #6b7280;
-  font-weight: 800;
-}
-
-.empty-copy {
-  color: #6b7280;
-}
-
-.table-wrap {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  min-width: 760px;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  border-bottom: 1px solid #e1e9e5;
-  padding: 14px 10px;
-  color: #26332e;
-  text-align: left;
-}
-
-th {
-  color: #6b7280;
-  font-size: 0.84rem;
-  text-transform: uppercase;
-}
-
-td strong,
-td small {
-  display: block;
-}
-
-td small {
-  margin-top: 4px;
-  color: #6b7280;
-}
-
-.row-actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.text-button {
-  border: 0;
-  background: transparent;
-  color: #be3455;
-  cursor: pointer;
-  font-weight: 800;
-}
-
-.text-button:disabled {
-  color: #91a29b;
-  cursor: not-allowed;
-}
-
-@media (max-width: 900px) {
-  .sections-page {
-    padding: 22px;
-  }
-
-  .sections-header,
-  .header-tools,
-  .form-actions {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .sections-grid,
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-
-  .filter-panel {
-    min-width: 0;
-  }
-}
-</style>

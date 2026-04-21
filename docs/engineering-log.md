@@ -14,6 +14,49 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 
 ## 2026-04-21
 
+### Pending Checkpoint - Antigravity Frontend Refresh Review
+
+Current page/module complete: Antigravity dashboard and workspace visual refresh with verified browser QA.
+
+Scope:
+- reviewed Antigravity's uncommitted frontend pass across the dashboard, login page, shared workspace rail, design tokens, and core school workspaces.
+- kept the shared-shell architecture in place while accepting the new visual system centered on:
+  - `apps/web/app/assets/css/main.css`
+  - `apps/web/tailwind.config.ts`
+  - `apps/web/app/components/SchoolWorkspaceRail.vue`
+  - `apps/web/app/pages/dashboard.vue`
+  - `apps/web/app/pages/index.vue`
+- confirmed the new mobile drawer behavior in the shared rail.
+- updated `apps/web/scripts/browser-workflow-smoke.mjs` so the QA suite works with both the old login copy and the new Antigravity login copy.
+- excluded one-off helper cleanup scripts from the checkpoint:
+  - `normalize_layouts.mjs`
+  - `apps/web/clean_orphans.ps1`
+  - `apps/web/app/pages/schools/[schoolId]/clean_orphans.ps1`
+
+Verification:
+- `cd apps/web && npm run build`: passed.
+- direct Playwright browser QA passed for:
+  - login
+  - dashboard
+  - mobile drawer
+  - `/schools/1/academic-classes`
+  - `/schools/1/students`
+  - `/schools/1/reports`
+  - `/schools/1/attendance`
+- `cd apps/web && npm run qa:browser`: passed with 10 workflow checks.
+- useful artifacts saved at:
+  - `docs/browser-checks/antigravity-dashboard-qa-20260421.png`
+  - `docs/browser-checks/antigravity-mobile-drawer-20260421.png`
+  - `docs/browser-checks/workflow-smoke-20260421040744.png`
+
+Notes:
+- the big frontend diff is real product work, not just style noise; core workflows still pass after the UI pass.
+- known Nuxt/Nitro/Node warnings remain the same classified warnings from `docs/KNOWN-BUILD-WARNINGS.md`.
+
+Next:
+- commit and push the Antigravity frontend checkpoint.
+- continue with deeper visual review or focused UI polish on the remaining less-traveled pages.
+
 ### Pending Checkpoint - Frontend Shell Stabilization Before Antigravity
 
 Current page/module complete: dashboard and workspace navigation shell unification.

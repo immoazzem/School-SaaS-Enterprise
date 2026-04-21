@@ -323,47 +323,4 @@ onMounted(loadWorkspace)
   </main>
 </template>
 
-<style scoped>
-.check-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  color: #4b5563;
-  font-weight: 800;
-}
 
-.document-detail {
-  display: grid;
-  gap: 12px;
-}
-
-.document-detail span {
-  display: flex;
-  min-height: 44px;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid #e3ebe7;
-  color: #6b7280;
-  gap: 12px;
-}
-
-.document-detail strong {
-  color: #111827;
-  text-align: right;
-}
-
-.filter-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-}
-
-.filter-row select {
-  min-height: 38px;
-  border: 1px solid rgba(17, 24, 39, 0.1);
-  border-radius: 8px;
-  padding: 0 10px;
-  background: #fff;
-}
-</style>

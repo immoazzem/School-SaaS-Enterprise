@@ -170,409 +170,162 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="years-page">
-    <header class="years-header">
-      <div>
-        <NuxtLink class="back-link" to="/dashboard">Dashboard</NuxtLink>
-        <h1>Academic Years</h1>
-        <p>Define school-year calendars, set the active year, and keep archived years available for records.</p>
-      </div>
+  <main class="operation-shell">
+    <SchoolWorkspaceRail
+      :school-id="schoolId"
+      aria-label="Academic years navigation"
+      context-title="Academics setup"
+      :context-links="[
+        { label: 'Classes', to: `/schools/${schoolId}/academic-classes` },
+        { label: 'Sections', to: `/schools/${schoolId}/academic-sections` },
+        { label: 'Subjects', to: `/schools/${schoolId}/subjects` },
+      ]"
+    />
 
-      <div class="header-actions">
-        <NuxtLink class="button secondary" :to="`/schools/${schoolId}/academic-classes`">
-          Classes
-        </NuxtLink>
-        <NuxtLink class="button secondary" :to="`/schools/${schoolId}/academic-sections`">
-          Sections
-        </NuxtLink>
-        <NuxtLink class="button secondary" :to="`/schools/${schoolId}/subjects`">
-          Subjects
-        </NuxtLink>
-      </div>
-    </header>
-
-    <section class="year-summary">
-      <article class="surface summary-item">
-        <span>Visible years</span>
-        <strong>{{ years.length }}</strong>
-      </article>
-      <article class="surface summary-item">
-        <span>Current year</span>
-        <strong>{{ currentYear?.code || 'Unset' }}</strong>
-      </article>
-      <article class="surface summary-item">
-        <span>Filter</span>
-        <strong>{{ currentOnly ? 'Current' : statusFilter || 'All' }}</strong>
-      </article>
-    </section>
-
-    <section class="years-grid">
-      <form class="surface year-form" @submit.prevent="saveYear">
+    <section class="operation-workspace">
+      <header class="workspace-header">
         <div>
-          <p class="muted">{{ editingYearId ? 'Edit calendar' : 'New calendar' }}</p>
-          <h2>{{ editingYearId ? 'Update academic year' : 'Add academic year' }}</h2>
+          <p class="eyebrow">Academics</p>
+          <h1>Academic Years</h1>
+          <p>Define school-year calendars, set the active year, and keep archived years available for records.</p>
         </div>
+        <NuxtLink class="button secondary" to="/dashboard">Dashboard</NuxtLink>
+      </header>
 
-        <div class="field">
-          <label for="year-name">Name</label>
-          <input id="year-name" v-model="form.name" required placeholder="2026 Academic Year" />
-        </div>
+      <section class="summary-grid">
+        <article class="surface summary-item">
+          <span>Visible years</span>
+          <strong>{{ years.length }}</strong>
+        </article>
+        <article class="surface summary-item">
+          <span>Current year</span>
+          <strong>{{ currentYear?.code || 'Unset' }}</strong>
+        </article>
+        <article class="surface summary-item">
+          <span>Filter</span>
+          <strong>{{ currentOnly ? 'Current' : statusFilter || 'All' }}</strong>
+        </article>
+      </section>
 
-        <div class="field">
-          <label for="year-code">Code</label>
-          <input id="year-code" v-model="form.code" required placeholder="2026" />
-        </div>
-
-        <div class="form-row">
-          <div class="field">
-            <label for="starts-on">Starts on</label>
-            <input id="starts-on" v-model="form.starts_on" required type="date" />
-          </div>
-          <div class="field">
-            <label for="ends-on">Ends on</label>
-            <input id="ends-on" v-model="form.ends_on" required type="date" />
-          </div>
-        </div>
-
-        <div class="form-row">
-          <label class="check-field" for="is-current">
-            <input id="is-current" v-model="form.is_current" type="checkbox" />
-            <span>Set as current</span>
-          </label>
-
-          <div class="field">
-            <label for="year-status">Status</label>
-            <select id="year-status" v-model="form.status">
-              <option value="active">Active</option>
-              <option value="archived">Archived</option>
-            </select>
-          </div>
-        </div>
-
-        <p v-if="error" class="error">{{ error }}</p>
-        <p v-if="success" class="success">{{ success }}</p>
-
-        <div class="form-actions">
-          <button class="button" type="submit" :disabled="saving">
-            {{ saving ? 'Saving' : editingYearId ? 'Update year' : 'Save year' }}
-          </button>
-          <button v-if="editingYearId" class="button secondary" type="button" @click="resetForm">
-            Cancel
-          </button>
-        </div>
-      </form>
-
-      <section class="surface year-list">
-        <div class="list-heading">
+      <section class="workspace-grid">
+        <form class="surface record-form" @submit.prevent="saveYear">
           <div>
-            <p class="muted">Calendar register</p>
-            <h2>Academic years</h2>
+            <p class="muted">{{ editingYearId ? 'Edit calendar' : 'New calendar' }}</p>
+            <h2>{{ editingYearId ? 'Update academic year' : 'Add academic year' }}</h2>
           </div>
 
-          <div class="filters">
-            <label class="check-field compact" for="current-only">
-              <input id="current-only" :checked="currentOnly" type="checkbox" @change="toggleCurrentOnly" />
-              <span>Current only</span>
+          <div class="field">
+            <label for="year-name">Name</label>
+            <input id="year-name" v-model="form.name" required placeholder="2026 Academic Year" />
+          </div>
+
+          <div class="field">
+            <label for="year-code">Code</label>
+            <input id="year-code" v-model="form.code" required placeholder="2026" />
+          </div>
+
+          <div class="form-row">
+            <div class="field">
+              <label for="starts-on">Starts on</label>
+              <input id="starts-on" v-model="form.starts_on" required type="date" />
+            </div>
+            <div class="field">
+              <label for="ends-on">Ends on</label>
+              <input id="ends-on" v-model="form.ends_on" required type="date" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label class="check-field" for="is-current">
+              <input id="is-current" v-model="form.is_current" type="checkbox" />
+              <span>Set as current</span>
             </label>
-
-            <select :value="statusFilter" aria-label="Status filter" @change="chooseStatus">
-              <option value="">All status</option>
-              <option value="active">Active</option>
-              <option value="archived">Archived</option>
-            </select>
+            <div class="field">
+              <label for="year-status">Status</label>
+              <select id="year-status" v-model="form.status">
+                <option value="active">Active</option>
+                <option value="archived">Archived</option>
+              </select>
+            </div>
           </div>
-        </div>
 
-        <p v-if="loading" class="muted">Loading academic years</p>
+          <p v-if="error" class="error">{{ error }}</p>
+          <p v-if="success" class="success">{{ success }}</p>
 
-        <div v-else class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Year</th>
-                <th>Dates</th>
-                <th>Current</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="year in years" :key="year.id">
-                <td>
-                  <strong>{{ year.name }}</strong>
-                  <small>{{ year.code }}</small>
-                </td>
-                <td>
-                  <strong>{{ year.starts_on }}</strong>
-                  <small>to {{ year.ends_on }}</small>
-                </td>
-                <td>
-                  <span class="status-pill" :class="{ current: year.is_current }">
-                    {{ year.is_current ? 'Current' : 'Available' }}
-                  </span>
-                </td>
-                <td>{{ year.status }}</td>
-                <td>
-                  <div class="row-actions">
-                    <button class="text-button" type="button" @click="editYear(year)">Edit</button>
-                    <button
-                      class="text-button"
-                      type="button"
-                      :disabled="year.is_current"
-                      @click="makeCurrent(year)"
-                    >
-                      Set current
-                    </button>
-                    <button
-                      class="text-button"
-                      type="button"
-                      :disabled="year.status === 'archived' || deletingYearId === year.id"
-                      @click="archiveYear(year)"
-                    >
-                      Archive
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr v-if="years.length === 0">
-                <td colspan="5">No academic years yet.</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+          <div class="form-actions">
+            <button class="button" type="submit" :disabled="saving">
+              {{ saving ? 'Saving' : editingYearId ? 'Update year' : 'Save year' }}
+            </button>
+            <button v-if="editingYearId" class="button secondary" type="button" @click="resetForm">Cancel</button>
+          </div>
+        </form>
+
+        <section class="surface record-list">
+          <div class="list-header">
+            <div>
+              <p class="muted">Calendar register</p>
+              <h2>Academic years</h2>
+            </div>
+            <div class="filters">
+              <label class="check-field compact" for="current-only">
+                <input id="current-only" :checked="currentOnly" type="checkbox" @change="toggleCurrentOnly" />
+                <span>Current only</span>
+              </label>
+              <select :value="statusFilter" aria-label="Status filter" @change="chooseStatus">
+                <option value="">All status</option>
+                <option value="active">Active</option>
+                <option value="archived">Archived</option>
+              </select>
+            </div>
+          </div>
+
+          <p v-if="loading" class="muted">Loading academic years</p>
+
+          <div v-else class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Year</th>
+                  <th>Dates</th>
+                  <th>Current</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="year in years" :key="year.id">
+                  <td>
+                    <strong>{{ year.name }}</strong>
+                    <small>{{ year.code }}</small>
+                  </td>
+                  <td>
+                    <strong>{{ year.starts_on }}</strong>
+                    <small>to {{ year.ends_on }}</small>
+                  </td>
+                  <td>
+                    <span class="status-pill" :class="{ current: year.is_current }">
+                      {{ year.is_current ? 'Current' : 'Available' }}
+                    </span>
+                  </td>
+                  <td>{{ year.status }}</td>
+                  <td>
+                    <div class="row-actions">
+                      <button class="text-button" type="button" @click="editYear(year)">Edit</button>
+                      <button class="text-button" type="button" :disabled="year.is_current" @click="makeCurrent(year)">Set current</button>
+                      <button class="text-button" type="button" :disabled="year.status === 'archived' || deletingYearId === year.id" @click="archiveYear(year)">Archive</button>
+                    </div>
+                  </td>
+                </tr>
+                <tr v-if="years.length === 0">
+                  <td colspan="5">No academic years yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
       </section>
     </section>
   </main>
 </template>
 
-<style scoped>
-.years-page {
-  min-height: 100vh;
-  padding: 30px;
-  background: #f7f3ef;
-}
 
-.years-header {
-  display: flex;
-  gap: 20px;
-  align-items: end;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.back-link {
-  color: #be3455;
-  font-weight: 800;
-}
-
-h1 {
-  margin: 12px 0 0;
-  color: #111827;
-  font-size: clamp(2.1rem, 5.8vw, 4.4rem);
-  line-height: 0.96;
-}
-
-.years-header p {
-  max-width: 720px;
-  margin: 16px 0 0;
-  color: #6b7280;
-}
-
-.header-actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.year-summary {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  margin-bottom: 18px;
-}
-
-.summary-item {
-  display: grid;
-  gap: 10px;
-  padding: 18px;
-}
-
-.summary-item span {
-  color: #6b7280;
-  font-weight: 700;
-}
-
-.summary-item strong {
-  color: #111827;
-  font-size: 1.55rem;
-}
-
-.years-grid {
-  display: grid;
-  grid-template-columns: minmax(300px, 390px) minmax(0, 1fr);
-  gap: 18px;
-}
-
-.year-form,
-.year-list {
-  padding: 22px;
-}
-
-.year-form {
-  display: grid;
-  align-content: start;
-  gap: 16px;
-}
-
-.year-form h2,
-.list-heading h2 {
-  margin: 0;
-  color: #111827;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.check-field {
-  display: flex;
-  min-height: 46px;
-  align-items: center;
-  gap: 10px;
-  color: #4b5563;
-  font-weight: 800;
-}
-
-.check-field input {
-  width: 18px;
-  height: 18px;
-  accent-color: #be3455;
-}
-
-.check-field.compact {
-  min-height: 40px;
-  font-size: 0.88rem;
-  white-space: nowrap;
-}
-
-.form-actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.list-heading {
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-  align-items: center;
-  margin-bottom: 18px;
-}
-
-.filters {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
-.filters select {
-  min-height: 42px;
-  border: 1px solid rgba(17, 24, 39, 0.1);
-  border-radius: 8px;
-  padding: 0 12px;
-  background: #fff;
-  color: #111827;
-}
-
-.table-wrap {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  min-width: 820px;
-  border-collapse: collapse;
-}
-
-th,
-td {
-  border-bottom: 1px solid #e1e9e5;
-  padding: 14px 10px;
-  color: #26332e;
-  text-align: left;
-}
-
-th {
-  color: #6b7280;
-  font-size: 0.84rem;
-  text-transform: uppercase;
-}
-
-td strong,
-td small {
-  display: block;
-}
-
-td small {
-  margin-top: 4px;
-  color: #6b7280;
-}
-
-.status-pill {
-  display: inline-flex;
-  min-height: 30px;
-  align-items: center;
-  border: 1px solid #d6e1dc;
-  border-radius: 8px;
-  padding: 0 10px;
-  color: #6b7280;
-  font-weight: 800;
-}
-
-.status-pill.current {
-  border-color: #be3455;
-  background: #eef7f3;
-  color: #be3455;
-}
-
-.row-actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.text-button {
-  border: 0;
-  background: transparent;
-  color: #be3455;
-  cursor: pointer;
-  font-weight: 800;
-}
-
-.text-button:disabled {
-  color: #91a29b;
-  cursor: not-allowed;
-}
-
-@media (max-width: 960px) {
-  .years-page {
-    padding: 22px;
-  }
-
-  .years-header,
-  .header-actions,
-  .form-actions,
-  .filters {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .year-summary,
-  .years-grid,
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-}
-</style>

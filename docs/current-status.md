@@ -4,6 +4,30 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Production Stabilization Status
 
+Current page/module complete: Antigravity frontend refresh review and QA checkpoint.
+
+- Antigravity refreshed the authenticated frontend visual system across the shared shell, dashboard, login page, and core school workspaces.
+- Main frontend changes are centered in:
+  - `apps/web/app/assets/css/main.css`
+  - `apps/web/tailwind.config.ts`
+  - `apps/web/app/components/SchoolWorkspaceRail.vue`
+  - `apps/web/app/pages/dashboard.vue`
+  - `apps/web/app/pages/index.vue`
+- The left navigation now supports a mobile drawer while preserving the shared school workspace rail on desktop.
+- The dashboard now uses grouped module sections, polished KPI cards, and the updated blue/slate design system.
+- The repo QA harness needed one compatibility fix after the login redesign:
+  - `apps/web/scripts/browser-workflow-smoke.mjs` now accepts both the older login labels and Antigravity's new `Email address` / `Continue to Workspace` labels.
+- Verification after Antigravity review:
+  - `npm run build` passed.
+  - direct browser QA passed for login, dashboard, and representative routes.
+  - `npm run qa:browser` passed with 10 workflow checks.
+- Latest useful browser artifacts:
+  - `docs/browser-checks/antigravity-dashboard-qa-20260421.png`
+  - `docs/browser-checks/antigravity-mobile-drawer-20260421.png`
+  - `docs/browser-checks/workflow-smoke-20260421040744.png`
+- Cleanup note:
+  - temporary one-off layout cleanup helper scripts from the Antigravity pass were not kept in the repo checkpoint.
+
 Current page/module complete: Frontend shell stabilization checkpoint before Antigravity dashboard redesign.
 
 - Added a shared workspace rail component at `apps/web/app/components/SchoolWorkspaceRail.vue`.

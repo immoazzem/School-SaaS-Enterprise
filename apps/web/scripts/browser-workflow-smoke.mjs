@@ -43,9 +43,13 @@ async function goto(page, path) {
 
 async function login(page) {
   await page.goto(baseURL, { waitUntil: 'networkidle' })
-  await page.getByLabel('Email').fill('test@example.com')
+  const emailField = page.getByLabel('Email address').or(page.getByLabel('Email'))
+  const continueButton = page.getByRole('button', { name: /Continue to Workspace/i })
+    .or(page.getByRole('button', { name: /^Continue$/i }))
+
+  await emailField.fill('test@example.com')
   await page.getByLabel('Password').fill('password')
-  await page.getByRole('button', { name: 'Continue' }).click()
+  await continueButton.click()
   await page.waitForURL('**/dashboard', { timeout: 20000 })
   await assertNoVisibleErrors(page, 'login')
 }

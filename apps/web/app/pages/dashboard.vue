@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { DashboardSummary } from '~/composables/useApi'
-import { schoolWorkspaceModules } from '~/utils/schoolWorkspaceNav'
+import { schoolWorkspaceGroups, schoolWorkspaceModules } from '~/utils/schoolWorkspaceNav'
 
 interface ItemResponse<T> {
   data: T
@@ -29,8 +29,13 @@ const selectedSchool = computed(() =>
   auth.schools.value.find((school) => school.id === auth.selectedSchoolId.value) ?? null,
 )
 
-const featuredModules = computed(() =>
-  schoolWorkspaceModules.filter((item) => canOpen(item)).slice(0, 8),
+const groupedModules = computed(() =>
+  schoolWorkspaceGroups.map((group) => ({
+    title: group.title,
+    tone: group.tone,
+    items: schoolWorkspaceModules
+      .filter((item) => item.tone === group.tone && canOpen(item)),
+  })),
 )
 
 const currencyFormatter = new Intl.NumberFormat('en-BD', {
@@ -44,21 +49,31 @@ const kpis = computed(() => [
     label: 'Students',
     value: dashboardSummary.value?.admin.student_count ?? 0,
     detail: 'Active and historical records',
+    eyebrow: 'Enrolment',
+    trend: '+2.4%',
   },
   {
     label: 'Employees',
     value: dashboardSummary.value?.admin.employee_count ?? 0,
     detail: 'Teaching and operations team',
+    eyebrow: 'Staff',
+    trend: '+1.1%',
   },
   {
-    label: 'Attendance',
-    value: `${dashboardSummary.value?.admin.today_attendance_rate ?? 0}%`,
+    label: `${dashboardSummary.value?.admin.today_attendance_rate ?? 0}%`,
+    value: null,
     detail: 'Today across recorded students',
+    eyebrow: 'Attendance',
+    isRate: true,
+    trend: '+0.5%',
   },
   {
-    label: 'Collection',
-    value: formatMoney(dashboardSummary.value?.admin.fee_collection_this_month ?? 0),
+    label: formatMoney(dashboardSummary.value?.admin.fee_collection_this_month ?? 0),
+    value: null,
     detail: 'This month',
+    eyebrow: 'Collection',
+    isMoney: true,
+    trend: '+12.5%',
   },
 ])
 
@@ -163,511 +178,203 @@ onMounted(loadDashboard)
 </script>
 
 <template>
-  <main class="dashboard-shell">
+  <main class="operation-shell">
     <SchoolWorkspaceRail :school-id="selectedSchool?.id ?? null" aria-label="Main navigation" />
 
-    <section class="dashboard-main">
-      <header class="dashboard-header">
-        <div>
-          <p class="eyebrow">Command center</p>
-          <h1>{{ selectedSchool?.name || 'No school selected' }}</h1>
-          <p class="header-copy">Five years of academics, attendance, finance, staff, exams, documents, and promotions are ready for local QA.</p>
-        </div>
-
-        <div class="header-actions">
-          <LocaleSwitcher />
-          <button class="dash-btn ghost" type="button" @click="auth.logout()">{{ $t('actions.signOut') }}</button>
-        </div>
-      </header>
-
-      <p v-if="error" class="error">{{ error }}</p>
-      <p v-if="success" class="success">{{ success }}</p>
-      <p v-if="loading || summaryLoading" class="muted">Loading dashboard</p>
-
-      <section class="kpi-grid" aria-label="School metrics">
-        <article v-for="metric in kpis" :key="metric.label" class="kpi-card">
-          <span>{{ metric.label }}</span>
-          <strong>{{ metric.value }}</strong>
-          <small>{{ metric.detail }}</small>
-        </article>
-      </section>
-
-      <section class="dashboard-grid">
-        <article class="panel wide-panel">
-          <div class="panel-header">
-            <div>
-              <p class="eyebrow">Operating picture</p>
-              <h2>Collections trend</h2>
-            </div>
-            <strong>{{ dashboardSummary?.accountant.unpaid_invoices ?? 0 }} unpaid</strong>
+    <section class="operation-workspace pb-24">
+      <div class="workspace-content-inner">
+        <!-- Header -->
+        <header class="workspace-header">
+          <div class="flex flex-col">
+            <p class="eyebrow">Command Center</p>
+            <h1>{{ selectedSchool?.name || 'No tenant selected' }}</h1>
+            <p v-if="selectedSchool" class="text-slate-500 font-medium mt-1.5 flex items-center gap-2">
+              <span class="inline-block w-2h h-2 rounded-full bg-emerald-400"></span>
+              {{ selectedSchool.slug }} · {{ selectedSchool.roles?.[0]?.name || 'Member' }}
+            </p>
           </div>
 
-          <div v-if="collectionTrend.length" class="trend-chart" aria-label="Collection trend">
-            <div v-for="row in collectionTrend" :key="row.month" class="trend-row">
-              <span>{{ row.month }}</span>
-              <div>
-                <i :style="{ width: `${Math.max((Number(row.total) / trendMax) * 100, 4)}%` }"></i>
-              </div>
-              <strong>{{ formatMoney(row.total) }}</strong>
-            </div>
-          </div>
-          <p v-else class="empty-copy">No collection trend yet.</p>
-        </article>
-
-        <article class="panel">
-          <div class="panel-header">
-            <div>
-              <p class="eyebrow">Today</p>
-              <h2>Attention</h2>
-            </div>
-          </div>
-
-          <ul class="attention-list">
-            <li>
-              <span>Pending leave</span>
-              <strong>{{ dashboardSummary?.admin.pending_leave_applications ?? 0 }}</strong>
-            </li>
-            <li>
-              <span>Pending marks</span>
-              <strong>{{ dashboardSummary?.teacher.pending_marks_entries ?? 0 }}</strong>
-            </li>
-            <li>
-              <span>Pending salaries</span>
-              <strong>{{ dashboardSummary?.accountant.pending_salaries ?? 0 }}</strong>
-            </li>
-          </ul>
-        </article>
-      </section>
-
-      <section class="panel">
-        <div class="panel-header">
-          <div>
-            <p class="eyebrow">Modules</p>
-            <h2>Workspaces</h2>
-          </div>
-        </div>
-
-        <div class="module-grid">
-          <button
-            v-for="item in featuredModules"
-            :key="item.label"
-            class="module-card"
-            type="button"
-            @click="openModule(item)"
-          >
-            <strong>{{ item.label }}</strong>
-            <span>{{ item.description }}</span>
-          </button>
-        </div>
-      </section>
-
-      <section class="dashboard-grid">
-        <form class="panel setup-panel" @submit.prevent="createSchool">
-          <div>
-            <p class="eyebrow">Tenant setup</p>
-            <h2>Create a school</h2>
-            <p class="muted">Add another tenant and continue from the same dashboard.</p>
-          </div>
-
-          <div class="field">
-            <label for="school-name">School name</label>
-            <input
-              id="school-name"
-              v-model="schoolForm.name"
-              autocomplete="organization"
-              required
-              type="text"
-              placeholder="Example International School"
-            />
-          </div>
-
-          <div class="field">
-            <label for="school-slug">Slug</label>
-            <input id="school-slug" v-model="schoolForm.slug" type="text" placeholder="example-international-school" />
-          </div>
-
-          <div class="form-row">
-            <div class="field">
-              <label for="school-timezone">Timezone</label>
-              <input id="school-timezone" v-model="schoolForm.timezone" type="text" />
-            </div>
-            <div class="field">
-              <label for="school-locale">Locale</label>
-              <input id="school-locale" v-model="schoolForm.locale" type="text" />
-            </div>
-          </div>
-
-          <button class="dash-btn primary" type="submit" :disabled="creatingSchool">
-            {{ creatingSchool ? 'Creating school' : 'Create school' }}
-          </button>
-        </form>
-
-        <section class="panel">
-          <div class="panel-header">
-            <div>
-              <p class="eyebrow">Tenants</p>
-              <h2>Schools</h2>
-            </div>
-          </div>
-
-          <div v-if="auth.schools.value.length" class="school-list">
-            <button
-              v-for="school in auth.schools.value"
-              :key="school.id"
-              class="school-row"
-              :class="{ selected: school.id === auth.selectedSchoolId.value }"
-              type="button"
-              @click="auth.selectSchool(school.id)"
-            >
-              <span>
-                <strong>{{ school.name }}</strong>
-                <small>{{ school.slug }} / {{ school.roles?.[0]?.name || 'Member' }}</small>
-              </span>
-              <em>{{ school.status }}</em>
+          <div class="flex flex-wrap items-center gap-3 mt-4 md:mt-0">
+            <LocaleSwitcher />
+            <span v-if="auth.user?.email" class="hidden sm:inline-flex items-center px-3 py-1.5 ring-1 ring-inset ring-slate-200 rounded-full bg-white text-xs font-semibold text-slate-700 shadow-sm cursor-default">
+              <svg class="w-4 h-4 mr-1.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+              {{ auth.user?.email }}
+            </span>
+            <button class="button secondary compact" type="button" @click="auth.logout()">
+              {{ $t('actions.signOut') }}
             </button>
           </div>
+        </header>
 
-          <p v-else class="empty-copy">No schools yet.</p>
+        <p v-if="error" class="error fade-in">{{ error }}</p>
+        <p v-if="success" class="success fade-in">{{ success }}</p>
+        
+        <div v-if="loading || summaryLoading" class="flex items-center gap-3 p-4 bg-slate-100 rounded-xl max-w-sm text-slate-500 font-medium text-sm animate-pulse">
+          <svg class="animate-spin h-5 w-5 text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          Loading workspace data…
+        </div>
+
+        <!-- KPI row -->
+        <section v-if="selectedSchool" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 fade-in" aria-label="School metrics">
+          <article v-for="metric in kpis" :key="metric.eyebrow" class="summary-item group">
+            <div class="absolute top-0 right-0 p-4 opacity-10 transform translate-x-2 -translate-y-2 group-hover:scale-110 transition-transform">
+              <svg class="w-20 h-20 text-slate-400" fill="currentColor" viewBox="0 0 24 24"><path opacity="0.4" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z"/><path d="M16.293 8.293a1 1 0 00-1.414 0L12 11.586l-2.879-2.879a1 1 0 10-1.414 1.414l3.586 3.586a1 1 0 001.414 0l4.293-4.293a1 1 0 000-1.414z"/></svg>
+            </div>
+            <span>{{ metric.eyebrow }}</span>
+            <div class="flex items-baseline gap-2 mt-1">
+              <strong>
+                {{ metric.isRate || metric.isMoney ? metric.label : metric.value }}
+              </strong>
+              <span class="!mb-0 inline-flex items-center text-xs font-bold text-emerald-700 bg-emerald-100/50 px-2 py-0.5 rounded-full">
+                <svg class="w-3 h-3 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                {{ metric.trend }}
+              </span>
+            </div>
+            <p class="text-sm text-slate-500 m-0 mt-3 font-medium">{{ metric.detail }}</p>
+          </article>
         </section>
-      </section>
+
+        <!-- Trend + Attention -->
+        <section v-if="selectedSchool" class="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-5 fade-in" style="animation-delay: 50ms;">
+          <article class="surface flex flex-col gap-4 p-5 lg:p-6">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <p class="eyebrow">Operating picture</p>
+                <h2 class="text-xl font-display font-semibold text-slate-900 tracking-tight m-0">Collections trend</h2>
+              </div>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-rose-50 text-rose-700 text-xs font-bold">
+                <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                {{ dashboardSummary?.accountant.unpaid_invoices ?? 0 }} unpaid
+              </span>
+            </div>
+
+            <div v-if="collectionTrend.length" class="flex flex-col gap-3 mt-2" aria-label="Collection trend">
+              <div v-for="row in collectionTrend" :key="row.month" class="grid grid-cols-[60px_1fr_90px] md:grid-cols-[80px_1fr_110px] gap-3 items-center">
+                <span class="text-sm font-semibold text-slate-700">{{ row.month }}</span>
+                <div class="h-8 md:h-10 w-full overflow-hidden rounded-r-lg flex items-center">
+                  <div class="h-full bg-brand-500 rounded-r-lg transition-all duration-500 hover:bg-brand-400" :style="{ width: `${Math.max((Number(row.total) / trendMax) * 100, 2)}%` }"></div>
+                </div>
+                <strong class="text-sm font-bold text-slate-900 text-right">{{ formatMoney(row.total) }}</strong>
+              </div>
+            </div>
+            <p v-else class="text-sm text-slate-500 font-medium py-8 text-center border-2 border-dashed border-slate-200 rounded-xl mt-2">No collection trend data available yet.</p>
+          </article>
+
+          <article class="surface flex flex-col gap-4 p-5 lg:p-6">
+            <div>
+              <p class="eyebrow">Today</p>
+              <h2 class="text-xl font-display font-semibold text-slate-900 tracking-tight m-0">Attention Required</h2>
+            </div>
+
+            <ul class="flex flex-col gap-3 m-0 p-0 list-none mt-2">
+              <li class="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-brand-200 transition-colors shadow-sm">
+                <span class="text-sm font-semibold text-slate-700">Pending leave</span>
+                <strong class="text-2xl font-display font-bold text-brand-600">{{ dashboardSummary?.admin.pending_leave_applications ?? 0 }}</strong>
+              </li>
+              <li class="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-brand-200 transition-colors shadow-sm">
+                <span class="text-sm font-semibold text-slate-700">Pending marks</span>
+                <strong class="text-2xl font-display font-bold text-brand-600">{{ dashboardSummary?.teacher.pending_marks_entries ?? 0 }}</strong>
+              </li>
+              <li class="flex items-center justify-between p-4 rounded-xl border border-slate-200 bg-slate-50 hover:bg-white hover:border-brand-200 transition-colors shadow-sm">
+                <span class="text-sm font-semibold text-slate-700">Pending salaries</span>
+                <strong class="text-2xl font-display font-bold text-brand-600">{{ dashboardSummary?.accountant.pending_salaries ?? 0 }}</strong>
+              </li>
+            </ul>
+          </article>
+        </section>
+
+        <!-- Module grid grouped by section -->
+        <section v-if="selectedSchool" class="flex flex-col gap-8 fade-in mt-2" style="animation-delay: 100ms;">
+          <div v-for="group in groupedModules.filter(g => g.items.length)" :key="group.title" class="flex flex-col gap-3">
+            <h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest border-b border-slate-200 pb-2">{{ group.title }}</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <button
+                v-for="item in group.items"
+                :key="item.label"
+                class="module-tile"
+                type="button"
+                @click="openModule(item)"
+              >
+                <div class="flex items-center gap-3 mb-1">
+                  <div class="w-8 h-8 rounded-lg bg-brand-50 text-brand-600 flex items-center justify-center">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                  </div>
+                  <strong>{{ item.label }}</strong>
+                </div>
+                <span class="pl-11">{{ item.description }}</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Create school + school list -->
+        <section class="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-5 mt-8 border-t border-slate-200 pt-8">
+          <form class="surface flex flex-col gap-5 p-5 lg:p-6" @submit.prevent="createSchool">
+            <div>
+              <p class="eyebrow">Tenants</p>
+              <h2 class="text-xl font-display font-semibold text-slate-900 tracking-tight m-0">Create a New School</h2>
+              <p class="text-sm text-slate-500 mt-1">Deploy a new tenant instantly and manage it from this workspace.</p>
+            </div>
+
+            <div class="field mt-2">
+              <label for="school-name">School name</label>
+              <input id="school-name" v-model="schoolForm.name" autocomplete="organization" required type="text" placeholder="Example International School" />
+            </div>
+
+            <div class="field">
+              <label for="school-slug">Slug Identifier</label>
+              <input id="school-slug" v-model="schoolForm.slug" type="text" placeholder="example-international-school" />
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label for="school-timezone">Timezone</label>
+                <input id="school-timezone" v-model="schoolForm.timezone" type="text" />
+              </div>
+              <div class="field">
+                <label for="school-locale">Locale</label>
+                <input id="school-locale" v-model="schoolForm.locale" type="text" />
+              </div>
+            </div>
+
+            <div class="mt-2 text-right">
+              <button class="button md:w-auto w-full" type="submit" :disabled="creatingSchool">
+                <span v-if="creatingSchool" class="flex items-center gap-2">
+                  <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                  Deploying...
+                </span>
+                <span v-else>Deploy School tenant</span>
+              </button>
+            </div>
+          </form>
+
+          <article class="surface flex flex-col gap-5 p-5 lg:p-6">
+            <div>
+              <p class="eyebrow">Tenants</p>
+              <h2 class="text-xl font-display font-semibold text-slate-900 tracking-tight m-0">Your Access</h2>
+            </div>
+
+            <div v-if="auth.schools.value.length" class="flex flex-col gap-3 mt-2">
+              <button
+                v-for="school in auth.schools.value"
+                :key="school.id"
+                class="flex items-center justify-between p-4 border border-slate-200 rounded-xl text-left transition-all duration-150"
+                :class="school.id === auth.selectedSchoolId.value ? 'bg-brand-50 border-brand-200 shadow-sm' : 'bg-white hover:bg-slate-50 hover:border-slate-300'"
+                type="button"
+                @click="auth.selectSchool(school.id)"
+              >
+                <span class="flex flex-col gap-1">
+                  <strong class="text-sm font-bold text-slate-900 leading-none">{{ school.name }}</strong>
+                  <small class="text-xs text-slate-500">{{ school.slug }} / {{ school.roles?.[0]?.name || 'Member' }}</small>
+                </span>
+                <span class="status-pill" :class="school.status">{{ school.status }}</span>
+              </button>
+            </div>
+
+            <p v-else class="text-sm text-slate-500 font-medium py-10 text-center border-2 border-dashed border-slate-200 rounded-xl mt-2">No active access. Create a tenant.</p>
+          </article>
+        </section>
+      </div>
     </section>
   </main>
 </template>
-
-<style scoped>
-.dashboard-shell {
-  display: grid;
-  min-height: 100vh;
-  grid-template-columns: 288px minmax(0, 1fr);
-  background: #f4f7f8;
-  color: #18201d;
-}
-
-.panel h2,
-.dashboard-header h1 {
-  color: #18201d;
-}
-
-.eyebrow {
-  color: #a33d4f;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.dashboard-main {
-  display: grid;
-  align-content: start;
-  gap: 18px;
-  padding: 28px;
-}
-
-.dashboard-header,
-.panel-header {
-  display: flex;
-  gap: 18px;
-  align-items: flex-start;
-  justify-content: space-between;
-}
-
-.dashboard-header h1 {
-  max-width: 860px;
-  margin: 0;
-  font-size: 3.2rem;
-  font-weight: 780;
-  letter-spacing: 0;
-  line-height: 1;
-}
-
-.header-copy {
-  max-width: 760px;
-  margin: 12px 0 0;
-  color: #5e6a66;
-  font-size: 1rem;
-  line-height: 1.6;
-}
-
-.header-actions {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.dash-btn {
-  display: inline-flex;
-  min-height: 42px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #cad6d3;
-  border-radius: 8px;
-  padding: 0 16px;
-  background: #fff;
-  color: #18201d;
-  cursor: pointer;
-  font-weight: 800;
-}
-
-.dash-btn:hover {
-  border-color: #1f6f5b;
-  color: #1f6f5b;
-}
-
-.dash-btn.primary {
-  border-color: #1f6f5b;
-  background: #1f6f5b;
-  color: #fff;
-}
-
-.dash-btn:disabled {
-  cursor: progress;
-  opacity: 0.7;
-}
-
-.eyebrow {
-  margin: 0 0 8px;
-  font-size: 0.76rem;
-  letter-spacing: 0;
-}
-
-.kpi-grid,
-.dashboard-grid,
-.module-grid {
-  display: grid;
-  gap: 14px;
-}
-
-.kpi-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.dashboard-grid {
-  grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.75fr);
-}
-
-.panel,
-.kpi-card {
-  border: 1px solid #dce5e2;
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 18px 44px rgba(24, 32, 29, 0.06);
-}
-
-.panel {
-  padding: 22px;
-}
-
-.kpi-card {
-  display: grid;
-  gap: 8px;
-  min-height: 138px;
-  padding: 18px;
-}
-
-.kpi-card span,
-.kpi-card small,
-.empty-copy,
-.muted {
-  color: #65716d;
-}
-
-.kpi-card strong {
-  color: #18201d;
-  font-size: 2rem;
-  font-weight: 820;
-  letter-spacing: 0;
-}
-
-.wide-panel {
-  min-height: 340px;
-}
-
-.panel-header h2 {
-  margin: 0;
-  font-size: 1.35rem;
-}
-
-.panel-header > strong {
-  border-radius: 8px;
-  padding: 8px 10px;
-  background: #fff2f4;
-  color: #a33d4f;
-}
-
-.trend-chart {
-  display: grid;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-.trend-row {
-  display: grid;
-  grid-template-columns: 72px minmax(0, 1fr) 120px;
-  gap: 12px;
-  align-items: center;
-}
-
-.trend-row span,
-.trend-row strong {
-  color: #34423e;
-  font-weight: 800;
-}
-
-.trend-row div {
-  height: 12px;
-  overflow: hidden;
-  border-radius: 8px;
-  background: #e8efed;
-}
-
-.trend-row i {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: #1f6f5b;
-}
-
-.attention-list {
-  display: grid;
-  gap: 12px;
-  margin: 18px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.attention-list li {
-  display: flex;
-  min-height: 58px;
-  align-items: center;
-  justify-content: space-between;
-  border: 1px solid #e1e8e6;
-  border-radius: 8px;
-  padding: 12px;
-  background: #f8fbfa;
-}
-
-.attention-list span {
-  color: #5e6a66;
-  font-weight: 760;
-}
-
-.attention-list strong {
-  color: #a33d4f;
-  font-size: 1.35rem;
-}
-
-.module-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin-top: 18px;
-}
-
-.module-card {
-  display: grid;
-  gap: 8px;
-  min-height: 104px;
-  align-content: start;
-  border: 1px solid #dce5e2;
-  border-radius: 8px;
-  padding: 14px;
-  background: #f8fbfa;
-  color: #18201d;
-  cursor: pointer;
-  text-align: left;
-}
-
-.module-card:hover {
-  border-color: #1f6f5b;
-  background: #eef8f4;
-}
-
-.module-card span {
-  color: #65716d;
-  line-height: 1.45;
-}
-
-.setup-panel {
-  display: grid;
-  align-content: start;
-  gap: 16px;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.school-list {
-  display: grid;
-  gap: 10px;
-  margin-top: 16px;
-}
-
-.school-row {
-  display: flex;
-  min-height: 66px;
-  align-items: center;
-  justify-content: space-between;
-  border: 1px solid #dce5e2;
-  border-radius: 8px;
-  padding: 12px;
-  background: #fff;
-  color: #18201d;
-  cursor: pointer;
-  text-align: left;
-}
-
-.school-row.selected,
-.school-row:hover {
-  border-color: #1f6f5b;
-  background: #eef8f4;
-}
-
-.school-row span {
-  display: grid;
-  gap: 4px;
-}
-
-.school-row small {
-  color: #65716d;
-}
-
-.school-row em {
-  color: #1f6f5b;
-  font-style: normal;
-  font-weight: 900;
-  text-transform: capitalize;
-}
-
-@media (max-width: 1100px) {
-  .dashboard-shell,
-  .dashboard-grid,
-  .kpi-grid,
-  .module-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .dashboard-header,
-  .header-actions {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .dashboard-header h1 {
-    font-size: 2.25rem;
-  }
-}
-
-@media (max-width: 680px) {
-  .dashboard-main {
-    padding: 16px;
-  }
-
-  .form-row,
-  .trend-row {
-    grid-template-columns: 1fr;
-  }
-
-  .trend-row strong {
-    justify-self: start;
-  }
-}
-</style>

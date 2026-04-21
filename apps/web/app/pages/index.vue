@@ -25,175 +25,63 @@ async function submitLogin() {
 </script>
 
 <template>
-  <main class="login-page">
-    <section class="login-intro fade-in">
-      <p class="eyebrow">Enterprise school operations</p>
-      <h1>Run every school from one calm workspace.</h1>
-      <p class="intro-copy">
-        Sign in, choose a school, and manage the first academic setup module.
-      </p>
-      <div class="status-line">
-        <span>API</span>
-        <strong>{{ apiEndpoint }}</strong>
+  <main class="min-h-screen flex flex-col lg:flex-row bg-slate-50 relative overflow-hidden">
+    <!-- Left Column: Branding (Dark/Glassy) -->
+    <section class="lg:w-1/2 bg-slate-900 text-white flex flex-col justify-center p-8 lg:p-16 relative z-10">
+      <!-- Subtle Background Pattern -->
+      <div class="absolute inset-0 z-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 32px 32px;"></div>
+      
+      <div class="relative z-10 max-w-lg fade-in">
+        <p class="text-brand-400 font-bold tracking-widest uppercase text-sm mb-4">Enterprise Operations</p>
+        <h1 class="text-4xl lg:text-6xl font-display font-extrabold tracking-tight leading-tight mb-6 text-white mt-0">
+          Run every school from one calm workspace.
+        </h1>
+        <p class="text-slate-300 text-lg md:text-xl leading-relaxed mb-10">
+          Sign in, choose a school scope, and manage academics, people, and operations with absolute precision.
+        </p>
+        
+        <div class="inline-flex items-center gap-3 px-4 py-2.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md">
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span class="text-sm font-semibold text-slate-200">API: <strong class="text-white">{{ apiEndpoint }}</strong></span>
+        </div>
       </div>
     </section>
 
-    <section class="login-panel surface fade-in" aria-label="Sign in">
-      <div>
-        <p class="panel-label">Workspace access</p>
-        <h2>Sign in</h2>
+    <!-- Right Column: Authentication -->
+    <section class="lg:w-1/2 flex items-center justify-center p-8 lg:p-16 bg-white relative z-20 shadow-2xl">
+      <div class="w-full max-w-md fade-in" style="animation-delay: 150ms;">
+        <div class="mb-8 text-center lg:text-left">
+          <div class="w-12 h-12 bg-brand-600 rounded-xl flex items-center justify-center shadow-lg shadow-brand-600/20 mb-6 mx-auto lg:mx-0">
+            <span class="text-white font-bold text-xl">S</span>
+          </div>
+          <p class="text-sm font-bold text-brand-600 uppercase tracking-widest mb-2 m-0">Workspace Access</p>
+          <h2 class="text-3xl font-display font-bold text-slate-900 tracking-tight m-0">Sign in to continue</h2>
+        </div>
+
+        <form @submit.prevent="submitLogin" class="flex flex-col gap-5">
+          <div class="field">
+            <label for="email">Email address</label>
+            <input id="email" v-model="email" autocomplete="email" type="email" required />
+          </div>
+          <div class="field">
+            <label for="password">Password</label>
+            <input id="password" v-model="password" autocomplete="current-password" type="password" required />
+          </div>
+
+          <p v-if="error" class="error mt-2">{{ error }}</p>
+
+          <button class="button mt-4 w-full" type="submit" :disabled="loading">
+            <span v-if="loading" class="flex items-center gap-2">
+              <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Authenticating...
+            </span>
+            <span v-else>Continue to Workspace</span>
+          </button>
+        </form>
       </div>
-
-      <form class="login-form" @submit.prevent="submitLogin">
-        <div class="field">
-          <label for="email">Email</label>
-          <input id="email" v-model="email" autocomplete="email" type="email" />
-        </div>
-        <div class="field">
-          <label for="password">Password</label>
-          <input id="password" v-model="password" autocomplete="current-password" type="password" />
-        </div>
-
-        <p v-if="error" class="error">{{ error }}</p>
-
-        <button class="button" type="submit" :disabled="loading">
-          {{ loading ? 'Signing in' : 'Continue' }}
-        </button>
-      </form>
     </section>
   </main>
 </template>
-
-<style scoped>
-.login-page {
-  position: relative;
-  isolation: isolate;
-  display: grid;
-  min-height: 100vh;
-  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 440px);
-  gap: 48px;
-  align-items: center;
-  padding: 56px;
-  background:
-    radial-gradient(circle at 82% 12%, rgba(238, 135, 203, 0.32), transparent 24rem),
-    radial-gradient(circle at 16% 20%, rgba(255, 241, 190, 0.78), transparent 28rem),
-    linear-gradient(180deg, #fffaf4 0%, #f5f0ed 54%, #eceff3 100%);
-  overflow: hidden;
-}
-
-.login-page::before {
-  position: absolute;
-  inset: 18px;
-  z-index: -1;
-  border-radius: 8px;
-  background: linear-gradient(115deg, #fff1be 28%, #ee87cb 70%, #b060ff);
-  box-shadow: inset 0 0 0 1px rgba(17, 24, 39, 0.06);
-  content: "";
-  opacity: 0.86;
-}
-
-.login-page::after {
-  position: absolute;
-  inset: 26px;
-  z-index: -1;
-  border-radius: 8px;
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.2)),
-    linear-gradient(rgba(17, 24, 39, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(17, 24, 39, 0.05) 1px, transparent 1px);
-  background-size: auto, 64px 64px, 64px 64px;
-  content: "";
-}
-
-.login-intro {
-  max-width: 760px;
-  padding: 26px;
-}
-
-.eyebrow,
-.panel-label {
-  margin: 0 0 18px;
-  color: #7c1938;
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0;
-  text-transform: uppercase;
-}
-
-h1 {
-  max-width: 780px;
-  margin: 0;
-  color: #111827;
-  font-size: clamp(3rem, 8vw, 7.4rem);
-  font-weight: 760;
-  letter-spacing: -0.065em;
-  line-height: 0.84;
-}
-
-.intro-copy {
-  max-width: 520px;
-  margin: 28px 0 0;
-  color: rgba(17, 24, 39, 0.72);
-  font-size: 1.2rem;
-  line-height: 1.6;
-}
-
-.status-line {
-  display: inline-flex;
-  max-width: 100%;
-  gap: 12px;
-  align-items: center;
-  margin-top: 38px;
-  border: 1px solid rgba(17, 24, 39, 0.07);
-  border-radius: 999px;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.42);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.7),
-    0 14px 30px rgba(17, 24, 39, 0.08);
-  color: rgba(17, 24, 39, 0.64);
-  backdrop-filter: blur(18px);
-}
-
-.status-line strong {
-  overflow-wrap: anywhere;
-  color: #111827;
-}
-
-.login-panel {
-  display: grid;
-  gap: 28px;
-  border-color: rgba(255, 255, 255, 0.42);
-  padding: 34px;
-  background: rgba(255, 255, 255, 0.52);
-}
-
-.login-panel h2 {
-  margin: 0;
-  color: #111827;
-  font-size: 2rem;
-  letter-spacing: -0.035em;
-}
-
-.login-form {
-  display: grid;
-  gap: 18px;
-}
-
-button:disabled {
-  cursor: progress;
-  opacity: 0.7;
-}
-
-@media (max-width: 860px) {
-  .login-page {
-    grid-template-columns: 1fr;
-    gap: 30px;
-    padding: 28px;
-  }
-
-  h1 {
-    font-size: clamp(2.6rem, 16vw, 4.4rem);
-  }
-}
-</style>

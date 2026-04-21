@@ -38,8 +38,8 @@ export default defineNuxtConfig({
       name: 'School SaaS Enterprise',
       short_name: 'School SaaS',
       description: 'School operations workspace for attendance, marks, finance, and academic workflows.',
-      theme_color: '#be3455',
-      background_color: '#f7f3ef',
+      theme_color: '#2563eb',
+      background_color: '#f8fafc',
       display: 'standalone',
       start_url: '/',
       icons: [
