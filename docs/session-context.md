@@ -884,7 +884,7 @@ Current page/module complete: Production Stabilization Checkpoint I, Final Stabi
 
 Production stabilization status:
 
-- `docs/IMPROVEMENT-ROADMAP.md` is the active pre-Phase 7 stabilization roadmap.
+- Pre-Phase 7 stabilization is complete; use `docs/current-status.md` and `docs/engineering-log.md` for the durable record instead of a separate roadmap file.
 - Checkpoint A roadmap was committed and pushed as `933a920 docs: add production stabilization roadmap`.
 - Checkpoint B frontend foundation was committed and pushed as `a6bcff8 feat: stabilize frontend foundation`.
 - Nuxt frontend dependencies now include Tailwind CSS module, Tailwind v3, Pinia, VueUse, Zod, PostCSS, and Autoprefixer.
