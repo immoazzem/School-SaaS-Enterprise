@@ -14,6 +14,52 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 
 ## 2026-04-22
 
+### Pending Checkpoint - Root Operator Pages Moved Off Mock Data
+
+Current page/module complete: root operator pages now read from live API data instead of `schoolDashboardData.ts`.
+
+Scope:
+- replaced the remaining mock-driven root pages with live API-backed views:
+  - `apps/web/pages/index.vue`
+  - `apps/web/pages/analytics.vue`
+  - `apps/web/pages/students.vue`
+  - `apps/web/pages/classes.vue`
+  - `apps/web/pages/attendance.vue`
+  - `apps/web/pages/marks.vue`
+  - `apps/web/pages/reports.vue`
+  - `apps/web/pages/finance/fees.vue`
+- redirected `apps/web/pages/second-page.vue` to `/` so the old template stub no longer ships.
+- deleted `apps/web/utils/schoolDashboardData.ts` because the rebuilt root operator surfaces no longer depend on curated mock arrays.
+
+Verification:
+- `cd apps/web && npm run build`: passed.
+- super-admin browser sweep passed with no console errors and no `4xx/5xx` responses for:
+  - `/`
+  - `/analytics`
+  - `/students`
+  - `/classes`
+  - `/attendance`
+  - `/marks`
+  - `/reports`
+  - `/finance/fees`
+- browser artifacts saved at:
+  - `docs/browser-checks/root-dashboard-live-20260422.png`
+  - `docs/browser-checks/route-_analytics-20260422.png`
+  - `docs/browser-checks/route-_students-20260422.png`
+  - `docs/browser-checks/route-_classes-20260422.png`
+  - `docs/browser-checks/route-_attendance-20260422.png`
+  - `docs/browser-checks/route-_marks-20260422.png`
+  - `docs/browser-checks/route-_reports-20260422.png`
+  - `docs/browser-checks/route-_finance_fees-20260422.png`
+
+Notes:
+- one runtime defect surfaced during the first browser pass: the root reports page called a nonexistent `/report-exports` endpoint. That was removed and the page now derives its queue from live report-capable modules.
+- build still emits the previously known Nuxt/Nitro warnings already tracked in `docs/KNOWN-BUILD-WARNINGS.md`.
+
+Next:
+- continue school-scoped mutation QA using the super-admin and role accounts on the ten-year seeded environment.
+- focus next on deeper create/update/delete workflows and cross-module regressions rather than adding more broad overview pages.
+
 ### Pending Checkpoint - Enterprise Route Coverage And Ten-Year QA Baseline
 
 Current page/module complete: missing route-family frontend coverage, role-aware admin UX, and ten-year seeded QA baseline.

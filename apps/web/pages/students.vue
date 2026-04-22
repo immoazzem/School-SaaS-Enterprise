@@ -1,28 +1,32 @@
 <script setup lang="ts">
-import { studentRoster } from '@/utils/schoolDashboardData'
+import type { Student, StudentInvoice } from '~/composables/useApi'
 
 definePageMeta({
   layout: 'default',
 })
 
-interface LiveStudentRecord {
-  id: number
-  full_name: string
-  admission_no: string
-  guardian?: {
-    full_name?: string
-  }
+interface StudentsResponse {
+  data: Student[]
 }
 
-interface LiveStudentsResponse {
-  data: LiveStudentRecord[]
+interface InvoicesResponse {
+  data: StudentInvoice[]
+}
+
+type LiveStudentRow = {
+  id: number
+  name: string
+  className: string
+  guardian: string
+  risk: string
+  balance: string
 }
 
 const session = useSession()
 const loading = ref(false)
 const errorMessage = ref('')
 const search = ref('')
-const liveStudents = ref(studentRoster)
+const liveStudents = ref<LiveStudentRow[]>([])
 
 const riskColor = (value: string) => ({
   Low: 'success',
@@ -31,26 +35,50 @@ const riskColor = (value: string) => ({
 }[value] ?? 'default')
 
 async function loadStudents() {
-  if (!session.selectedSchool.value)
+  if (!session.selectedSchool.value) {
+    liveStudents.value = []
     return
+  }
 
   loading.value = true
   errorMessage.value = ''
 
   try {
-    const response = await useApiFetch<LiveStudentsResponse>(`/schools/${session.selectedSchool.value.id}/students?status=active&search=${encodeURIComponent(search.value)}`)
+    const schoolId = session.selectedSchool.value.id
+    const query = new URLSearchParams({ status: 'active' })
+    if (search.value.trim())
+      query.set('search', search.value.trim())
 
-    liveStudents.value = response.data.map(student => ({
-      name: student.full_name,
-      className: student.admission_no,
-      guardian: student.guardian?.full_name ?? 'No guardian linked',
-      risk: 'Low',
-      balance: 'Live record',
-    }))
+    const [studentResponse, invoiceResponse] = await Promise.all([
+      useApiFetch<StudentsResponse>(`/schools/${schoolId}/students?${query.toString()}`),
+      useApiFetch<InvoicesResponse>(`/schools/${schoolId}/student-invoices?per_page=300`),
+    ])
+
+    const balances = new Map<number, number>()
+    invoiceResponse.data.forEach((invoice) => {
+      const studentId = invoice.student_enrollment?.student_id
+      if (!studentId)
+        return
+      balances.set(studentId, (balances.get(studentId) ?? 0) + Math.max(Number(invoice.total) - Number(invoice.paid_amount), 0))
+    })
+
+    liveStudents.value = studentResponse.data.map((student) => {
+      const balance = balances.get(student.id) ?? 0
+      const risk = balance >= 10000 ? 'Intervention' : balance > 0 ? 'Watch' : 'Low'
+
+      return {
+        id: student.id,
+        name: student.full_name,
+        className: student.admission_no,
+        guardian: student.guardian?.full_name ?? 'No guardian linked',
+        risk,
+        balance: balance > 0 ? `৳ ${Math.round(balance).toLocaleString()}` : 'Cleared',
+      }
+    })
   }
   catch {
-    errorMessage.value = 'Student records could not be loaded from the API. Showing the local snapshot instead.'
-    liveStudents.value = studentRoster
+    errorMessage.value = 'Student records could not be loaded from the API.'
+    liveStudents.value = []
   }
   finally {
     loading.value = false
@@ -65,13 +93,13 @@ watch([() => session.selectedSchool.value?.id, search], loadStudents, { immediat
     <SchoolPageHeader
       eyebrow="Students"
       title="Student operations"
-      subtitle="Track learner status, financial follow-up, and guardian accountability from one list."
+      subtitle="Track learner status, financial follow-up, and guardian accountability from one live list."
     >
       <template #actions>
-        <VBtn variant="outlined" color="default" prepend-icon="tabler-filter">
-          Filters
+        <VBtn variant="outlined" color="default" prepend-icon="tabler-filter" :to="session.selectedSchool ? `/schools/${session.selectedSchool.id}/enrollments` : '/schools'">
+          Enrollments
         </VBtn>
-        <VBtn color="primary" prepend-icon="tabler-user-plus">
+        <VBtn color="primary" prepend-icon="tabler-user-plus" :to="session.selectedSchool ? `/schools/${session.selectedSchool.id}/students` : '/schools'">
           Add student
         </VBtn>
       </template>
@@ -91,7 +119,7 @@ watch([() => session.selectedSchool.value?.id, search], loadStudents, { immediat
         <div class="school-toolbar">
           <VTextField
             v-model="search"
-            placeholder="Search by student, class, guardian"
+            placeholder="Search by student, admission number, guardian"
             prepend-inner-icon="tabler-search"
             density="compact"
             hide-details
@@ -99,8 +127,8 @@ watch([() => session.selectedSchool.value?.id, search], loadStudents, { immediat
             rounded="lg"
             class="school-toolbar__search"
           />
-          <VBtn variant="tonal" color="default" prepend-icon="tabler-download">
-            Export
+          <VBtn variant="tonal" color="default" prepend-icon="tabler-download" :to="session.selectedSchool ? `/schools/${session.selectedSchool.id}/students` : '/schools'">
+            Open workspace
           </VBtn>
         </div>
       </VCardText>
@@ -112,18 +140,18 @@ watch([() => session.selectedSchool.value?.id, search], loadStudents, { immediat
         >
           Loading student records...
         </div>
-        <VTable class="school-data-table">
+        <VTable v-else class="school-data-table">
           <thead>
             <tr>
               <th>Student</th>
-              <th>Class</th>
+              <th>Admission</th>
               <th>Guardian</th>
               <th>Risk</th>
               <th>Balance</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="student in liveStudents" :key="student.name">
+            <tr v-for="student in liveStudents" :key="student.id">
               <td class="font-weight-medium">{{ student.name }}</td>
               <td>{{ student.className }}</td>
               <td>{{ student.guardian }}</td>

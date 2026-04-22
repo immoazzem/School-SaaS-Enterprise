@@ -115,6 +115,33 @@ Do not preserve the prior Antigravity pass just because it exists.
 
 ## Current Implementation Checkpoints
 
+- Latest checkpoint: root operator pages moved off mock data and verified with a super-admin browser sweep.
+- Root-level operator pages are now live API-backed instead of using `apps/web/utils/schoolDashboardData.ts`:
+  - `apps/web/pages/index.vue`
+  - `apps/web/pages/analytics.vue`
+  - `apps/web/pages/students.vue`
+  - `apps/web/pages/classes.vue`
+  - `apps/web/pages/attendance.vue`
+  - `apps/web/pages/marks.vue`
+  - `apps/web/pages/reports.vue`
+  - `apps/web/pages/finance/fees.vue`
+- `apps/web/pages/second-page.vue` now redirects to `/`.
+- `apps/web/utils/schoolDashboardData.ts` was deleted because the rebuilt root operator layer no longer depends on mock arrays.
+- Latest verification:
+  - `cd apps/web && npm run build` passed
+  - super-admin browser sweep passed cleanly for `/`, `/analytics`, `/students`, `/classes`, `/attendance`, `/marks`, `/reports`, and `/finance/fees`
+- Latest browser artifacts:
+  - `docs/browser-checks/root-dashboard-live-20260422.png`
+  - `docs/browser-checks/route-_analytics-20260422.png`
+  - `docs/browser-checks/route-_students-20260422.png`
+  - `docs/browser-checks/route-_classes-20260422.png`
+  - `docs/browser-checks/route-_attendance-20260422.png`
+  - `docs/browser-checks/route-_marks-20260422.png`
+  - `docs/browser-checks/route-_reports-20260422.png`
+  - `docs/browser-checks/route-_finance_fees-20260422.png`
+- Immediate next step:
+  - continue deeper school-scoped mutation QA and bug fixing on the ten-year seed rather than broadening the route map further.
+
 - Latest checkpoint: enterprise route coverage pass and ten-year QA baseline.
 - Missing route-family frontend surfaces have now been added for:
   - enterprise admin

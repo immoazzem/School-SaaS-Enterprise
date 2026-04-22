@@ -4,6 +4,46 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Frontend Checkpoint
 
+Current page/module complete: root operator pages converted from mock-driven dashboards to live super-admin verified portfolio surfaces.
+
+- Replaced the remaining root-level mock-backed pages with live API-backed operator views:
+  - `apps/web/pages/index.vue`
+  - `apps/web/pages/analytics.vue`
+  - `apps/web/pages/students.vue`
+  - `apps/web/pages/classes.vue`
+  - `apps/web/pages/attendance.vue`
+  - `apps/web/pages/marks.vue`
+  - `apps/web/pages/reports.vue`
+  - `apps/web/pages/finance/fees.vue`
+- Removed the dead placeholder page by redirecting `apps/web/pages/second-page.vue` to `/`.
+- Deleted obsolete mock source `apps/web/utils/schoolDashboardData.ts`.
+- Super-admin browser verification passed cleanly for:
+  - `/`
+  - `/analytics`
+  - `/students`
+  - `/classes`
+  - `/attendance`
+  - `/marks`
+  - `/reports`
+  - `/finance/fees`
+- Latest useful browser artifacts:
+  - `docs/browser-checks/root-dashboard-live-20260422.png`
+  - `docs/browser-checks/route-_analytics-20260422.png`
+  - `docs/browser-checks/route-_students-20260422.png`
+  - `docs/browser-checks/route-_classes-20260422.png`
+  - `docs/browser-checks/route-_attendance-20260422.png`
+  - `docs/browser-checks/route-_marks-20260422.png`
+  - `docs/browser-checks/route-_reports-20260422.png`
+  - `docs/browser-checks/route-_finance_fees-20260422.png`
+- Verification after this pass:
+  - `cd apps/web && npm run build` passed
+  - super-admin browser sweep completed with `[]` runtime issues on the rebuilt root routes
+- Known follow-up:
+  - the frontend now has much less fake operator state, but the project is still not at the honest end-state of “whole project finished”.
+  - next work should continue deeper mutation QA on the school-scoped modules and edge-case workflows under the ten-year seed.
+
+## Latest Frontend Checkpoint
+
 Current page/module complete: enterprise route coverage pass, role-aware admin surfaces, and ten-year seeded QA baseline.
 
 - Added missing live frontend surfaces for the remaining backend route families:

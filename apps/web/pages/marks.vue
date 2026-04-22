@@ -1,27 +1,37 @@
 <script setup lang="ts">
-import { marksReleaseReadiness, marksRows } from '@/utils/schoolDashboardData'
+import type { DashboardSummary, MarksEntry } from '~/composables/useApi'
 
 definePageMeta({
   layout: 'default',
 })
 
-interface LiveMarksRecord {
-  verification_status: string
-  class_subject?: {
-    subject?: {
-      name?: string
-    }
-  }
+interface ListResponse<T> {
+  data: T[]
 }
 
-interface LiveMarksResponse {
-  data: LiveMarksRecord[]
+interface DashboardSummaryResponse {
+  data: DashboardSummary
+}
+
+type MarksRow = {
+  subject: string
+  progress: string
+  pending: number
+  moderated: string
+}
+
+type ReadinessRow = {
+  title: string
+  note: string
+  value: string
+  tone: string
 }
 
 const session = useSession()
 const loading = ref(false)
 const errorMessage = ref('')
-const liveMarksRows = ref(marksRows)
+const liveMarksRows = ref<MarksRow[]>([])
+const readinessRows = ref<ReadinessRow[]>([])
 
 const moderationColor = (value: string) => ({
   Complete: 'success',
@@ -30,37 +40,76 @@ const moderationColor = (value: string) => ({
 }[value] ?? 'default')
 
 async function loadMarks() {
-  if (!session.selectedSchool.value)
+  if (!session.selectedSchool.value) {
+    liveMarksRows.value = []
+    readinessRows.value = []
     return
+  }
 
   loading.value = true
   errorMessage.value = ''
 
   try {
-    const response = await useApiFetch<LiveMarksResponse>(`/schools/${session.selectedSchool.value.id}/marks-entries`)
+    const schoolId = session.selectedSchool.value.id
+    const [marksResponse, dashboardResponse] = await Promise.all([
+      useApiFetch<ListResponse<MarksEntry>>(`/schools/${schoolId}/marks-entries?per_page=300`),
+      useApiFetch<DashboardSummaryResponse>(`/schools/${schoolId}/dashboard/summary`),
+    ])
 
-    const grouped = new Map<string, { subject: string; progress: string; pending: number; moderated: string }>()
-
-    response.data.forEach(entry => {
+    const grouped = new Map<string, { total: number; pending: number; rejected: number }>()
+    marksResponse.data.forEach((entry) => {
       const subject = entry.class_subject?.subject?.name ?? 'Unknown subject'
-      const existing = grouped.get(subject) ?? { subject, progress: '0%', pending: 0, moderated: 'Complete' }
-      existing.pending += entry.verification_status === 'pending' ? 1 : 0
-      existing.moderated = entry.verification_status === 'rejected'
-        ? 'Needs review'
-        : entry.verification_status === 'pending'
-          ? 'In review'
-          : existing.moderated
-      grouped.set(subject, existing)
+      const bucket = grouped.get(subject) ?? { total: 0, pending: 0, rejected: 0 }
+      bucket.total += 1
+      if (entry.verification_status === 'pending')
+        bucket.pending += 1
+      if (entry.verification_status === 'rejected')
+        bucket.rejected += 1
+      grouped.set(subject, bucket)
     })
 
-    liveMarksRows.value = (grouped.size ? Array.from(grouped.values()) : marksRows).map(row => ({
-      ...row,
-      progress: row.pending > 0 ? `${Math.max(100 - row.pending * 2, 35)}%` : '100%',
-    }))
+    liveMarksRows.value = Array.from(grouped.entries()).map(([subject, bucket]) => {
+      const completed = Math.max(bucket.total - bucket.pending - bucket.rejected, 0)
+      const progress = bucket.total > 0 ? `${Math.round((completed / bucket.total) * 100)}%` : '0%'
+
+      return {
+        subject,
+        progress,
+        pending: bucket.pending + bucket.rejected,
+        moderated: bucket.rejected > 0 ? 'Needs review' : bucket.pending > 0 ? 'In review' : 'Complete',
+      }
+    }).sort((a, b) => a.subject.localeCompare(b.subject))
+
+    const dashboard = dashboardResponse.data
+    const pendingMarks = dashboard.teacher.pending_marks_entries
+    const upcomingExams = dashboard.teacher.upcoming_exams.length
+    const blockedSubjects = liveMarksRows.value.filter(item => item.moderated === 'Needs review').length
+
+    readinessRows.value = [
+      {
+        title: 'Teacher queue',
+        note: 'Mark entries still pending verification or completion.',
+        value: pendingMarks.toLocaleString(),
+        tone: pendingMarks > 0 ? 'warning' : 'success',
+      },
+      {
+        title: 'Upcoming exams',
+        note: 'Scheduled exam windows shaping the next release cycle.',
+        value: upcomingExams.toLocaleString(),
+        tone: upcomingExams > 0 ? 'primary' : 'success',
+      },
+      {
+        title: 'Blocked subjects',
+        note: 'Subjects still carrying rejected or disputed entries.',
+        value: blockedSubjects.toLocaleString(),
+        tone: blockedSubjects > 0 ? 'error' : 'success',
+      },
+    ]
   }
   catch {
-    errorMessage.value = 'Marks data is unavailable right now. Showing the local operating snapshot instead.'
-    liveMarksRows.value = marksRows
+    errorMessage.value = 'Marks data is unavailable right now.'
+    liveMarksRows.value = []
+    readinessRows.value = []
   }
   finally {
     loading.value = false
@@ -75,13 +124,13 @@ watch(() => session.selectedSchool.value?.id, loadMarks, { immediate: true })
     <SchoolPageHeader
       eyebrow="Assessment"
       title="Assessment desk"
-      subtitle="Run the mark entry cycle with cleaner signals around backlog, moderation, and release readiness."
+      subtitle="Run the mark entry cycle with live signals around backlog, moderation, and release readiness."
     >
       <template #actions>
-        <VBtn variant="outlined" color="default" prepend-icon="tabler-adjustments-horizontal">
-          Moderation
+        <VBtn variant="outlined" color="default" prepend-icon="tabler-adjustments-horizontal" :to="session.selectedSchool ? `/schools/${session.selectedSchool.id}/marks` : '/schools'">
+          Moderation desk
         </VBtn>
-        <VBtn color="primary" prepend-icon="tabler-send">
+        <VBtn color="primary" prepend-icon="tabler-send" :to="session.selectedSchool ? `/schools/${session.selectedSchool.id}/reports` : '/schools'">
           Prepare release
         </VBtn>
       </template>
@@ -98,7 +147,7 @@ watch(() => session.selectedSchool.value?.id, loadMarks, { immediate: true })
 
     <VRow class="mb-2">
       <VCol
-        v-for="item in marksReleaseReadiness"
+        v-for="item in readinessRows"
         :key="item.title"
         cols="12"
         md="4"
@@ -118,7 +167,7 @@ watch(() => session.selectedSchool.value?.id, loadMarks, { immediate: true })
               {{ item.note }}
             </div>
             <VChip :color="item.tone" variant="tonal" size="small">
-              {{ item.tone === 'success' ? 'On track' : item.tone === 'warning' ? 'Watch' : 'Blocked' }}
+              {{ item.tone === 'success' ? 'Healthy' : item.tone === 'warning' ? 'Watch' : item.tone === 'error' ? 'Blocked' : 'Active' }}
             </VChip>
           </VCardText>
         </VCard>
@@ -131,7 +180,13 @@ watch(() => session.selectedSchool.value?.id, loadMarks, { immediate: true })
         <VCardSubtitle>Backlog and moderation status by subject desk.</VCardSubtitle>
       </VCardItem>
       <VCardText class="pt-2">
-        <VTable class="school-data-table">
+        <div
+          v-if="loading"
+          class="text-body-2 text-medium-emphasis mt-3"
+        >
+          Refreshing live marks records...
+        </div>
+        <VTable v-else class="school-data-table">
           <thead>
             <tr>
               <th>Subject</th>
@@ -153,12 +208,6 @@ watch(() => session.selectedSchool.value?.id, loadMarks, { immediate: true })
             </tr>
           </tbody>
         </VTable>
-        <div
-          v-if="loading"
-          class="text-body-2 text-medium-emphasis mt-3"
-        >
-          Refreshing live marks records...
-        </div>
       </VCardText>
     </VCard>
   </div>

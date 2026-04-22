@@ -1,22 +1,13 @@
 <script lang="ts" setup>
-import {
-  dashboardAlerts,
-  dashboardCollections,
-  dashboardQuickActions,
-  dashboardStats,
-  reportQueue,
-  schoolRows,
-} from '@/utils/schoolDashboardData'
+import type { DashboardSummary } from '~/composables/useApi'
 
 definePageMeta({
   layout: 'default',
 })
 
-const session = useSession()
-const dashboardLoading = ref(false)
-const dashboardError = ref('')
-const liveCollections = ref<typeof dashboardCollections | null>(null)
-const liveAlerts = ref<typeof dashboardAlerts | null>(null)
+interface DashboardSummaryResponse {
+  data: DashboardSummary
+}
 
 interface DashboardStat {
   title: string
@@ -27,79 +18,111 @@ interface DashboardStat {
   note: string
 }
 
-interface DashboardAttendanceConcern {
-  attendance_percentage: number
-  student_enrollment?: {
-    student?: {
-      full_name?: string
-    }
-  }
+type DashboardAlert = {
+  title: string
+  severity: string
+  time: string
 }
 
-interface DashboardCollectionTrendItem {
-  month: string
-  total: number
+type CollectionRow = {
+  label: string
+  value: number
 }
 
-interface DashboardSummaryResponse {
-  data: {
-    admin: {
-      student_count: number
-      employee_count: number
-      today_attendance_rate: number
-      fee_collection_this_month: number
-      fee_collection_last_month: number
-      pending_leave_applications: number
-      attendance_concerns: DashboardAttendanceConcern[]
-    }
-    accountant: {
-      collection_trend: DashboardCollectionTrendItem[]
-    }
-  }
+type QueueRow = {
+  name: string
+  owner: string
+  status: string
+  updated: string
 }
 
-const liveStats = ref<DashboardStat[] | null>(null)
+type PortfolioRow = {
+  id: number
+  name: string
+  students: string
+  staff: string
+  attendance: string
+  collection: string
+}
 
-const activeStats = computed(() => liveStats.value ?? dashboardStats)
-const activeCollections = computed(() => liveCollections.value ?? dashboardCollections)
-const activeAlerts = computed(() => liveAlerts.value ?? dashboardAlerts)
+const dashboardQuickActions = [
+  { label: 'Mark attendance', to: '/attendance', icon: 'tabler-user-check' },
+  { label: 'Publish marks', to: '/marks', icon: 'tabler-clipboard-check' },
+  { label: 'Collect fees', to: '/finance/fees', icon: 'tabler-receipt-2' },
+  { label: 'Issue notice', to: '/notices', icon: 'tabler-speakerphone' },
+]
+
+const session = useSession()
+const dashboardLoading = ref(false)
+const dashboardError = ref('')
+const activeStats = ref<DashboardStat[]>([])
+const activeCollections = ref<CollectionRow[]>([])
+const activeAlerts = ref<DashboardAlert[]>([])
+const reportQueue = ref<QueueRow[]>([])
+const portfolioRows = ref<PortfolioRow[]>([])
+
+function alertTone(severity: string) {
+  return {
+    Critical: 'error',
+    Warning: 'warning',
+    Info: 'default',
+  }[severity] ?? 'default'
+}
 
 async function loadDashboard() {
-  if (!session.selectedSchool.value)
+  if (!session.schools.value.length) {
+    activeStats.value = []
+    activeCollections.value = []
+    activeAlerts.value = []
+    reportQueue.value = []
+    portfolioRows.value = []
     return
+  }
 
   dashboardLoading.value = true
   dashboardError.value = ''
 
   try {
-    const response = await useApiFetch<DashboardSummaryResponse>(`/schools/${session.selectedSchool.value.id}/dashboard/summary`)
+    const results = await Promise.all(
+      session.schools.value.map(async (school) => {
+        const response = await useApiFetch<DashboardSummaryResponse>(`/schools/${school.id}/dashboard/summary`)
+        return {
+          school,
+          summary: response.data,
+        }
+      }),
+    )
 
-    const admin = response.data.admin
-    const accountant = response.data.accountant
-    const collectionDelta = admin.fee_collection_last_month > 0
-      ? ((admin.fee_collection_this_month - admin.fee_collection_last_month) / admin.fee_collection_last_month) * 100
+    const totalStudents = results.reduce((sum, item) => sum + item.summary.admin.student_count, 0)
+    const totalEmployees = results.reduce((sum, item) => sum + item.summary.admin.employee_count, 0)
+    const feeThisMonth = results.reduce((sum, item) => sum + Number(item.summary.admin.fee_collection_this_month), 0)
+    const feeLastMonth = results.reduce((sum, item) => sum + Number(item.summary.admin.fee_collection_last_month), 0)
+    const pendingLeaves = results.reduce((sum, item) => sum + item.summary.admin.pending_leave_applications, 0)
+    const attendanceAverage = results.length
+      ? results.reduce((sum, item) => sum + Number(item.summary.admin.today_attendance_rate), 0) / results.length
       : 0
+    const collectionDelta = feeLastMonth > 0 ? ((feeThisMonth - feeLastMonth) / feeLastMonth) * 100 : 0
 
-    liveStats.value = [
+    activeStats.value = [
       {
         title: 'Active students',
-        value: admin.student_count.toLocaleString(),
-        delta: '+0.0%',
+        value: totalStudents.toLocaleString(),
+        delta: `+${results.length}`,
         tone: 'primary',
         icon: 'tabler-users',
-        note: `Across ${session.schools.value.length} campuses`,
+        note: `Across ${results.length} schools`,
       },
       {
         title: 'Attendance today',
-        value: `${admin.today_attendance_rate}%`,
-        delta: '+0.0%',
+        value: `${attendanceAverage.toFixed(1)}%`,
+        delta: `${attendanceAverage >= 90 ? '+' : ''}${(attendanceAverage - 90).toFixed(1)} pts`,
         tone: 'success',
         icon: 'tabler-user-check',
-        note: `${admin.employee_count.toLocaleString()} employees in directory`,
+        note: `${totalEmployees.toLocaleString()} employees in directory`,
       },
       {
         title: 'Fee collection',
-        value: `৳ ${Math.round(admin.fee_collection_this_month).toLocaleString()}`,
+        value: `৳ ${Math.round(feeThisMonth).toLocaleString()}`,
         delta: `${collectionDelta >= 0 ? '+' : ''}${collectionDelta.toFixed(1)}%`,
         tone: 'warning',
         icon: 'tabler-receipt-2',
@@ -107,47 +130,74 @@ async function loadDashboard() {
       },
       {
         title: 'Pending leave approvals',
-        value: admin.pending_leave_applications.toLocaleString(),
-        delta: '+0',
+        value: pendingLeaves.toLocaleString(),
+        delta: pendingLeaves > 0 ? 'Action needed' : 'Clear',
         tone: 'info',
         icon: 'tabler-clipboard-check',
         note: 'Awaiting decision',
       },
     ]
 
-    const recentTrend = accountant.collection_trend.slice(-5)
-    const maxTotal = Math.max(...recentTrend.map(item => item.total), 1)
-    liveCollections.value = recentTrend.map(item => ({
-      label: item.month,
-      value: Math.round((item.total / maxTotal) * 100),
+    const collectionByMonth = new Map<string, number>()
+    results.forEach(({ summary }) => {
+      summary.accountant.collection_trend.forEach((item) => {
+        collectionByMonth.set(item.month, (collectionByMonth.get(item.month) ?? 0) + Number(item.total))
+      })
+    })
+    const trendEntries = Array.from(collectionByMonth.entries()).slice(-5)
+    const maxTotal = Math.max(...trendEntries.map(([, total]) => total), 1)
+    activeCollections.value = trendEntries.map(([label, total]) => ({
+      label,
+      value: Math.max(8, Math.round((total / maxTotal) * 100)),
     }))
 
-    liveAlerts.value = admin.attendance_concerns.slice(0, 4).map(item => ({
-      title: item.student_enrollment?.student?.full_name
-        ? `${item.student_enrollment.student.full_name} attendance dropped below threshold`
-        : 'Attendance concern flagged',
-      severity: item.attendance_percentage < 60 ? 'Critical' : 'Warning',
-      time: `${item.attendance_percentage}% attendance`,
+    activeAlerts.value = results.flatMap(({ school, summary }) =>
+      summary.admin.attendance_concerns.slice(0, 2).map(item => ({
+        title: item.student_enrollment?.student?.full_name
+          ? `${item.student_enrollment.student.full_name} at ${school.name} dropped below threshold`
+          : `${school.name} has an attendance concern`,
+        severity: item.attendance_percentage < 60 ? 'Critical' : 'Warning',
+        time: `${Number(item.attendance_percentage).toFixed(1)}% attendance`,
+      })),
+    ).slice(0, 6)
+
+    reportQueue.value = results.map(({ school, summary }) => ({
+      name: `${school.name} export pack`,
+      owner: 'Reporting workspace',
+      status: summary.teacher.pending_marks_entries > 0 ? 'Needs review' : 'Ready',
+      updated: `${summary.admin.upcoming_exams.length} upcoming exams`,
     }))
+
+    portfolioRows.value = results.map(({ school, summary }) => {
+      const billed = Number(summary.admin.fee_collection_this_month) + summary.accountant.outstanding_by_class.reduce((sum, item) => sum + Number(item.outstanding), 0)
+      const collection = billed > 0
+        ? `${Math.round((Number(summary.admin.fee_collection_this_month) / billed) * 100)}%`
+        : '0%'
+
+      return {
+        id: school.id,
+        name: school.name,
+        students: summary.admin.student_count.toLocaleString(),
+        staff: summary.admin.employee_count.toLocaleString(),
+        attendance: `${Number(summary.admin.today_attendance_rate).toFixed(1)}%`,
+        collection,
+      }
+    })
   }
   catch {
-    dashboardError.value = 'Live dashboard data is unavailable right now. Showing the local operating snapshot instead.'
-    liveStats.value = null
-    liveCollections.value = null
-    liveAlerts.value = null
+    dashboardError.value = 'Live dashboard data is unavailable right now.'
+    activeStats.value = []
+    activeCollections.value = []
+    activeAlerts.value = []
+    reportQueue.value = []
+    portfolioRows.value = []
   }
   finally {
     dashboardLoading.value = false
   }
 }
 
-watch(() => session.selectedSchool.value?.id, loadDashboard, { immediate: true })
-
-const alertTone = (severity: string) => ({
-  Critical: 'error',
-  Warning: 'warning',
-  Info: 'default',
-}[severity] ?? 'default')
+watch(() => session.schools.value.map(school => school.id).join(','), loadDashboard, { immediate: true })
 </script>
 
 <template>
@@ -161,9 +211,10 @@ const alertTone = (severity: string) => ({
         <VBtn
           variant="outlined"
           color="default"
-          prepend-icon="tabler-calendar"
+          prepend-icon="tabler-building-community"
+          to="/schools"
         >
-          April 2026
+          Portfolio
         </VBtn>
         <VBtn
           color="primary"
@@ -240,7 +291,13 @@ const alertTone = (severity: string) => ({
           </VCardItem>
 
           <VCardText class="pt-2">
-            <div class="school-alert-list">
+            <div
+              v-if="dashboardLoading"
+              class="text-body-2 text-medium-emphasis"
+            >
+              Refreshing portfolio attention queue...
+            </div>
+            <div v-else class="school-alert-list">
               <div
                 v-for="alert in activeAlerts"
                 :key="alert.title"
@@ -325,7 +382,7 @@ const alertTone = (severity: string) => ({
                   </div>
                 </div>
                 <VChip
-                  :color="report.status === 'Ready' ? 'success' : report.status === 'Refreshing' ? 'warning' : 'default'"
+                  :color="report.status === 'Ready' ? 'success' : report.status === 'Needs review' ? 'warning' : 'default'"
                   variant="tonal"
                   size="small"
                 >
@@ -359,7 +416,7 @@ const alertTone = (severity: string) => ({
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="school in schoolRows" :key="school.name">
+                <tr v-for="school in portfolioRows" :key="school.id">
                   <td class="font-weight-medium">{{ school.name }}</td>
                   <td>{{ school.students }}</td>
                   <td>{{ school.staff }}</td>
