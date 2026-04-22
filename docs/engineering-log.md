@@ -14,6 +14,219 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 
 ## 2026-04-22
 
+### Pending Checkpoint - Enterprise Route Coverage And Ten-Year QA Baseline
+
+Current page/module complete: missing route-family frontend coverage, role-aware admin UX, and ten-year seeded QA baseline.
+
+Scope:
+- added the remaining explicit frontend surfaces for backend route families that were still missing:
+  - `apps/web/pages/admin.vue`
+  - `apps/web/pages/admin/schools.vue`
+  - `apps/web/pages/admin/users.vue`
+  - `apps/web/pages/admin/jobs.vue`
+  - `apps/web/pages/admin/audit-logs.vue`
+  - `apps/web/pages/schools/[schoolId]/notifications.vue`
+  - `apps/web/pages/schools/[schoolId]/invitations.vue`
+  - `apps/web/pages/schools/[schoolId]/settings.vue`
+  - `apps/web/pages/schools/[schoolId]/discounts.vue`
+  - `apps/web/pages/schools/[schoolId]/invoice-payments.vue`
+  - `apps/web/pages/schools/[schoolId]/portal-student.vue`
+  - `apps/web/pages/schools/[schoolId]/portal-parent.vue`
+- added `apps/web/composables/useEnterpriseAccess.ts`.
+- updated admin pages to stop calling enterprise-only APIs for non-super-admin users and render a clean informational access state instead.
+- expanded `apps/api/database/seeders/DemoDataSeeder.php` into a deterministic ten-year demo environment:
+  - years `2017-2026`
+  - role accounts for super admin, school owner, school admin, principal, teacher, accountant, student, parent, and read-only auditor
+  - seeded discounts, invitations, notifications, and portal-compatible users
+- reset local database with:
+  - `cd apps/api && php artisan migrate:fresh --seed --seeder=DemoDataSeeder`
+
+Verification:
+- `cd apps/api && php artisan migrate:fresh --seed --seeder=DemoDataSeeder`: passed.
+- API login verified for:
+  - `superadmin@example.com`
+  - `test@example.com`
+  - `sadia.islam@example.com`
+  - `farhana.kabir@example.com`
+  - `mahmud.alam@example.com`
+  - `student001@example.com`
+  - `guardian001@example.com`
+  - `auditor@example.com`
+- browser role sweep passed with no console errors for:
+  - `/admin`, `/admin/schools`, `/admin/users`, `/admin/jobs`, `/admin/audit-logs`
+  - `/dashboard`, `/schools/1/students`, `/schools/1/finance`, `/schools/1/reports`, `/schools/1/settings`
+  - `/schools/1/portal-student`, `/schools/1/notifications`
+  - `/schools/1/portal-parent`, `/schools/1/notifications`
+  - `/schools/1/invoice-payments`, `/schools/1/discounts`
+- browser artifacts saved at:
+  - `docs/browser-checks/super-admin-20260422-role-qa-v2.png`
+  - `docs/browser-checks/school-owner-20260422-role-qa-v2.png`
+  - `docs/browser-checks/student-20260422-role-qa-v2.png`
+  - `docs/browser-checks/parent-20260422-role-qa-v2.png`
+  - `docs/browser-checks/accountant-20260422-role-qa-v2.png`
+  - `docs/browser-checks/login-live-inspect-20260422.png`
+- `cd apps/api && php artisan test`: passed with `117 tests / 702 assertions`.
+- `cd apps/web && npm run build`: passed.
+
+Notes:
+- build still emits the previously known Nuxt/Nitro warnings already tracked in `docs/KNOWN-BUILD-WARNINGS.md`.
+- this pass materially improves route coverage and QA readiness, but it is not the final claim that every module has been mutation-tested end to end.
+
+Next:
+- continue role-by-role, module-by-module mutation QA under the ten-year seed.
+- fix defects uncovered in the remaining less-traveled routes before the next checkpoint commit.
+
+### Pending Checkpoint - Live Portfolio, Communications, And Settings Surfaces
+
+Current page/module complete: `schools`, `notices`, and `settings` converted from placeholders into live management pages.
+
+Scope:
+- rebuilt `apps/web/pages/schools.vue` to:
+  - refresh real school membership context
+  - create schools through `/api/v1/schools`
+  - switch selected school context
+  - open live school-scoped workspaces
+- rebuilt `apps/web/pages/notices.vue` to:
+  - read `/api/v1/schools/{school}/notifications`
+  - read unread counts
+  - mark notifications read
+  - list/create/revoke invitations through `/api/v1/schools/{school}/invitations`
+- rebuilt `apps/web/pages/settings.vue` to:
+  - read and save `/api/v1/schools/{school}/settings`
+  - conditionally surface enterprise health, jobs, and audit data only for users with enterprise admin access
+- kept the restored school-scoped pages compiling and loading alongside the rebuilt root shell.
+
+Verification:
+- `cd apps/web && npm run build`: passed.
+- browser verification passed for:
+  - `http://127.0.0.1:3000/schools`
+  - `http://127.0.0.1:3000/notices`
+  - `http://127.0.0.1:3000/settings`
+  - `http://127.0.0.1:3000/schools/1/students`
+- browser artifacts saved at:
+  - `docs/browser-checks/-schools-qa-20260422.png`
+  - `docs/browser-checks/-notices-qa-20260422.png`
+  - `docs/browser-checks/-settings-qa-20260422.png`
+  - `docs/browser-checks/settings-qa-20260422-v2.png`
+
+Notes:
+- the frontend now covers more of the live backend surface without pretending everything is finished.
+- the next meaningful slice is explicit UI for the remaining backend-only domains: admin schools/users/jobs/audit, finance exceptions, and portal-facing visibility.
+
+Next:
+- continue filling frontend coverage gaps against the backend route inventory.
+- then move into broader seeded-data QA and defect fixing across the restored school workspaces.
+
+### Pending Checkpoint - Root-Level Operator Page Redesign Cluster
+
+Current page/module complete: analytics, attendance, marks, finance, reports, classes, notices, schools, and settings redesigned on the new shell.
+
+Scope:
+- extended the rebuilt root-level frontend language through:
+  - `apps/web/pages/analytics.vue`
+  - `apps/web/pages/attendance.vue`
+  - `apps/web/pages/marks.vue`
+  - `apps/web/pages/finance/fees.vue`
+  - `apps/web/pages/reports.vue`
+  - `apps/web/pages/classes.vue`
+  - `apps/web/pages/notices.vue`
+  - `apps/web/pages/schools.vue`
+  - `apps/web/pages/settings.vue`
+- expanded `apps/web/utils/schoolDashboardData.ts` with the supporting operational signals for those screens:
+  - analytics signals and cohort signals
+  - attendance escalations
+  - marks release-readiness states
+  - finance pressure points
+  - report-library groups
+  - class-planning signals
+  - communication-performance signals
+  - portfolio signals
+  - settings-domain ownership labels
+- pushed the pages away from plain table-only layouts and toward a consistent pattern of:
+  - page header with actions
+  - summary/decision cards
+  - one primary register or queue
+
+Verification:
+- `cd apps/web && npm run build`: passed.
+- Playwright browser verification passed for:
+  - `http://127.0.0.1:3000/analytics`
+  - `http://127.0.0.1:3000/attendance`
+  - `http://127.0.0.1:3000/marks`
+  - `http://127.0.0.1:3000/finance/fees`
+  - `http://127.0.0.1:3000/reports`
+  - `http://127.0.0.1:3000/settings`
+- screenshots saved at:
+  - `docs/browser-checks/frontend-rebuild-analytics-20260422.png`
+  - `docs/browser-checks/frontend-rebuild-attendance-20260422.png`
+  - `docs/browser-checks/frontend-rebuild-marks-20260422.png`
+  - `docs/browser-checks/frontend-rebuild-finance-20260422.png`
+  - `docs/browser-checks/frontend-rebuild-reports-20260422.png`
+  - `docs/browser-checks/frontend-rebuild-settings-20260422.png`
+
+Notes:
+- this cluster gives the rebuild a shared product voice across the core route set instead of leaving only login/dashboard/students polished.
+- the shell now reads much more like one operations suite, though a final tightening pass is still needed before checkpointing.
+
+Next:
+- continue through any remaining root-level routes that still feel underdesigned.
+- then create a restore-point commit for the frontend rebuild state.
+
+### Pending Checkpoint - Frontend Redesign Reset And Signal-Informed Shell
+
+Current page/module complete: frontend redesign reset, shell rebuild, and first rendered page pass.
+
+Scope:
+- treated the current frontend as a fresh rebuild target and ignored the prior Antigravity visual direction.
+- rebuilt the new root-level Nuxt frontend around the current admin-theme app structure instead of the older `apps/web/app/*` tree.
+- rewrote the authenticated shell through:
+  - `apps/web/layouts/components/DefaultLayoutWithVerticalNav.vue`
+  - `apps/web/navigation/vertical/index.ts`
+  - `apps/web/assets/styles/styles.scss`
+  - `apps/web/themeConfig.ts`
+  - `apps/web/plugins/webfontloader.client.ts`
+- added new school-operations mock data and reusable page primitives:
+  - `apps/web/utils/schoolDashboardData.ts`
+  - `apps/web/components/SchoolMetricCard.vue`
+  - `apps/web/components/SchoolPageHeader.vue`
+- rebuilt core pages:
+  - `apps/web/pages/login.vue`
+  - `apps/web/pages/index.vue`
+  - `apps/web/pages/students.vue`
+  - plus the matching route set for analytics, attendance, marks, classes, reports, notices, schools, settings, and finance
+- aligned the look with the requested Signal reference:
+  - Inter + JetBrains Mono
+  - dark left rail
+  - compact top bar
+  - calm pale workspace canvas
+  - restrained green emphasis
+- fixed live boot/runtime issues found during browser work:
+  - corrected Sass forwarding in `apps/web/assets/styles/variables/_template.scss`
+  - removed the fragile Google Fonts Sass import from `apps/web/assets/styles/styles.scss`
+  - replaced invalid `definePage(...)` usage with `definePageMeta(...)` across rebuilt pages
+  - reduced top-bar/page-header duplication
+  - improved login hero contrast
+
+Verification:
+- `cd apps/web && npm run build`: passed.
+- live browser verification passed with Playwright screenshots for:
+  - `http://127.0.0.1:3000/login`
+  - `http://127.0.0.1:3000/`
+  - `http://127.0.0.1:3000/students`
+- screenshots saved at:
+  - `docs/browser-checks/frontend-rebuild-login-playwright-20260422-v2.png`
+  - `docs/browser-checks/frontend-rebuild-dashboard-playwright-20260422-v2.png`
+  - `docs/browser-checks/frontend-rebuild-students-playwright-20260422.png`
+
+Notes:
+- dev-only agent-browser screenshots were misleading until the Sass font import was removed; Playwright screenshots are the reliable artifacts for this slice.
+- the current repo state is still a large frontend replacement diff because the old `apps/web/app/*` structure has effectively been superseded by the new root-level app structure.
+- Nuxt still emits the same duplicated `useAppConfig` / Node runtime warnings already seen earlier; they were not introduced by this redesign pass.
+
+Next:
+- continue the same redesign pass across analytics, attendance, marks, reports, finance, and settings.
+- then update the low-token session context and create the next restore-point commit.
+
 ### Pending Checkpoint - Frontend Dashboard and High-Traffic Workspace Migration
 
 Current page/module complete: dashboard, students, finance, reports, and attendance moved deeper into the rebuilt frontend system.

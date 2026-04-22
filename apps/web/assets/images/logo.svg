@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" fill="none" width="36" height="36">
+  <!-- Signal-inspired school logo: Shield with a book / graduation cap motif -->
+  <!-- Deep green shield base -->
+  <path d="M20 2L4 9v12c0 8.8 6.8 17 16 19 9.2-2 16-10.2 16-19V9L20 2z" fill="#22C55E" opacity="0.15"/>
+  <path d="M20 4L6 10.4v10.6c0 7.7 5.9 14.9 14 17 8.1-2.1 14-9.3 14-17V10.4L20 4z" fill="#22C55E" opacity="0.25"/>
+  <!-- Book icon inside -->
+  <rect x="12" y="14" width="16" height="12" rx="2" fill="#22C55E"/>
+  <rect x="12" y="14" width="8" height="12" fill="#16A34A"/>
+  <path d="M20 14v12" stroke="#fff" stroke-width="1.5"/>
+  <path d="M15 18h4M15 21h4M21 18h4M21 21h4" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- Graduation cap accent -->
+  <path d="M20 9l-6 3 6 3 6-3-6-3z" fill="#22C55E"/>
+  <path d="M14 12v4" stroke="#22C55E" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

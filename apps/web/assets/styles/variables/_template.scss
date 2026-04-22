@@ -1,0 +1,24 @@
+// ℹ️ Override Vuexy core variables to match Signal Dashboard aesthetic
+
+@forward "@core/scss/template/variables" with (
+  // Flat vertical nav - no elevation on sidebar
+  $vertical-nav-navbar-style: "floating",
+  $vertical-nav-navbar-elevation: 0,
+  $vertical-nav-background-color-rgb: var(--v-theme-background),
+
+  // Wider sidebar
+  $vertical-nav-horizontal-spacing: 1rem,
+  $vertical-nav-horizontal-padding: 1rem,
+  $layout-vertical-nav-collapsed-width: 72px,
+
+  // Tighter navbar
+  $layout-vertical-nav-navbar-height: 60px,
+  $layout-horizontal-nav-navbar-height: 60px,
+
+  // Section title spacing - more compact like Signal dashboard
+  $vertical-nav-section-title-mt: 1.25rem,
+  $vertical-nav-section-title-mb: 0.25rem,
+
+  // Icon sizes
+  $vertical-nav-items-icon-size: 1.25rem,
+);

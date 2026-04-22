@@ -1,0 +1,113 @@
+// ❗ Path must be relative
+// Override Vuetify variables for Signal Dashboard aesthetic — flat, compact, tech-focused
+
+// Inter font for body, JetBrains Mono for monospace/code elements
+$signal-font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+$signal-font-mono: "JetBrains Mono", "Cascadia Code", "Fira Code", ui-monospace, monospace;
+
+@forward "../../../@core/scss/template/libs/vuetify/variables" with (
+  $body-font-family: $signal-font-sans,
+  $border-radius-root: 8px,
+
+  $rounded: (
+    "sm": 4px,
+    "lg": 12px,
+    "shaped": 24px 0,
+  ),
+
+  // Very flat shadows — Signal dashboard is nearly shadow-free
+  $shadow-key-umbra: (
+    0: (0 0 0 0 rgba(var(--v-shadow-key-umbra-color), 1)),
+    1: (0 1px 3px rgba(var(--v-shadow-key-umbra-color), 0.06)),
+    2: (0 1px 4px rgba(var(--v-shadow-key-umbra-color), var(--v-shadow-xs-opacity))),
+    3: (0 2px 6px rgba(var(--v-shadow-key-umbra-color), 0.08)),
+    4: (0 2px 8px rgba(var(--v-shadow-key-umbra-color), var(--v-shadow-sm-opacity))),
+    5: (0 3px 10px rgba(var(--v-shadow-key-umbra-color), 0.09)),
+    6: (0 2px 10px rgba(var(--v-shadow-key-umbra-color), var(--v-shadow-md-opacity))),
+    7: (0 3px 14px rgba(var(--v-shadow-key-umbra-color), 0.07)),
+    8: (0 3px 14px rgba(var(--v-shadow-key-umbra-color), var(--v-shadow-lg-opacity))),
+    9: (0 4px 10px rgba(var(--v-shadow-key-umbra-color), 0.10)),
+    10: (0 4px 20px rgba(var(--v-shadow-key-umbra-color), var(--v-shadow-xl-opacity))),
+    11: (0 4px 12px rgba(var(--v-shadow-key-umbra-color), 0.11)),
+    12: (0 5px 13px rgba(var(--v-shadow-key-umbra-color), 0.12)),
+    13: (0 5px 14px rgba(var(--v-shadow-key-umbra-color), 0.12)),
+    14: (0 5px 15px rgba(var(--v-shadow-key-umbra-color), 0.13)),
+    15: (0 6px 16px rgba(var(--v-shadow-key-umbra-color), 0.13)),
+    16: (0 6px 17px rgba(var(--v-shadow-key-umbra-color), 0.14)),
+    17: (0 6px 18px rgba(var(--v-shadow-key-umbra-color), 0.14)),
+    18: (0 7px 19px rgba(var(--v-shadow-key-umbra-color), 0.15)),
+    19: (0 7px 20px 5px rgba(var(--v-shadow-key-umbra-color), 0.15)),
+    20: (0 8px 21px rgba(var(--v-shadow-key-umbra-color), 0.16)),
+    21: (0 8px 22px rgba(var(--v-shadow-key-umbra-color), 0.17)),
+    22: (0 8px 23px rgba(var(--v-shadow-key-umbra-color), 0.17)),
+    23: (0 9px 24px rgba(var(--v-shadow-key-umbra-color), 0.18)),
+    24: (0 9px 26px rgba(var(--v-shadow-key-umbra-color), 0.18))
+  ),
+
+  $shadow-key-penumbra: (
+    0: (0 0 transparent), 1: (0 0 transparent), 2: (0 0 transparent), 3: (0 0 transparent),
+    4: (0 0 transparent), 5: (0 0 transparent), 6: (0 0 transparent), 7: (0 0 transparent),
+    8: (0 0 transparent), 9: (0 0 transparent), 10: (0 0 transparent), 11: (0 0 transparent),
+    12: (0 0 transparent), 13: (0 0 transparent), 14: (0 0 transparent), 15: (0 0 transparent),
+    16: (0 0 transparent), 17: (0 0 transparent), 18: (0 0 transparent), 19: (0 0 transparent),
+    20: (0 0 transparent), 21: (0 0 transparent), 22: (0 0 transparent), 23: (0 0 transparent),
+    24: (0 0 transparent),
+  ),
+
+  $shadow-key-ambient: (
+    0: (0 0 transparent), 1: (0 0 transparent), 2: (0 0 transparent), 3: (0 0 transparent),
+    4: (0 0 transparent), 5: (0 0 transparent), 6: (0 0 transparent), 7: (0 0 transparent),
+    8: (0 0 transparent), 9: (0 0 transparent), 10: (0 0 transparent), 11: (0 0 transparent),
+    12: (0 0 transparent), 13: (0 0 transparent), 14: (0 0 transparent), 15: (0 0 transparent),
+    16: (0 0 transparent), 17: (0 0 transparent), 18: (0 0 transparent), 19: (0 0 transparent),
+    20: (0 0 transparent), 21: (0 0 transparent), 22: (0 0 transparent), 23: (0 0 transparent),
+    24: (0 0 transparent),
+  ),
+
+  // Signal dashboard typography - Inter
+  $typography: (
+    "h1": ("size": 2.5rem, "weight": 600, "line-height": 3.5rem, "letter-spacing": -0.02em),
+    "h2": ("size": 2rem, "weight": 600, "line-height": 2.75rem, "letter-spacing": -0.01em),
+    "h3": ("size": 1.625rem, "weight": 600, "line-height": 2.25rem),
+    "h4": ("size": 1.375rem, "weight": 600, "line-height": 2rem, "letter-spacing": -0.005em),
+    "h5": ("size": 1.0625rem, "weight": 600, "line-height": 1.625rem),
+    "h6": ("size": 0.9375rem, "weight": 500, "line-height": 1.375rem, "letter-spacing": normal),
+    "body-1": ("size": 0.9375rem, "line-height": 1.5rem, "letter-spacing": normal),
+    "body-2": ("size": 0.8125rem, "line-height": 1.25rem, "letter-spacing": normal),
+    "subtitle-1": ("size": 0.9375rem, "weight": 400, "line-height": 1.5rem),
+    "subtitle-2": ("size": 0.8125rem, "weight": 400, "line-height": 1.25rem, "letter-spacing": normal),
+    "button": ("size": 0.875rem, "weight": 600, "line-height": 1.25rem, "letter-spacing": 0.01em, "text-transform": capitalize),
+    "caption": ("size": 0.75rem, "line-height": 1.125rem, "letter-spacing": 0.02em),
+    "overline": ("size": 0.6875rem, "weight": 600, "line-height": 1rem, "letter-spacing": 0.08em),
+  ),
+
+  // Card — flat, border-based
+  $card-elevation: 1,
+  $card-text-padding: 20px,
+  $card-item-padding: 20px,
+  $card-title-font-size: 1.0625rem,
+
+  // Buttons — slightly taller, more padding
+  $button-height: 40px,
+  $button-padding-ratio: 2.0,
+
+  // Chips — compact
+  $chip-height: 28px,
+  $chip-font-size: 12px,
+
+  // Tables
+  $table-row-height: 48px,
+  $table-font-size: 0.875rem,
+
+  // Tabs — compact
+  $tabs-height: 40px,
+
+  // Fields
+  $field-font-size: 0.9375rem,
+  $input-density: ("default": -2, "comfortable": -4, "compact": -6),
+
+  // Badges
+  $badge-height: 1.375rem,
+  $badge-min-width: 22px,
+  $badge-font-size: 0.75rem,
+);

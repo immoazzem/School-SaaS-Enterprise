@@ -33,10 +33,13 @@ use App\Models\Role;
 use App\Models\SalaryRecord;
 use App\Models\School;
 use App\Models\SchoolDocument;
+use App\Models\SchoolInvitation;
 use App\Models\SchoolMembership;
+use App\Models\SchoolNotification;
 use App\Models\Shift;
 use App\Models\Student;
 use App\Models\StudentAttendanceRecord;
+use App\Models\StudentDiscount;
 use App\Models\StudentEnrollment;
 use App\Models\StudentGroup;
 use App\Models\StudentInvoice;
@@ -49,11 +52,12 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class DemoDataSeeder extends Seeder
 {
     /**
-     * A deterministic five-year operating dataset for local QA and browser smoke checks.
+     * A deterministic ten-year operating dataset for local QA and browser smoke checks.
      */
     public function run(): void
     {
@@ -76,6 +80,18 @@ class DemoDataSeeder extends Seeder
                     'subscription_status' => 'trialing',
                     'trial_ends_at' => now()->addDays(30),
                     'plan_limits' => ['students' => 5000, 'employees' => 500, 'documents' => 10000],
+                    'settings' => [
+                        'currency' => 'BDT',
+                        'academic_year_start_month' => 1,
+                        'allow_parent_portal' => true,
+                        'allow_student_portal' => true,
+                        'fee_invoice_prefix' => 'INV-DEMO',
+                        'attendance_warning_threshold_percent' => 75,
+                        'sms_enabled' => true,
+                        'sms_provider' => 'log',
+                        'sms_api_key' => 'demo-sms-key',
+                        'pdf_footer_text' => 'Demo School SaaS Enterprise',
+                    ],
                 ]
             );
 
@@ -94,18 +110,20 @@ class DemoDataSeeder extends Seeder
 
             $years = $this->seedAcademicYears($school);
             [$classes, $sections, $groups, $shifts, $subjects, $classSubjects] = $this->seedAcademicSetup($school);
-            [$employees, $teacherUsers] = $this->seedEmployees($school, $user);
+            [$employees, $teacherUsers, $staffUsers] = $this->seedEmployees($school, $user);
             $students = $this->seedStudents($school);
+            $roleUsers = $this->seedAccessUsers($school, $user, $staffUsers, $students);
             $enrollments = $this->seedEnrollments($school, $students, $years, $classes, $sections, $groups, $shifts);
             $this->seedTimetable($school, $years, $classes, $shifts, $subjects, $teacherUsers);
             $this->seedAssignments($school, $user, $years, $classes, $subjects, $enrollments);
             [$exams, $examSchedules] = $this->seedExams($school, $user, $years, $classSubjects);
             $this->seedMarksAndResults($school, $user, $exams, $examSchedules, $enrollments);
             $this->seedAttendance($school, $user, $enrollments, $employees, $years);
-            $this->seedFinance($school, $years, $classes, $groups, $enrollments);
+            $this->seedFinance($school, $user, $years, $classes, $groups, $enrollments);
             $this->seedStaffOperations($school, $user, $years, $employees);
             $this->seedPromotions($school, $user, $years, $classes, $enrollments);
             $this->seedCalendarDocumentsAndAudit($school, $user, $years, $classes);
+            $this->seedInvitationsAndNotifications($school, $user, $roleUsers, $years, $enrollments);
         });
     }
 
@@ -115,7 +133,7 @@ class DemoDataSeeder extends Seeder
     private function seedAcademicYears(School $school): array
     {
         $years = [];
-        for ($year = 2022; $year <= 2026; $year++) {
+        for ($year = 2017; $year <= 2026; $year++) {
             $years[$year] = AcademicYear::query()->updateOrCreate(
                 ['school_id' => $school->id, 'code' => "AY-{$year}"],
                 [
@@ -225,7 +243,7 @@ class DemoDataSeeder extends Seeder
     }
 
     /**
-     * @return array{0: array<int, Employee>, 1: array<int, User>}
+     * @return array{0: array<int, Employee>, 1: array<int, User>, 2: array<string, User>}
      */
     private function seedEmployees(School $school, User $owner): array
     {
@@ -239,6 +257,7 @@ class DemoDataSeeder extends Seeder
 
         $employees = [];
         $teacherUsers = [];
+        $staffUsers = [];
         $names = [
             ['Amina Rahman', 'female', 'TCHR', 'Mathematics'],
             ['Karim Uddin', 'male', 'TCHR', 'English'],
@@ -252,12 +271,13 @@ class DemoDataSeeder extends Seeder
 
         foreach ($names as $index => [$name, $gender, $designationCode, $specialization]) {
             $employeeNo = 'EMP-DEMO-'.str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT);
+            $userEmail = strtolower(str_replace(' ', '.', $name)).'@example.com';
             $employees[$index + 1] = Employee::query()->updateOrCreate(
                 ['school_id' => $school->id, 'employee_no' => $employeeNo],
                 [
                     'designation_id' => $designationMap[$designationCode]->id,
                     'full_name' => $name,
-                    'email' => strtolower(str_replace(' ', '.', $name)).'@example.com',
+                    'email' => $userEmail,
                     'phone' => '+88017'.str_pad((string) ($index + 1), 8, '0', STR_PAD_LEFT),
                     'gender' => $gender,
                     'religion' => 'Islam',
@@ -271,16 +291,32 @@ class DemoDataSeeder extends Seeder
                 ]
             );
 
+            $staffUser = User::query()->updateOrCreate(
+                ['email' => $userEmail],
+                ['name' => $name, 'password' => bcrypt('password')]
+            );
+            SchoolMembership::query()->updateOrCreate(
+                ['school_id' => $school->id, 'user_id' => $staffUser->id],
+                ['status' => 'active', 'joined_at' => CarbonImmutable::create(2017, 1, 1)]
+            );
+            $staffUsers[$designationCode === 'TCHR' ? strtolower(str_replace(' ', '-', $name)) : strtolower($designationCode)] = $staffUser;
+
+            $roleKey = match ($designationCode) {
+                'TCHR' => 'teacher',
+                'PRIN' => 'principal',
+                'ACCT' => 'accountant',
+                default => 'school-admin',
+            };
+            $role = Role::query()->where('key', $roleKey)->first();
+            if ($role) {
+                UserRoleAssignment::query()->updateOrCreate(
+                    ['school_id' => $school->id, 'user_id' => $staffUser->id, 'role_id' => $role->id],
+                    ['assigned_by' => $owner->id]
+                );
+            }
+
             if ($designationCode === 'TCHR') {
-                $teacherUser = User::query()->updateOrCreate(
-                    ['email' => strtolower(str_replace(' ', '.', $name)).'.teacher@example.com'],
-                    ['name' => $name, 'password' => bcrypt('password')]
-                );
-                SchoolMembership::query()->updateOrCreate(
-                    ['school_id' => $school->id, 'user_id' => $teacherUser->id],
-                    ['status' => 'active', 'joined_at' => CarbonImmutable::create(2022, 1, 1)]
-                );
-                $teacherUsers[] = $teacherUser;
+                $teacherUsers[] = $staffUser;
                 TeacherProfile::query()->updateOrCreate(
                     ['school_id' => $school->id, 'employee_id' => $employees[$index + 1]->id],
                     [
@@ -300,7 +336,7 @@ class DemoDataSeeder extends Seeder
             $teacherUsers[] = $owner;
         }
 
-        return [$employees, $teacherUsers];
+        return [$employees, $teacherUsers, $staffUsers];
     }
 
     /**
@@ -338,7 +374,7 @@ class DemoDataSeeder extends Seeder
                     'gender' => $i % 2 === 0 ? 'female' : 'male',
                     'religion' => 'Islam',
                     'date_of_birth' => 2013 + ($i % 5).'-03-10',
-                    'admitted_on' => '2022-01-01',
+                    'admitted_on' => '2017-01-01',
                     'address' => 'Dhaka',
                     'medical_notes' => $i % 17 === 0 ? 'Asthma watch' : 'No known issues',
                     'status' => $i > 44 ? 'graduated' : 'active',
@@ -364,7 +400,7 @@ class DemoDataSeeder extends Seeder
 
         foreach ($students as $studentIndex => $student) {
             foreach ($years as $year => $academicYear) {
-                $classIndex = min(5, max(1, ($year - 2022) + 1 + (($studentIndex - 1) % 2)));
+                $classIndex = min(5, max(1, ($year - 2017) + 1 + (($studentIndex - 1) % 2)));
                 $sectionCode = 'C'.$classIndex.'-'.($studentIndex % 2 === 0 ? 'B' : 'A');
                 $status = $year < 2026 ? 'completed' : ($studentIndex > 44 ? 'archived' : 'active');
                 $enrollments[$year][$studentIndex] = StudentEnrollment::query()->updateOrCreate(
@@ -612,7 +648,7 @@ class DemoDataSeeder extends Seeder
         }
     }
 
-    private function seedFinance(School $school, array $years, array $classes, array $groups, array $enrollments): void
+    private function seedFinance(School $school, User $user, array $years, array $classes, array $groups, array $enrollments): void
     {
         $feeCategories = [];
         foreach ([['Tuition Fee', 'TUITION', 'monthly'], ['Exam Fee', 'EXAM', 'per_exam'], ['Transport Fee', 'TRANSPORT', 'optional']] as $sort => [$name, $code, $billingType]) {
@@ -628,7 +664,7 @@ class DemoDataSeeder extends Seeder
                     ['school_id' => $school->id, 'fee_category_id' => $feeCategories['TUITION']->id, 'academic_year_id' => $academicYear->id, 'academic_class_id' => $class->id],
                     [
                         'student_group_id' => $groups[1]->id,
-                        'amount' => 2000 + ($classIndex * 350) + (($year - 2022) * 100),
+                        'amount' => 2000 + ($classIndex * 350) + (($year - 2017) * 100),
                         'due_day_of_month' => 10,
                         'months_applicable' => $this->monthList($year),
                         'is_recurring' => true,
@@ -686,6 +722,37 @@ class DemoDataSeeder extends Seeder
                     'credentials_encrypted' => ['merchant_id' => "demo-{$gateway}", 'public_key' => 'demo-public', 'secret_key' => 'demo-secret'],
                     'is_active' => $gateway !== 'stripe',
                     'test_mode' => true,
+                ]
+            );
+        }
+
+        $discountPolicy = \App\Models\DiscountPolicy::query()->updateOrCreate(
+            ['school_id' => $school->id, 'code' => 'MERIT-25'],
+            [
+                'name' => 'Merit Waiver',
+                'discount_type' => 'percent',
+                'amount' => 25,
+                'applies_to_category_ids' => [$feeCategories['TUITION']->id],
+                'is_stackable' => false,
+                'status' => 'active',
+            ]
+        );
+
+        foreach ([1, 7, 13, 19] as $studentIndex) {
+            if (!isset($enrollments[2026][$studentIndex])) {
+                continue;
+            }
+
+            StudentDiscount::query()->updateOrCreate(
+                [
+                    'school_id' => $school->id,
+                    'student_enrollment_id' => $enrollments[2026][$studentIndex]->id,
+                    'discount_policy_id' => $discountPolicy->id,
+                    'academic_year_id' => $years[2026]->id,
+                ],
+                [
+                    'approved_by' => $user->id,
+                    'notes' => 'Seeded merit discount for QA.',
                 ]
             );
         }
@@ -820,7 +887,171 @@ class DemoDataSeeder extends Seeder
                     'auditable_id' => $academicYear->id,
                     'ip_address' => '127.0.0.1',
                     'user_agent' => 'DemoDataSeeder',
-                    'metadata' => ['year' => $year, 'source' => 'five-year-demo'],
+                    'metadata' => ['year' => $year, 'source' => 'ten-year-demo'],
+                ]
+            );
+        }
+    }
+
+    /**
+     * @param  array<string, User>  $staffUsers
+     * @param  array<int, Student>  $students
+     * @return array<string, User>
+     */
+    private function seedAccessUsers(School $school, User $owner, array $staffUsers, array $students): array
+    {
+        $roleUsers = ['school-owner' => $owner];
+
+        $superAdmin = User::query()->updateOrCreate(
+            ['email' => 'superadmin@example.com'],
+            ['name' => 'Super Admin', 'password' => bcrypt('password')]
+        );
+        SchoolMembership::query()->updateOrCreate(
+            ['school_id' => $school->id, 'user_id' => $superAdmin->id],
+            ['status' => 'active', 'joined_at' => CarbonImmutable::create(2017, 1, 1)]
+        );
+        $superRole = Role::query()->where('key', 'super-admin')->first();
+        if ($superRole) {
+            UserRoleAssignment::query()->updateOrCreate(
+                ['school_id' => $school->id, 'user_id' => $superAdmin->id, 'role_id' => $superRole->id],
+                ['assigned_by' => $owner->id]
+            );
+        }
+        $roleUsers['super-admin'] = $superAdmin;
+
+        if (isset($staffUsers['offc'])) {
+            $roleUsers['school-admin'] = $staffUsers['offc'];
+        }
+        if (isset($staffUsers['prin'])) {
+            $roleUsers['principal'] = $staffUsers['prin'];
+        }
+        if (isset($staffUsers['acct'])) {
+            $roleUsers['accountant'] = $staffUsers['acct'];
+        }
+
+        $teacherUser = collect($staffUsers)
+            ->filter(fn (User $user, string $key): bool => str_contains($key, 'amina-rahman') || str_contains($key, 'karim-uddin'))
+            ->first();
+        if ($teacherUser instanceof User) {
+            $roleUsers['teacher'] = $teacherUser;
+        }
+
+        $student = $students[1];
+        $studentUser = User::query()->updateOrCreate(
+            ['email' => $student->email],
+            ['name' => $student->full_name, 'password' => bcrypt('password')]
+        );
+        SchoolMembership::query()->updateOrCreate(
+            ['school_id' => $school->id, 'user_id' => $studentUser->id],
+            ['status' => 'active', 'joined_at' => CarbonImmutable::create(2017, 1, 1)]
+        );
+        $studentRole = Role::query()->where('key', 'student')->first();
+        if ($studentRole) {
+            UserRoleAssignment::query()->updateOrCreate(
+                ['school_id' => $school->id, 'user_id' => $studentUser->id, 'role_id' => $studentRole->id],
+                ['assigned_by' => $owner->id]
+            );
+        }
+        $roleUsers['student'] = $studentUser;
+
+        $guardian = $student->guardian()->firstOrFail();
+        $parentUser = User::query()->updateOrCreate(
+            ['email' => $guardian->email],
+            ['name' => $guardian->full_name, 'password' => bcrypt('password')]
+        );
+        SchoolMembership::query()->updateOrCreate(
+            ['school_id' => $school->id, 'user_id' => $parentUser->id],
+            ['status' => 'active', 'joined_at' => CarbonImmutable::create(2017, 1, 1)]
+        );
+        $parentRole = Role::query()->where('key', 'parent')->first();
+        if ($parentRole) {
+            UserRoleAssignment::query()->updateOrCreate(
+                ['school_id' => $school->id, 'user_id' => $parentUser->id, 'role_id' => $parentRole->id],
+                ['assigned_by' => $owner->id]
+            );
+        }
+        $roleUsers['parent'] = $parentUser;
+
+        $auditor = User::query()->updateOrCreate(
+            ['email' => 'auditor@example.com'],
+            ['name' => 'Read Only Auditor', 'password' => bcrypt('password')]
+        );
+        SchoolMembership::query()->updateOrCreate(
+            ['school_id' => $school->id, 'user_id' => $auditor->id],
+            ['status' => 'active', 'joined_at' => CarbonImmutable::create(2017, 1, 1)]
+        );
+        $auditorRole = Role::query()->where('key', 'read-only-auditor')->first();
+        if ($auditorRole) {
+            UserRoleAssignment::query()->updateOrCreate(
+                ['school_id' => $school->id, 'user_id' => $auditor->id, 'role_id' => $auditorRole->id],
+                ['assigned_by' => $owner->id]
+            );
+        }
+        $roleUsers['read-only-auditor'] = $auditor;
+
+        return $roleUsers;
+    }
+
+    /**
+     * @param  array<string, User>  $roleUsers
+     * @param  array<int, AcademicYear>  $years
+     * @param  array<int, array<int, StudentEnrollment>>  $enrollments
+     */
+    private function seedInvitationsAndNotifications(School $school, User $owner, array $roleUsers, array $years, array $enrollments): void
+    {
+        $schoolAdminRole = Role::query()->where('key', 'school-admin')->first();
+        if ($schoolAdminRole) {
+            foreach ([1, 2, 3] as $index) {
+                SchoolInvitation::query()->updateOrCreate(
+                    ['school_id' => $school->id, 'email' => "invite{$index}@example.com"],
+                    [
+                        'role_id' => $schoolAdminRole->id,
+                        'invited_by' => $owner->id,
+                        'name' => "Invited Admin {$index}",
+                        'token' => (string) Str::uuid(),
+                        'status' => $index === 1 ? 'pending' : 'accepted',
+                        'expires_at' => now()->addDays(7 + $index),
+                        'accepted_by' => $index === 1 ? null : $owner->id,
+                        'accepted_at' => $index === 1 ? null : now()->subDays($index),
+                    ]
+                );
+            }
+        }
+
+        foreach ($roleUsers as $roleKey => $user) {
+            SchoolNotification::query()->updateOrCreate(
+                ['school_id' => $school->id, 'recipient_user_id' => $user->id, 'title' => "Quarterly update for {$roleKey}"],
+                [
+                    'type' => 'system',
+                    'body' => "Seeded notification for {$roleKey} QA walkthroughs.",
+                    'data' => ['role' => $roleKey, 'scope' => 'demo'],
+                    'read_at' => in_array($roleKey, ['student', 'parent'], true) ? null : now()->subDay(),
+                ]
+            );
+        }
+
+        foreach ([1, 5, 9] as $studentIndex) {
+            if (!isset($enrollments[2026][$studentIndex])) {
+                continue;
+            }
+
+            $student = $enrollments[2026][$studentIndex]->student()->first();
+            if (!$student?->email) {
+                continue;
+            }
+
+            $recipient = User::query()->where('email', $student->email)->first();
+            if (!$recipient) {
+                continue;
+            }
+
+            SchoolNotification::query()->updateOrCreate(
+                ['school_id' => $school->id, 'recipient_user_id' => $recipient->id, 'title' => "Result published {$student->admission_no}"],
+                [
+                    'type' => 'results',
+                    'body' => 'Your latest result summary is ready for review.',
+                    'data' => ['academic_year_id' => $years[2026]->id],
+                    'read_at' => null,
                 ]
             );
         }

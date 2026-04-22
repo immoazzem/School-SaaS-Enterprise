@@ -4,6 +4,170 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Frontend Checkpoint
 
+Current page/module complete: enterprise route coverage pass, role-aware admin surfaces, and ten-year seeded QA baseline.
+
+- Added missing live frontend surfaces for the remaining backend route families:
+  - `apps/web/pages/admin.vue`
+  - `apps/web/pages/admin/schools.vue`
+  - `apps/web/pages/admin/users.vue`
+  - `apps/web/pages/admin/jobs.vue`
+  - `apps/web/pages/admin/audit-logs.vue`
+  - `apps/web/pages/schools/[schoolId]/notifications.vue`
+  - `apps/web/pages/schools/[schoolId]/invitations.vue`
+  - `apps/web/pages/schools/[schoolId]/settings.vue`
+  - `apps/web/pages/schools/[schoolId]/discounts.vue`
+  - `apps/web/pages/schools/[schoolId]/invoice-payments.vue`
+  - `apps/web/pages/schools/[schoolId]/portal-student.vue`
+  - `apps/web/pages/schools/[schoolId]/portal-parent.vue`
+- Added `apps/web/composables/useEnterpriseAccess.ts` and updated all admin pages so non-enterprise users now see a clean informational state instead of triggering noisy 403-driven console failures.
+- Expanded `apps/api/database/seeders/DemoDataSeeder.php` from the older five-year seed into a ten-year, role-aware demo environment:
+  - academic years 2017-2026
+  - school-owner, super-admin, school-admin, principal, teacher, accountant, student, parent, and read-only-auditor users
+  - school settings, discounts, invitations, and notifications
+  - portal-compatible student/guardian logins
+- Local database was reset and reseeded with:
+  - `php artisan migrate:fresh --seed --seeder=DemoDataSeeder`
+- Browser role sweep passed with no console errors for:
+  - super admin admin routes
+  - school-owner dashboard/workspace routes
+  - student portal routes
+  - parent portal routes
+  - accountant finance routes
+- Latest useful browser artifacts:
+  - `docs/browser-checks/super-admin-20260422-role-qa-v2.png`
+  - `docs/browser-checks/school-owner-20260422-role-qa-v2.png`
+  - `docs/browser-checks/student-20260422-role-qa-v2.png`
+  - `docs/browser-checks/parent-20260422-role-qa-v2.png`
+  - `docs/browser-checks/accountant-20260422-role-qa-v2.png`
+  - `docs/browser-checks/login-live-inspect-20260422.png`
+- Verification after this pass:
+  - `cd apps/api && php artisan migrate:fresh --seed --seeder=DemoDataSeeder` passed
+  - `cd apps/api && php artisan test` passed with `117 tests / 702 assertions`
+  - `cd apps/web && npm run build` passed
+  - API login verified for:
+    - `superadmin@example.com`
+    - `test@example.com`
+    - `sadia.islam@example.com`
+    - `farhana.kabir@example.com`
+    - `mahmud.alam@example.com`
+    - `student001@example.com`
+    - `guardian001@example.com`
+    - `auditor@example.com`
+- Known follow-up:
+  - this is now a strong enterprise QA baseline, but not a truthful “every feature deeply certified” finish line yet.
+  - next work should continue full module-by-module mutation QA and fix defects discovered under the ten-year seed.
+
+Current page/module complete: live portfolio, communications, and settings surfaces on the rebuilt frontend.
+
+- Replaced placeholder root-level management pages with live API-backed flows:
+  - `apps/web/pages/schools.vue`
+  - `apps/web/pages/notices.vue`
+  - `apps/web/pages/settings.vue`
+- `Schools` now:
+  - refreshes real school membership context
+  - creates new schools
+  - switches selected school context
+  - links directly into the selected school workspace
+- `Notice center` now:
+  - loads real school notifications
+  - shows unread count
+  - marks notifications read
+  - lists and creates school invitations when the current user can manage users
+- `Platform settings` now:
+  - loads and saves real school settings for the active school
+  - shows enterprise health/jobs/audit only when the current user actually has enterprise admin access
+  - no longer throws noisy 403s in the browser for school-owner users
+- Restored school-scoped workspace routes compile and load after the compatibility bridge:
+  - `apps/web/pages/schools/[schoolId]/*`
+- Latest browser verification:
+  - `http://127.0.0.1:3000/schools`
+  - `http://127.0.0.1:3000/notices`
+  - `http://127.0.0.1:3000/settings`
+  - `http://127.0.0.1:3000/schools/1/students`
+- Latest useful browser artifacts:
+  - `docs/browser-checks/-schools-qa-20260422.png`
+  - `docs/browser-checks/-notices-qa-20260422.png`
+  - `docs/browser-checks/-settings-qa-20260422.png`
+  - `docs/browser-checks/settings-qa-20260422-v2.png`
+- `npm run build` passed after this slice.
+- Known follow-up:
+  - continue converting the remaining backend domains that still do not have explicit frontend surfaces: admin management, audit-centric operations, deeper finance controls, and portal-facing views.
+
+Current page/module complete: root-level operator page redesign for analytics, attendance, marks, finance, reports, classes, notices, schools, and settings.
+
+- Extended the new frontend language across the remaining key root-level operator pages:
+  - `apps/web/pages/analytics.vue`
+  - `apps/web/pages/attendance.vue`
+  - `apps/web/pages/marks.vue`
+  - `apps/web/pages/finance/fees.vue`
+  - `apps/web/pages/reports.vue`
+  - `apps/web/pages/classes.vue`
+  - `apps/web/pages/notices.vue`
+  - `apps/web/pages/schools.vue`
+  - `apps/web/pages/settings.vue`
+- Expanded shared mock/operator data in `apps/web/utils/schoolDashboardData.ts` so the new pages are decision-oriented instead of placeholder tables.
+- The page system now follows one clearer pattern:
+  - page header with actions
+  - summary/decision surfaces
+  - one primary operational register
+- Verified the redesigned screens in the browser:
+  - `http://127.0.0.1:3000/analytics`
+  - `http://127.0.0.1:3000/attendance`
+  - `http://127.0.0.1:3000/marks`
+  - `http://127.0.0.1:3000/finance/fees`
+  - `http://127.0.0.1:3000/reports`
+  - `http://127.0.0.1:3000/settings`
+- Latest useful browser artifacts:
+  - `docs/browser-checks/frontend-rebuild-analytics-20260422.png`
+  - `docs/browser-checks/frontend-rebuild-attendance-20260422.png`
+  - `docs/browser-checks/frontend-rebuild-marks-20260422.png`
+  - `docs/browser-checks/frontend-rebuild-finance-20260422.png`
+  - `docs/browser-checks/frontend-rebuild-reports-20260422.png`
+  - `docs/browser-checks/frontend-rebuild-settings-20260422.png`
+- `npm run build` passed after this page cluster.
+- Known follow-up:
+  - the frontend shell and root-level pages are now aligned, but the next pass should tighten the remaining route set and then create a restore-point commit.
+
+Current page/module complete: frontend redesign reset, live shell repair, and first rendered rebuild pass.
+
+- Ignored the prior Antigravity direction and treated the current frontend as a fresh rebuild target.
+- Re-centered the frontend on the local premium admin resource as a design/system source while keeping the app itself in the current Nuxt codebase.
+- Rebuilt the new root-level frontend shell around:
+  - `apps/web/layouts/components/DefaultLayoutWithVerticalNav.vue`
+  - `apps/web/navigation/vertical/index.ts`
+  - `apps/web/assets/styles/styles.scss`
+  - `apps/web/pages/index.vue`
+  - `apps/web/pages/login.vue`
+  - `apps/web/pages/students.vue`
+  - `apps/web/utils/schoolDashboardData.ts`
+  - `apps/web/components/SchoolMetricCard.vue`
+  - `apps/web/components/SchoolPageHeader.vue`
+- Adopted the visual direction requested from the Signal reference:
+  - Inter + JetBrains Mono font pairing
+  - dark restrained left rail
+  - compact enterprise top bar
+  - calmer pale workspace background
+  - flatter metric and workflow cards
+- Fixed the live frontend boot issues discovered during browser QA:
+  - corrected Sass variable forwarding in `apps/web/assets/styles/variables/_template.scss`
+  - removed the fragile Google Fonts Sass import that broke Vite CSS in dev
+  - replaced invalid `definePage(...)` usage with `definePageMeta(...)` across rebuilt pages
+  - reduced top-bar duplication so the shell no longer repeats the page title above every screen
+  - improved login hero contrast so the brand-side heading is readable
+- Browser verification completed with real rendered pages:
+  - `http://127.0.0.1:3000/login`
+  - `http://127.0.0.1:3000/`
+  - `http://127.0.0.1:3000/students`
+- Latest useful browser artifacts:
+  - `docs/browser-checks/frontend-rebuild-login-playwright-20260422-v2.png`
+  - `docs/browser-checks/frontend-rebuild-dashboard-playwright-20260422-v2.png`
+  - `docs/browser-checks/frontend-rebuild-students-playwright-20260422.png`
+- Current local frontend URL: `http://127.0.0.1:3000`
+- Known follow-up:
+  - the rebuild is now visually real and stable on login/dashboard/students, but the remaining pages still need the same quality pass before this becomes the final frontend checkpoint.
+
+## Latest Frontend Checkpoint
+
 Current page/module complete: frontend dashboard and high-traffic workspace migration.
 
 - Rebuilt the main operator pages around native admin surfaces:

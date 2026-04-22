@@ -90,6 +90,14 @@ Important: the current admin theme is only a design/system reference for the aut
 
 Radiant remains a historical reference for earlier marketing/login direction, but the authenticated frontend is now being rebuilt around the new admin shell.
 
+The current visual direction for this rebuild pass is:
+
+```text
+Use the local premium admin resource as the component/system source.
+Use https://signal-dashboard-1de.pages.dev/dashboard for look, density, and font mood.
+Do not preserve the prior Antigravity pass just because it exists.
+```
+
 ## Key Decisions Already Made
 
 - Use a new folder: `D:\Development\School-SaaS-Enterprise`.
@@ -106,6 +114,121 @@ Radiant remains a historical reference for earlier marketing/login direction, bu
 - First vertical slice: Academic Classes CRUD.
 
 ## Current Implementation Checkpoints
+
+- Latest checkpoint: enterprise route coverage pass and ten-year QA baseline.
+- Missing route-family frontend surfaces have now been added for:
+  - enterprise admin
+  - school notifications
+  - invitations
+  - school settings
+  - discounts
+  - invoice payments
+  - student portal
+  - parent portal
+- Admin pages are now role-aware through `apps/web/composables/useEnterpriseAccess.ts` and no longer fire privileged API calls for non-super-admin users.
+- `apps/api/database/seeders/DemoDataSeeder.php` is now a deterministic ten-year seed with role accounts and portal-compatible users.
+- Local database was reset with:
+  - `cd apps/api && php artisan migrate:fresh --seed --seeder=DemoDataSeeder`
+- Verified logins:
+  - `superadmin@example.com / password`
+  - `test@example.com / password`
+  - `sadia.islam@example.com / password`
+  - `farhana.kabir@example.com / password`
+  - `mahmud.alam@example.com / password`
+  - `student001@example.com / password`
+  - `guardian001@example.com / password`
+  - `auditor@example.com / password`
+- Browser role sweep passed for enterprise admin, school-owner, student, parent, and accountant flows.
+- Latest verification:
+  - `cd apps/api && php artisan test` passed with `117 tests / 702 assertions`
+  - `cd apps/web && npm run build` passed
+- Immediate next step:
+  - continue module-by-module mutation QA and defect fixing on top of the ten-year seed rather than creating more placeholder surfaces.
+
+- Latest checkpoint: live portfolio, communications, and settings surfaces.
+- Root-level pages now have real API-backed management flows for:
+  - `apps/web/pages/schools.vue`
+  - `apps/web/pages/notices.vue`
+  - `apps/web/pages/settings.vue`
+- Restored school-scoped pages under `apps/web/pages/schools/[schoolId]/*` now compile and load with the rebuilt shell.
+- Verified in browser:
+  - `http://127.0.0.1:3000/schools`
+  - `http://127.0.0.1:3000/notices`
+  - `http://127.0.0.1:3000/settings`
+  - `http://127.0.0.1:3000/schools/1/students`
+- Latest browser artifacts:
+  - `docs/browser-checks/-schools-qa-20260422.png`
+  - `docs/browser-checks/-notices-qa-20260422.png`
+  - `docs/browser-checks/-settings-qa-20260422.png`
+  - `docs/browser-checks/settings-qa-20260422-v2.png`
+- Current local frontend URL: `http://127.0.0.1:3000`
+- Current local API URL in frontend env: `https://school-api.test/api`
+- Immediate next step:
+  - continue frontend coverage for backend domains still lacking explicit UI: admin surface, audit-heavy operations, deeper finance exceptions, and portal-facing views.
+
+- Latest checkpoint: root-level operator page redesign cluster.
+- The new shell/design language now covers:
+  - `apps/web/pages/analytics.vue`
+  - `apps/web/pages/attendance.vue`
+  - `apps/web/pages/marks.vue`
+  - `apps/web/pages/finance/fees.vue`
+  - `apps/web/pages/reports.vue`
+  - `apps/web/pages/classes.vue`
+  - `apps/web/pages/notices.vue`
+  - `apps/web/pages/schools.vue`
+  - `apps/web/pages/settings.vue`
+- `apps/web/utils/schoolDashboardData.ts` was expanded to support these pages with richer operational mock data.
+- The root-level page pattern is now:
+  - page header with actions
+  - decision/summary surfaces
+  - one main table, queue, or register
+- Latest verification:
+  - `npm run build` passed
+  - Playwright browser verification passed for analytics, attendance, marks, finance, reports, and settings
+  - latest useful artifacts:
+    - `docs/browser-checks/frontend-rebuild-analytics-20260422.png`
+    - `docs/browser-checks/frontend-rebuild-attendance-20260422.png`
+    - `docs/browser-checks/frontend-rebuild-marks-20260422.png`
+    - `docs/browser-checks/frontend-rebuild-finance-20260422.png`
+    - `docs/browser-checks/frontend-rebuild-reports-20260422.png`
+    - `docs/browser-checks/frontend-rebuild-settings-20260422.png`
+- Immediate next step:
+  - finish the remaining root-level/frontend consistency pass and then create a restore-point commit.
+
+- Latest checkpoint: frontend redesign reset and first rendered rebuild pass.
+- The current frontend has been treated as a fresh rebuild target rather than a continuation of the prior Antigravity direction.
+- The active rebuilt shell now lives in the root-level frontend structure, especially:
+  - `apps/web/layouts/components/DefaultLayoutWithVerticalNav.vue`
+  - `apps/web/navigation/vertical/index.ts`
+  - `apps/web/assets/styles/styles.scss`
+  - `apps/web/pages/login.vue`
+  - `apps/web/pages/index.vue`
+  - `apps/web/pages/students.vue`
+  - `apps/web/utils/schoolDashboardData.ts`
+- The visual direction now uses:
+  - Inter + JetBrains Mono
+  - dark left rail
+  - compact top bar
+  - pale dashboard canvas
+  - restrained green accents
+- Live issues fixed during this pass:
+  - Sass variable forwarding in `_template.scss`
+  - Vite CSS dev crash from the Google Fonts Sass import
+  - invalid `definePage(...)` usage on rebuilt pages
+  - duplicated page-title feel in the shell
+  - low-contrast login hero heading
+- Latest verification:
+  - `npm run build` passed
+  - Playwright browser verification passed for:
+    - `http://127.0.0.1:3000/login`
+    - `http://127.0.0.1:3000/`
+    - `http://127.0.0.1:3000/students`
+  - latest useful artifacts:
+    - `docs/browser-checks/frontend-rebuild-login-playwright-20260422-v2.png`
+    - `docs/browser-checks/frontend-rebuild-dashboard-playwright-20260422-v2.png`
+    - `docs/browser-checks/frontend-rebuild-students-playwright-20260422.png`
+- Immediate next step:
+  - carry the same redesign quality pass through the remaining root-level pages before creating the next restore-point commit.
 
 - Latest checkpoint: dashboard and high-traffic workspace migration.
 - The main operator pages now sit deeper inside the rebuilt frontend system:
