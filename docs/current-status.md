@@ -4,6 +4,35 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Frontend Checkpoint
 
+Current page/module complete: Vuexy dashboard and high-traffic workspace migration.
+
+- Rebuilt the main operator pages around native Vuetify/Vuexy surfaces:
+  - `apps/web/app/pages/dashboard.vue`
+  - `apps/web/app/pages/schools/[schoolId]/students.vue`
+  - `apps/web/app/pages/schools/[schoolId]/finance.vue`
+  - `apps/web/app/pages/schools/[schoolId]/reports.vue`
+  - `apps/web/app/pages/schools/[schoolId]/attendance.vue`
+- The dashboard now uses Vuexy-style cards, alerts, chips, and grid sections while preserving the existing business logic.
+- Students, Finance, Reports, and Attendance now use Vuetify actions and feedback states:
+  - `VBtn` for actions
+  - `VAlert` for status messaging
+  - `VSheet` with `VProgressCircular` for loading states
+- Targeted browser verification passed on:
+  - `http://127.0.0.1:3000/dashboard`
+  - `http://127.0.0.1:3000/schools/1/students`
+  - `http://127.0.0.1:3000/schools/1/finance`
+  - `http://127.0.0.1:3000/schools/1/reports`
+  - `http://127.0.0.1:3000/schools/1/attendance`
+- Latest useful browser artifacts:
+  - `docs/browser-checks/vuexy-dashboard-polish-20260422.png`
+  - `docs/browser-checks/vuexy-students-polish-20260422.png`
+  - `docs/browser-checks/vuexy-finance-polish-20260422.png`
+  - `docs/browser-checks/vuexy-reports-polish-20260422.png`
+  - `docs/browser-checks/vuexy-attendance-polish-20260422.png`
+- Current local frontend URL: `http://127.0.0.1:3000`
+- Known follow-up:
+  - the long `npm run qa:browser` harness still needs a Vuexy-specific refresh, but direct browser checks for the rebuilt pages passed cleanly with no runtime console errors.
+
 Current page/module complete: Vuexy frontend rebuild foundation and shared shell migration.
 
 - New frontend theme source is now `D:\Development\Theme and templates\vuexy-admin-v10.11.1`.

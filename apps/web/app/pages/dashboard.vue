@@ -229,34 +229,39 @@ onMounted(loadDashboard)
         <div class="flex flex-col">
           <p class="eyebrow">Command Center</p>
           <h1>{{ selectedSchool?.name || 'No tenant selected' }}</h1>
-          <p v-if="selectedSchool" class="mt-1.5 flex items-center gap-2 font-medium text-slate-500">
-            <span class="inline-block h-2 w-2 rounded-full bg-emerald-400" />
-            {{ selectedSchool.slug }} · {{ selectedSchool.roles?.[0]?.name || 'Member' }}
-          </p>
+          <div v-if="selectedSchool" class="mt-1.5 flex flex-wrap items-center gap-2">
+            <VChip color="success" size="small" variant="tonal">
+              {{ selectedSchool.slug }}
+            </VChip>
+            <VChip size="small" variant="outlined">
+              {{ selectedSchool.roles?.[0]?.name || 'Member' }}
+            </VChip>
+          </div>
         </div>
 
         <div class="header-actions">
           <LocaleSwitcher />
           <span v-if="auth.user?.email" class="hidden cursor-default items-center rounded-md bg-white px-3 py-2 text-xs font-semibold text-slate-700 ring-1 ring-inset ring-slate-300 sm:inline-flex">
-            <svg class="mr-1.5 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
             {{ auth.user?.email }}
           </span>
-          <button class="button secondary compact" type="button" @click="auth.logout()">
+          <VBtn color="default" size="small" variant="outlined" @click="auth.logout()">
             {{ $t('actions.signOut') }}
-          </button>
+          </VBtn>
         </div>
       </header>
 
-      <p v-if="error" class="error fade-in">{{ error }}</p>
-      <p v-if="success" class="success fade-in">{{ success }}</p>
+      <VAlert v-if="error" class="fade-in" type="error" variant="tonal">{{ error }}</VAlert>
+      <VAlert v-if="success" class="fade-in" type="success" variant="tonal">{{ success }}</VAlert>
 
-      <div v-if="loading || summaryLoading" class="flex max-w-sm items-center gap-3 rounded-lg bg-slate-100 p-4 text-sm font-medium text-slate-500 animate-pulse">
-        <svg class="h-5 w-5 animate-spin text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
-        Loading workspace data…
-      </div>
+      <VSheet v-if="loading || summaryLoading" class="flex max-w-sm items-center gap-3 rounded-lg px-4 py-4 text-sm font-medium text-slate-500" color="surface-variant">
+        <VProgressCircular color="primary" indeterminate size="20" width="2" />
+        Loading workspace data...
+      </VSheet>
 
-      <section class="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1.7fr)_minmax(320px,0.9fr)]">
-        <article class="surface flex flex-col gap-5 p-5 lg:p-6">
+      <VRow class="mt-0" dense>
+        <VCol cols="12" xl="8">
+          <VCard class="h-100">
+            <VCardText class="d-flex flex-column gap-5 pa-5 pa-lg-6">
           <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div class="max-w-2xl">
               <p class="eyebrow">Workspace overview</p>
@@ -275,61 +280,75 @@ onMounted(loadDashboard)
           </div>
 
           <div v-if="selectedSchool" class="summary-grid fade-in" aria-label="School metrics">
-            <article v-for="metric in kpis" :key="metric.eyebrow" class="summary-item">
+            <VCard
+              v-for="metric in kpis"
+              :key="metric.eyebrow"
+              class="summary-item"
+            >
+              <VCardText class="pa-4">
               <span>{{ metric.eyebrow }}</span>
               <div class="mt-1 flex items-baseline gap-2">
                 <strong>
                   {{ metric.isRate || metric.isMoney ? metric.label : metric.value }}
                 </strong>
-                <span class="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">
-                  <svg class="mr-0.5 h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
+                <VChip color="success" size="x-small" variant="tonal">
                   {{ metric.trend }}
-                </span>
+                </VChip>
               </div>
               <p class="m-0 mt-2 text-sm text-slate-500">{{ metric.detail }}</p>
-            </article>
+              </VCardText>
+            </VCard>
           </div>
-        </article>
+            </VCardText>
+          </VCard>
+        </VCol>
 
-        <article class="surface flex flex-col gap-4 p-5 lg:p-6">
+        <VCol cols="12" xl="4">
+          <VCard class="h-100">
+            <VCardText class="d-flex flex-column gap-4 pa-5 pa-lg-6">
           <div>
             <p class="eyebrow">Launchpad</p>
             <h2 class="m-0 text-xl font-display font-semibold tracking-tight text-slate-900">Most-used workflows</h2>
           </div>
 
           <div v-if="selectedSchool && quickActions.length" class="grid grid-cols-1 gap-2">
-            <button
+            <VCard
               v-for="module in quickActions"
               :key="module.route"
-              class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 text-left transition-colors hover:bg-slate-50 hover:border-slate-300"
-              type="button"
+              class="cursor-pointer border border-slate-200 transition-colors hover:bg-slate-50 hover:border-slate-300"
+              rounded="lg"
               @click="openModule(module)"
             >
+              <VCardText class="d-flex align-start justify-space-between gap-3 pa-4">
               <span class="flex flex-col gap-1">
                 <strong class="text-sm font-semibold text-slate-900">{{ module.label }}</strong>
                 <span class="text-sm text-slate-500">{{ module.description }}</span>
               </span>
-              <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-            </button>
+              <VChip size="x-small" variant="outlined">Open</VChip>
+              </VCardText>
+            </VCard>
           </div>
 
-          <div v-else class="rounded-lg border border-dashed border-slate-300 bg-slate-50 px-4 py-6 text-sm text-slate-500">
+          <VSheet v-else class="rounded-lg border border-dashed border-slate-300 px-4 py-6 text-sm text-slate-500" color="surface-variant">
             Select or create a school to unlock the operational modules.
-          </div>
-        </article>
-      </section>
+          </VSheet>
+            </VCardText>
+          </VCard>
+        </VCol>
+      </VRow>
 
-      <section v-if="selectedSchool" class="grid grid-cols-1 gap-5 fade-in lg:grid-cols-[1.5fr_1fr]" style="animation-delay: 50ms;">
-        <article class="surface flex flex-col gap-4 p-5 lg:p-6">
+      <VRow v-if="selectedSchool" class="mt-0 fade-in" dense style="animation-delay: 50ms;">
+        <VCol cols="12" lg="8">
+          <VCard class="h-100">
+            <VCardText class="d-flex flex-column gap-4 pa-5 pa-lg-6">
           <div class="flex items-start justify-between gap-4">
             <div>
               <p class="eyebrow">Operating picture</p>
               <h2 class="m-0 text-xl font-display font-semibold tracking-tight text-slate-900">Collections trend</h2>
             </div>
-            <span class="inline-flex items-center gap-1.5 rounded-full bg-rose-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-rose-700">
-              <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span>
+            <VChip color="error" size="small" variant="tonal">
               {{ dashboardSummary?.accountant.unpaid_invoices ?? 0 }} unpaid
-            </span>
+            </VChip>
           </div>
 
           <div v-if="collectionTrend.length" class="mt-2 flex flex-col gap-3" aria-label="Collection trend">
@@ -341,21 +360,27 @@ onMounted(loadDashboard)
               <strong class="text-right text-sm font-bold text-slate-900">{{ formatMoney(row.total) }}</strong>
             </div>
           </div>
-          <p v-else class="mt-2 rounded-lg border-2 border-dashed border-slate-200 py-8 text-center text-sm font-medium text-slate-500">No collection trend data available yet.</p>
-        </article>
+          <VSheet v-else class="mt-2 rounded-lg border-2 border-dashed border-slate-200 py-8 text-center text-sm font-medium text-slate-500" color="surface-variant">No collection trend data available yet.</VSheet>
+            </VCardText>
+          </VCard>
+        </VCol>
 
-        <article class="surface flex flex-col gap-4 p-5 lg:p-6">
+        <VCol cols="12" lg="4">
+          <VCard class="h-100">
+            <VCardText class="d-flex flex-column gap-4 pa-5 pa-lg-6">
           <div>
             <p class="eyebrow">Today</p>
             <h2 class="m-0 text-xl font-display font-semibold tracking-tight text-slate-900">Attention required</h2>
           </div>
 
           <ul class="mt-2 m-0 flex list-none flex-col gap-3 p-0">
-            <li
+            <VCard
               v-for="item in attentionItems"
               :key="item.label"
-              class="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-4 py-3"
+              class="border border-slate-200 bg-slate-50"
+              rounded="lg"
             >
+              <VCardText class="d-flex align-center justify-space-between px-4 py-3">
               <span class="flex flex-col gap-1">
                 <span class="text-sm font-semibold text-slate-700">{{ item.label }}</span>
                 <span class="text-xs text-slate-500">{{ item.detail }}</span>
@@ -370,13 +395,17 @@ onMounted(loadDashboard)
               >
                 {{ item.value }}
               </strong>
-            </li>
+              </VCardText>
+            </VCard>
           </ul>
-        </article>
-      </section>
+            </VCardText>
+          </VCard>
+        </VCol>
+      </VRow>
 
       <section v-if="selectedSchool" class="fade-in" style="animation-delay: 100ms;">
-        <div class="surface flex flex-col gap-6 p-5 lg:p-6">
+        <VCard>
+          <VCardText class="d-flex flex-column gap-6 pa-5 pa-lg-6">
           <div class="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
             <div class="flex items-start justify-between gap-4">
               <div>
@@ -409,83 +438,84 @@ onMounted(loadDashboard)
               </div>
             </div>
           </div>
-        </div>
+          </VCardText>
+        </VCard>
       </section>
 
-      <section class="mt-8 grid grid-cols-1 gap-5 border-t border-slate-200 pt-8 lg:grid-cols-[1.5fr_1fr]">
-        <form class="surface flex flex-col gap-5 p-5 lg:p-6" @submit.prevent="createSchool">
+      <VRow class="mt-4 border-t border-slate-200 pt-8" dense>
+        <VCol cols="12" lg="8">
+          <VCard>
+            <VCardText class="d-flex flex-column gap-5 pa-5 pa-lg-6">
+        <form class="flex flex-col gap-5" @submit.prevent="createSchool">
           <div>
             <p class="eyebrow">Tenants</p>
             <h2 class="m-0 text-xl font-display font-semibold tracking-tight text-slate-900">Create a new school</h2>
             <p class="mt-1 text-sm text-slate-500">Provision a new tenant and hand it straight to the shared workspace shell.</p>
           </div>
 
-          <div class="field mt-2">
-            <label for="school-name">School name</label>
-            <input id="school-name" v-model="schoolForm.name" autocomplete="organization" required type="text" placeholder="Example International School" />
-          </div>
-
-          <div class="field">
-            <label for="school-slug">Slug identifier</label>
-            <input id="school-slug" v-model="schoolForm.slug" type="text" placeholder="example-international-school" />
-          </div>
-
-          <div class="form-row">
-            <div class="field">
-              <label for="school-timezone">Timezone</label>
-              <input id="school-timezone" v-model="schoolForm.timezone" type="text" />
-            </div>
-            <div class="field">
-              <label for="school-locale">Locale</label>
-              <input id="school-locale" v-model="schoolForm.locale" type="text" />
-            </div>
-          </div>
+          <VTextField v-model="schoolForm.name" autocomplete="organization" label="School name" placeholder="Example International School" required />
+          <VTextField v-model="schoolForm.slug" label="Slug identifier" placeholder="example-international-school" />
+          <VRow dense>
+            <VCol cols="12" md="6">
+              <VTextField v-model="schoolForm.timezone" label="Timezone" />
+            </VCol>
+            <VCol cols="12" md="6">
+              <VTextField v-model="schoolForm.locale" label="Locale" />
+            </VCol>
+          </VRow>
 
           <div class="mt-2 text-right">
-            <button class="button w-full md:w-auto" type="submit" :disabled="creatingSchool">
-              <span v-if="creatingSchool" class="flex items-center gap-2">
-                <svg class="h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
-                Provisioning…
-              </span>
-              <span v-else>Deploy school tenant</span>
-            </button>
+            <VBtn color="primary" :loading="creatingSchool" type="submit">
+              Deploy school tenant
+            </VBtn>
           </div>
         </form>
+            </VCardText>
+          </VCard>
+        </VCol>
 
-        <article class="surface flex flex-col gap-5 p-5 lg:p-6">
+        <VCol cols="12" lg="4">
+          <VCard>
+            <VCardText class="d-flex flex-column gap-5 pa-5 pa-lg-6">
           <div>
             <p class="eyebrow">Tenants</p>
             <h2 class="m-0 text-xl font-display font-semibold tracking-tight text-slate-900">Your access</h2>
           </div>
 
           <div v-if="auth.schools.value.length" class="mt-2 flex flex-col gap-3">
-            <button
+            <VCard
               v-for="school in auth.schools.value"
               :key="school.id"
-              class="flex items-center justify-between rounded-lg border px-4 py-3 text-left transition-colors duration-150"
+              class="cursor-pointer border transition-colors duration-150"
               :class="school.id === auth.selectedSchoolId.value ? 'border-brand-200 bg-brand-50' : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'"
-              type="button"
+              rounded="lg"
               @click="auth.selectSchool(school.id)"
             >
+              <VCardText class="d-flex align-center justify-space-between gap-3 px-4 py-3">
               <span class="flex flex-col gap-1">
                 <strong class="text-sm font-semibold leading-none text-slate-900">{{ school.name }}</strong>
                 <small class="text-xs text-slate-500">{{ school.slug }} / {{ school.roles?.[0]?.name || 'Member' }}</small>
               </span>
               <span class="status-pill" :class="school.status">{{ school.status }}</span>
-            </button>
+              </VCardText>
+            </VCard>
           </div>
 
-          <p v-else class="mt-2 rounded-lg border-2 border-dashed border-slate-200 py-10 text-center text-sm font-medium text-slate-500">No active access. Create a tenant.</p>
-        </article>
-      </section>
+          <VSheet v-else class="mt-2 rounded-lg border-2 border-dashed border-slate-200 py-10 text-center text-sm font-medium text-slate-500" color="surface-variant">No active access. Create a tenant.</VSheet>
+            </VCardText>
+          </VCard>
+        </VCol>
+      </VRow>
 
-      <section v-if="!selectedSchool && !loading" class="surface flex flex-col gap-4 p-5 lg:p-6">
+      <VCard v-if="!selectedSchool && !loading">
+        <VCardText class="d-flex flex-column gap-4 pa-5 pa-lg-6">
         <div>
           <p class="eyebrow">Getting started</p>
           <h2 class="m-0 text-xl font-display font-semibold tracking-tight text-slate-900">No school selected yet</h2>
           <p class="mt-1 text-sm text-slate-500">Create a school or choose one from your access list to unlock the operational modules.</p>
         </div>
-      </section>
+        </VCardText>
+      </VCard>
     </div>
   </SchoolWorkspaceTemplate>
 </template>

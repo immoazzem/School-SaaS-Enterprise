@@ -33,6 +33,7 @@ Do not modify these reference folders unless explicitly instructed:
 ```text
 D:\Development\tailwindui-radiant
 D:\Development\Laravel-School-Management
+D:\Development\Theme and templates\vuexy-admin-v10.11.1
 ```
 
 ## Project Goal
@@ -80,22 +81,15 @@ Web: http://localhost:3000
 
 ## Design Source
 
-The template folder is:
+The active frontend theme source is:
 
 ```text
-D:\Development\tailwindui-radiant\radiant-ts
+D:\Development\Theme and templates\vuexy-admin-v10.11.1
 ```
 
-Important: Radiant is a Tailwind UI Next.js/React/Sanity template. The project frontend must remain Nuxt/Vue. Port Radiant's visual language manually into Nuxt. Do not copy React, Next.js, Sanity, or Framer Motion code directly unless intentionally replacing it with Vue/Nuxt equivalents.
+Important: Vuexy is now the active admin design reference for the authenticated frontend rebuild. Keep the project frontend in Nuxt/Vue and port the visual system into the existing app architecture instead of trying to transplant unrelated demo app structure wholesale.
 
-Use Radiant for:
-
-- public landing page style
-- login page style
-- pricing page shell
-- typography, spacing, buttons, sections, screenshots, and marketing layout inspiration
-
-Build authenticated dashboards as custom Nuxt enterprise admin screens.
+Radiant remains a historical reference for earlier marketing/login direction, but the authenticated frontend is now being rebuilt toward Vuexy/Vuetify.
 
 ## Key Decisions Already Made
 
@@ -113,6 +107,26 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 - First vertical slice: Academic Classes CRUD.
 
 ## Current Implementation Checkpoints
+
+- Latest checkpoint: Vuexy dashboard and high-traffic workspace migration.
+- The main operator pages now sit deeper inside the Vuexy/Vuetify design system:
+  - `apps/web/app/pages/dashboard.vue`
+  - `apps/web/app/pages/schools/[schoolId]/students.vue`
+  - `apps/web/app/pages/schools/[schoolId]/finance.vue`
+  - `apps/web/app/pages/schools/[schoolId]/reports.vue`
+  - `apps/web/app/pages/schools/[schoolId]/attendance.vue`
+- Targeted verification after this slice:
+  - `npm run build` passed
+  - browser verification passed for dashboard, students, finance, reports, and attendance
+- Latest useful browser artifacts:
+  - `docs/browser-checks/vuexy-dashboard-polish-20260422.png`
+  - `docs/browser-checks/vuexy-students-polish-20260422.png`
+  - `docs/browser-checks/vuexy-finance-polish-20260422.png`
+  - `docs/browser-checks/vuexy-reports-polish-20260422.png`
+  - `docs/browser-checks/vuexy-attendance-polish-20260422.png`
+- Current local frontend URL remains `http://127.0.0.1:3000`.
+- Immediate next step:
+  - continue the Vuexy rebuild across the next workflow cluster: enrollments, exams, marks, and staff operations.
 
 - Latest checkpoint: Vuexy frontend rebuild foundation and shared shell migration.
 - Frontend theme source is now `D:\Development\Theme and templates\vuexy-admin-v10.11.1`.

@@ -246,17 +246,17 @@ onMounted(loadWorkspace)
           <p>Move from exam publication to downloadable files without leaving the reporting workspace.</p>
         </div>
         <div class="header-actions">
-          <NuxtLink class="button secondary" :to="`/schools/${schoolId}/exams`">Exams</NuxtLink>
-          <NuxtLink class="button secondary" to="/dashboard">Dashboard</NuxtLink>
+          <VBtn color="default" variant="outlined" :to="`/schools/${schoolId}/exams`">Exams</VBtn>
+          <VBtn color="default" variant="outlined" to="/dashboard">Dashboard</VBtn>
         </div>
       </header>
 
-      <p v-if="error" class="error">{{ error }}</p>
-      <p v-if="success" class="success">{{ success }}</p>
-      <div v-if="loading" class="surface flex max-w-sm items-center gap-3 p-4 text-sm font-medium text-slate-500">
-        <svg class="h-5 w-5 animate-spin text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
+      <VAlert v-if="error" type="error" variant="tonal">{{ error }}</VAlert>
+      <VAlert v-if="success" type="success" variant="tonal">{{ success }}</VAlert>
+      <VSheet v-if="loading" class="flex max-w-sm items-center gap-3 rounded-lg px-4 py-4 text-sm font-medium text-slate-500" color="surface-variant">
+        <VProgressCircular color="primary" indeterminate size="20" width="2" />
         Loading reports workspace
-      </div>
+      </VSheet>
 
       <section class="summary-grid">
         <article class="summary-item surface">
@@ -340,9 +340,7 @@ onMounted(loadWorkspace)
             </select>
           </div>
 
-          <button class="button" type="submit" :disabled="publishing || !selectedExamId">
-            {{ publishing ? 'Publishing' : 'Publish results' }}
-          </button>
+          <VBtn color="primary" :loading="publishing" type="submit" :disabled="!selectedExamId">Publish results</VBtn>
         </form>
 
         <form class="record-form surface" @submit.prevent="queueReport('marksheet')">
@@ -370,15 +368,9 @@ onMounted(loadWorkspace)
           </div>
 
           <div class="strip-actions">
-            <button class="button" type="submit" :disabled="exporting || !selectedExamId || !selectedEnrollmentId">
-              Queue marksheet
-            </button>
-            <button class="button secondary" type="button" :disabled="exporting || !selectedExamId" @click="queueReport('result-sheet')">
-              Result sheet
-            </button>
-            <button class="button secondary" type="button" :disabled="exporting || !selectedEnrollmentId" @click="queueReport('id-card')">
-              ID card
-            </button>
+            <VBtn color="primary" :loading="exporting" type="submit" :disabled="!selectedExamId || !selectedEnrollmentId">Queue marksheet</VBtn>
+            <VBtn color="default" variant="outlined" type="button" :disabled="exporting || !selectedExamId" @click="queueReport('result-sheet')">Result sheet</VBtn>
+            <VBtn color="default" variant="outlined" type="button" :disabled="exporting || !selectedEnrollmentId" @click="queueReport('id-card')">ID card</VBtn>
           </div>
 
           <div class="form-row">
@@ -393,26 +385,20 @@ onMounted(loadWorkspace)
           </div>
 
           <div class="strip-actions">
-            <button class="button secondary" type="button" :disabled="exporting || !selectedInvoiceId" @click="queueReport('invoice')">
-              Invoice PDF
-            </button>
-            <button class="button secondary" type="button" :disabled="exporting || !selectedSalaryRecordId" @click="queueReport('salary')">
-              Salary PDF
-            </button>
-            <button class="button secondary" type="button" :disabled="!lastExport" @click="checkExport">
-              Check file
-            </button>
+            <VBtn color="default" variant="outlined" type="button" :disabled="exporting || !selectedInvoiceId" @click="queueReport('invoice')">Invoice PDF</VBtn>
+            <VBtn color="default" variant="outlined" type="button" :disabled="exporting || !selectedSalaryRecordId" @click="queueReport('salary')">Salary PDF</VBtn>
+            <VBtn color="default" variant="outlined" type="button" :disabled="!lastExport" @click="checkExport">Check file</VBtn>
           </div>
 
-          <a
+          <VBtn
             v-if="exportStatus?.download_url"
-            class="button compact"
+            color="primary"
             :href="exportStatus.download_url"
             target="_blank"
             rel="noreferrer"
           >
             Open PDF
-          </a>
+          </VBtn>
         </form>
       </section>
 
@@ -422,7 +408,7 @@ onMounted(loadWorkspace)
             <p class="eyebrow">Result summaries</p>
             <h2>Published marksheet rows</h2>
           </div>
-          <button class="button secondary compact" type="button" @click="loadResults">Refresh</button>
+          <VBtn color="default" size="small" variant="outlined" type="button" @click="loadResults">Refresh</VBtn>
         </div>
 
         <div class="table-wrap">

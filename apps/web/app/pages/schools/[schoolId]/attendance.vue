@@ -337,15 +337,15 @@ onMounted(() => {
           <p class="muted">Record daily attendance from active enrollments and keep the day searchable.</p>
         </div>
         <div class="header-actions">
-          <button class="button secondary" type="button" :disabled="offlineQueue.syncing.value" @click="syncAttendanceQueue">
-            {{ offlineQueue.syncing.value ? 'Syncing queue' : 'Sync queue' }}
-          </button>
-          <NuxtLink class="button secondary" to="/dashboard">Dashboard</NuxtLink>
+          <VBtn color="default" variant="outlined" type="button" :loading="offlineQueue.syncing.value" @click="syncAttendanceQueue">
+            Sync queue
+          </VBtn>
+          <VBtn color="default" variant="outlined" to="/dashboard">Dashboard</VBtn>
         </div>
       </header>
 
-      <div v-if="error" class="alert error">{{ error }}</div>
-      <div v-if="success" class="alert success">{{ success }}</div>
+      <VAlert v-if="error" type="error" variant="tonal">{{ error }}</VAlert>
+      <VAlert v-if="success" type="success" variant="tonal">{{ success }}</VAlert>
 
       <OfflineNotice
         context="Attendance offline draft"
@@ -419,11 +419,11 @@ onMounted(() => {
           <textarea id="remarks" v-model="form.remarks" rows="4" placeholder="Morning homeroom." />
 
           <div class="form-actions">
-            <button class="button" type="submit" :disabled="saving">
-              {{ saving ? 'Saving...' : editingId ? 'Update attendance' : 'Save attendance' }}
-            </button>
-            <button class="button secondary" type="button" @click="saveDraft">Save offline draft</button>
-            <button v-if="editingId" class="button secondary" type="button" @click="resetForm">Cancel</button>
+            <VBtn color="primary" :loading="saving" type="submit">
+              {{ editingId ? 'Update attendance' : 'Save attendance' }}
+            </VBtn>
+            <VBtn color="default" variant="outlined" type="button" @click="saveDraft">Save offline draft</VBtn>
+            <VBtn v-if="editingId" color="default" variant="outlined" type="button" @click="resetForm">Cancel</VBtn>
           </div>
         </form>
 
@@ -443,14 +443,14 @@ onMounted(() => {
                 <option value="excused">Excused</option>
               </select>
               <input v-model="search" placeholder="Search student">
-              <button class="button secondary" type="submit">Search</button>
+              <VBtn color="default" size="small" variant="outlined" type="submit">Search</VBtn>
             </form>
           </div>
 
-          <div v-if="loading" class="surface flex max-w-sm items-center gap-3 p-4 text-sm font-medium text-slate-500">
-            <svg class="h-5 w-5 animate-spin text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
+          <VSheet v-if="loading" class="flex max-w-sm items-center gap-3 rounded-lg px-4 py-4 text-sm font-medium text-slate-500" color="surface-variant">
+            <VProgressCircular color="primary" indeterminate size="20" width="2" />
             Loading attendance...
-          </div>
+          </VSheet>
           <div v-else class="table-wrap">
             <table>
               <thead>

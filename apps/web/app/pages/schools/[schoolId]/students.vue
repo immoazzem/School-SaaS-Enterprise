@@ -330,7 +330,7 @@ watch(locale, async () => {
         </div>
         <div class="header-actions">
           <LocaleSwitcher />
-          <NuxtLink class="button secondary" to="/dashboard">Dashboard</NuxtLink>
+          <VBtn color="default" variant="outlined" to="/dashboard">Dashboard</VBtn>
         </div>
       </header>
 
@@ -349,12 +349,12 @@ watch(locale, async () => {
         </article>
       </section>
 
-      <p v-if="error" class="error">{{ error }}</p>
-      <p v-if="success" class="success">{{ success }}</p>
-      <div v-if="loading" class="surface flex max-w-sm items-center gap-3 p-4 text-sm font-medium text-slate-500">
-        <svg class="h-5 w-5 animate-spin text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
+      <VAlert v-if="error" type="error" variant="tonal">{{ error }}</VAlert>
+      <VAlert v-if="success" type="success" variant="tonal">{{ success }}</VAlert>
+      <VSheet v-if="loading" class="flex max-w-sm items-center gap-3 rounded-lg px-4 py-4 text-sm font-medium text-slate-500" color="surface-variant">
+        <VProgressCircular color="primary" indeterminate size="20" width="2" />
         {{ $t('common.loading') }}
-      </div>
+      </VSheet>
 
       <section class="workspace-grid">
         <form class="surface record-form" @submit.prevent="saveGuardian">
@@ -385,10 +385,10 @@ watch(locale, async () => {
           <textarea id="guardian-address" v-model="guardianForm.address" rows="3" />
 
           <div class="form-actions">
-            <button class="button" type="submit" :disabled="savingGuardian">
-              {{ savingGuardian ? 'Saving' : editingGuardianId ? 'Update guardian' : 'Save guardian' }}
-            </button>
-            <button v-if="editingGuardianId" class="button secondary" type="button" @click="resetGuardianForm">Cancel</button>
+            <VBtn color="primary" :loading="savingGuardian" type="submit">
+              {{ editingGuardianId ? 'Update guardian' : 'Save guardian' }}
+            </VBtn>
+            <VBtn v-if="editingGuardianId" color="default" variant="outlined" type="button" @click="resetGuardianForm">Cancel</VBtn>
           </div>
         </form>
 
@@ -461,10 +461,10 @@ watch(locale, async () => {
           <textarea id="student-medical" v-model="studentForm.medical_notes" rows="3" />
 
           <div class="form-actions">
-            <button class="button" type="submit" :disabled="savingStudent">
-              {{ savingStudent ? 'Saving' : editingStudentId ? 'Update student' : 'Save student' }}
-            </button>
-            <button v-if="editingStudentId" class="button secondary" type="button" @click="resetStudentForm">Cancel</button>
+            <VBtn color="primary" :loading="savingStudent" type="submit">
+              {{ editingStudentId ? 'Update student' : 'Save student' }}
+            </VBtn>
+            <VBtn v-if="editingStudentId" color="default" variant="outlined" type="button" @click="resetStudentForm">Cancel</VBtn>
           </div>
         </form>
       </section>
@@ -483,7 +483,7 @@ watch(locale, async () => {
                 <option value="">All statuses</option>
               </select>
               <input v-model="guardianSearch" aria-label="Search guardians" placeholder="Search" />
-              <button class="button secondary" type="submit">Search</button>
+              <VBtn color="default" size="small" variant="outlined" type="submit">Search</VBtn>
             </form>
           </div>
 
@@ -531,7 +531,7 @@ watch(locale, async () => {
                 <option value="">All statuses</option>
               </select>
               <input v-model="studentSearch" aria-label="Search students" placeholder="Search" />
-              <button class="button secondary" type="submit">{{ $t('actions.search') }}</button>
+              <VBtn color="default" size="small" variant="outlined" type="submit">{{ $t('actions.search') }}</VBtn>
             </form>
           </div>
 

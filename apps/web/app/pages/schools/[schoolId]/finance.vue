@@ -215,17 +215,17 @@ onMounted(loadWorkspace)
           <p>Keep tuition structure, manual billing, and bulk invoicing in one operating surface.</p>
         </div>
         <div class="header-actions">
-          <NuxtLink class="button secondary" :to="`/schools/${schoolId}/payment-gateways`">Payment gateways</NuxtLink>
-          <NuxtLink class="button secondary" to="/dashboard">Dashboard</NuxtLink>
+          <VBtn color="default" variant="outlined" :to="`/schools/${schoolId}/payment-gateways`">Payment gateways</VBtn>
+          <VBtn color="default" variant="outlined" to="/dashboard">Dashboard</VBtn>
         </div>
       </header>
 
-      <p v-if="error" class="error">{{ error }}</p>
-      <p v-if="success" class="success">{{ success }}</p>
-      <div v-if="loading" class="surface flex max-w-sm items-center gap-3 p-4 text-sm font-medium text-slate-500">
-        <svg class="h-5 w-5 animate-spin text-brand-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" /><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" /></svg>
+      <VAlert v-if="error" type="error" variant="tonal">{{ error }}</VAlert>
+      <VAlert v-if="success" type="success" variant="tonal">{{ success }}</VAlert>
+      <VSheet v-if="loading" class="flex max-w-sm items-center gap-3 rounded-lg px-4 py-4 text-sm font-medium text-slate-500" color="surface-variant">
+        <VProgressCircular color="primary" indeterminate size="20" width="2" />
         Loading finance workspace
-      </div>
+      </VSheet>
 
       <section class="summary-grid">
         <article class="surface summary-item">
@@ -267,7 +267,7 @@ onMounted(loadWorkspace)
               <option value="optional">Optional</option>
             </select>
           </div>
-          <button class="button" type="submit" :disabled="savingCategory">{{ savingCategory ? 'Saving category' : 'Save category' }}</button>
+          <VBtn color="primary" :loading="savingCategory" type="submit">Save category</VBtn>
         </form>
 
         <form class="surface record-form" @submit.prevent="saveStructure">
@@ -308,7 +308,7 @@ onMounted(loadWorkspace)
               <input id="fee-structure-due-day" v-model="structureForm.due_day_of_month" min="1" max="31" type="number" />
             </div>
           </div>
-          <button class="button" type="submit" :disabled="savingStructure">{{ savingStructure ? 'Saving structure' : 'Save structure' }}</button>
+          <VBtn color="primary" :loading="savingStructure" type="submit">Save structure</VBtn>
         </form>
       </section>
 
@@ -347,7 +347,7 @@ onMounted(loadWorkspace)
               </option>
             </select>
           </div>
-          <button class="button" type="submit" :disabled="savingInvoice">{{ savingInvoice ? 'Creating invoice' : 'Create invoice' }}</button>
+          <VBtn color="primary" :loading="savingInvoice" type="submit">Create invoice</VBtn>
         </form>
 
         <form class="surface record-form" @submit.prevent="queueBulkInvoices">
@@ -384,7 +384,7 @@ onMounted(loadWorkspace)
               </option>
             </select>
           </div>
-          <button class="button" type="submit" :disabled="queueingBulk">{{ queueingBulk ? 'Queueing invoices' : 'Queue invoices' }}</button>
+          <VBtn color="primary" :loading="queueingBulk" type="submit">Queue invoices</VBtn>
         </form>
       </section>
 
@@ -394,7 +394,7 @@ onMounted(loadWorkspace)
             <p class="eyebrow">Invoice ledger</p>
             <h2>Student invoices</h2>
           </div>
-          <button class="button secondary" type="button" @click="loadWorkspace">Refresh</button>
+          <VBtn color="default" size="small" variant="outlined" type="button" @click="loadWorkspace">Refresh</VBtn>
         </div>
         <div class="table-wrap">
           <table>

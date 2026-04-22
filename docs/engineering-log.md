@@ -12,6 +12,52 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 - Mention the current page/module in progress and phase completion notes.
 - Use visible agent-browser checks during UI phases when the dev server is available.
 
+## 2026-04-22
+
+### Pending Checkpoint - Vuexy Dashboard and High-Traffic Workspace Migration
+
+Current page/module complete: dashboard, students, finance, reports, and attendance moved deeper into the Vuexy/Vuetify frontend system.
+
+Scope:
+- updated `apps/web/app/pages/dashboard.vue` to use more native Vuexy/Vuetify building blocks:
+  - `VCard`
+  - `VCardText`
+  - `VRow`
+  - `VCol`
+  - `VChip`
+  - `VBtn`
+  - `VAlert`
+  - `VSheet`
+  - `VProgressCircular`
+- preserved the existing dashboard business logic while replacing the older surface language with a more enterprise admin presentation.
+- updated `apps/web/app/pages/schools/[schoolId]/students.vue` so actions, loading states, and feedback messaging align with the Vuexy shell.
+- updated `apps/web/app/pages/schools/[schoolId]/finance.vue` so header actions, queue actions, and loading states now match the Vuexy/Vuetify system.
+- updated `apps/web/app/pages/schools/[schoolId]/reports.vue` so export/open/refresh actions and feedback states use Vuetify components instead of older ad hoc buttons.
+- updated `apps/web/app/pages/schools/[schoolId]/attendance.vue` so action bars, alerts, and loading treatments are now consistent with the rebuilt shell.
+
+Verification:
+- `cd apps/web && npm run build`: passed.
+- direct Playwright browser verification passed for:
+  - `http://127.0.0.1:3000/dashboard`
+  - `http://127.0.0.1:3000/schools/1/students`
+  - `http://127.0.0.1:3000/schools/1/finance`
+  - `http://127.0.0.1:3000/schools/1/reports`
+  - `http://127.0.0.1:3000/schools/1/attendance`
+- screenshots saved at:
+  - `docs/browser-checks/vuexy-dashboard-polish-20260422.png`
+  - `docs/browser-checks/vuexy-students-polish-20260422.png`
+  - `docs/browser-checks/vuexy-finance-polish-20260422.png`
+  - `docs/browser-checks/vuexy-reports-polish-20260422.png`
+  - `docs/browser-checks/vuexy-attendance-polish-20260422.png`
+
+Notes:
+- the long `npm run qa:browser` harness is still due for a Vuexy-specific adaptation, but direct route verification passed and no browser console errors were recorded on the checked pages.
+- the known Nuxt/Nitro/Node warnings remain unchanged and are still the classified warnings tracked in `docs/KNOWN-BUILD-WARNINGS.md`.
+
+Next:
+- checkpoint and push this Vuexy page-migration slice.
+- continue with the next Vuexy rebuild cluster: enrollments, exams, marks, and staff-facing operations.
+
 ## 2026-04-21
 
 ### Pending Checkpoint - Vuexy Frontend Rebuild Foundation
