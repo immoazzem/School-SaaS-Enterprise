@@ -10,7 +10,7 @@
     --color-accent: theme('colors.brand.500');
     --color-surface: theme('colors.white');
     --color-border: theme('colors.slate.200');
-    --theme-force-recompile: 'vuexy-compact';
+    --theme-force-recompile: 'admin-compact';
   }
 
   html,
@@ -199,12 +199,12 @@
     box-shadow: none;
   }
 
-  .workspace-vuexy-drawer {
+  .workspace-admin-drawer {
     @apply border-r border-slate-200/80 bg-white;
     box-shadow: 18px 0 32px rgba(15, 23, 42, 0.04);
   }
 
-  .workspace-vuexy-drawer .v-navigation-drawer__content {
+  .workspace-admin-drawer .v-navigation-drawer__content {
     @apply bg-white;
   }
 

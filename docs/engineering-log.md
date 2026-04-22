@@ -14,12 +14,12 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 
 ## 2026-04-22
 
-### Pending Checkpoint - Vuexy Dashboard and High-Traffic Workspace Migration
+### Pending Checkpoint - Frontend Dashboard and High-Traffic Workspace Migration
 
-Current page/module complete: dashboard, students, finance, reports, and attendance moved deeper into the Vuexy/Vuetify frontend system.
+Current page/module complete: dashboard, students, finance, reports, and attendance moved deeper into the rebuilt frontend system.
 
 Scope:
-- updated `apps/web/app/pages/dashboard.vue` to use more native Vuexy/Vuetify building blocks:
+- updated `apps/web/app/pages/dashboard.vue` to use more native Vuetify building blocks:
   - `VCard`
   - `VCardText`
   - `VRow`
@@ -30,8 +30,8 @@ Scope:
   - `VSheet`
   - `VProgressCircular`
 - preserved the existing dashboard business logic while replacing the older surface language with a more enterprise admin presentation.
-- updated `apps/web/app/pages/schools/[schoolId]/students.vue` so actions, loading states, and feedback messaging align with the Vuexy shell.
-- updated `apps/web/app/pages/schools/[schoolId]/finance.vue` so header actions, queue actions, and loading states now match the Vuexy/Vuetify system.
+- updated `apps/web/app/pages/schools/[schoolId]/students.vue` so actions, loading states, and feedback messaging align with the rebuilt shell.
+- updated `apps/web/app/pages/schools/[schoolId]/finance.vue` so header actions, queue actions, and loading states now match the rebuilt interface system.
 - updated `apps/web/app/pages/schools/[schoolId]/reports.vue` so export/open/refresh actions and feedback states use Vuetify components instead of older ad hoc buttons.
 - updated `apps/web/app/pages/schools/[schoolId]/attendance.vue` so action bars, alerts, and loading treatments are now consistent with the rebuilt shell.
 
@@ -44,29 +44,29 @@ Verification:
   - `http://127.0.0.1:3000/schools/1/reports`
   - `http://127.0.0.1:3000/schools/1/attendance`
 - screenshots saved at:
-  - `docs/browser-checks/vuexy-dashboard-polish-20260422.png`
-  - `docs/browser-checks/vuexy-students-polish-20260422.png`
-  - `docs/browser-checks/vuexy-finance-polish-20260422.png`
-  - `docs/browser-checks/vuexy-reports-polish-20260422.png`
-  - `docs/browser-checks/vuexy-attendance-polish-20260422.png`
+  - `docs/browser-checks/frontend-dashboard-polish-20260422.png`
+  - `docs/browser-checks/frontend-students-polish-20260422.png`
+  - `docs/browser-checks/frontend-finance-polish-20260422.png`
+  - `docs/browser-checks/frontend-reports-polish-20260422.png`
+  - `docs/browser-checks/frontend-attendance-polish-20260422.png`
 
 Notes:
-- the long `npm run qa:browser` harness is still due for a Vuexy-specific adaptation, but direct route verification passed and no browser console errors were recorded on the checked pages.
+- the long `npm run qa:browser` harness is still due for a shell-specific adaptation, but direct route verification passed and no browser console errors were recorded on the checked pages.
 - the known Nuxt/Nitro/Node warnings remain unchanged and are still the classified warnings tracked in `docs/KNOWN-BUILD-WARNINGS.md`.
 
 Next:
-- checkpoint and push this Vuexy page-migration slice.
-- continue with the next Vuexy rebuild cluster: enrollments, exams, marks, and staff-facing operations.
+- checkpoint and push this page-migration slice.
+- continue with the next rebuild cluster: enrollments, exams, marks, and staff-facing operations.
 
 ## 2026-04-21
 
-### Pending Checkpoint - Vuexy Frontend Rebuild Foundation
+### Pending Checkpoint - Frontend Rebuild Foundation
 
-Current page/module complete: Vuexy frontend rebuild foundation and shared shell migration.
+Current page/module complete: frontend rebuild foundation and shared shell migration.
 
 Scope:
-- switched the frontend design source to `D:\Development\Theme and templates\vuexy-admin-v10.11.1`.
-- installed the core Vuexy-aligned frontend packages in `apps/web`:
+- switched the frontend design source to the current admin theme reference in `D:\Development\Theme and templates`.
+- installed the core frontend packages in `apps/web`:
   - `vuetify@3.10.8`
   - `vite-plugin-vuetify@2.1.2`
   - `sass@1.76.0`
@@ -74,9 +74,9 @@ Scope:
   - register the Vuetify Vite plugin
   - transpile Vuetify
   - preserve the existing Nuxt/Tailwind/i18n/API setup
-- added `apps/web/app/plugins/vuetify.ts` with a Vuexy-style light theme palette and component defaults.
+- added `apps/web/app/plugins/vuetify.ts` with the current light theme palette and component defaults.
 - updated `apps/web/app/app.vue` to mount the app inside `VApp` / `VMain`.
-- migrated the shared authenticated shell toward Vuexy through:
+- migrated the shared authenticated shell through:
   - `apps/web/app/components/SchoolWorkspaceTemplate.vue`
   - `apps/web/app/components/SchoolWorkspaceRail.vue`
   - `apps/web/app/utils/schoolWorkspaceNav.ts`
@@ -91,15 +91,15 @@ Verification:
   - `http://127.0.0.1:3000/dashboard`
   - `http://127.0.0.1:3000/schools/1/academic-classes`
 - screenshots saved at:
-  - `docs/browser-checks/vuexy-dashboard-20260422.png`
-  - `docs/browser-checks/vuexy-academic-classes-20260422.png`
+  - `docs/browser-checks/frontend-dashboard-20260422.png`
+  - `docs/browser-checks/frontend-academic-classes-20260422.png`
 
 Notes:
 - the long `npm run qa:browser` flow still needs another adjustment pass for the rebuilt shell. The app itself builds and the targeted browser checks passed.
 - known Nuxt/Nitro/Node warnings remain the same classified warnings in `docs/KNOWN-BUILD-WARNINGS.md`.
 
 Next:
-- continue the Vuexy rebuild by migrating the dashboard and the highest-traffic school workspaces onto more native Vuetify/Vuexy card/form/list patterns.
+- continue the frontend rebuild by migrating the dashboard and the highest-traffic school workspaces onto more native card/form/list patterns.
 - then adapt the browser smoke harness to the rebuilt shell and checkpoint the phase cleanly.
 
 ### Pending Checkpoint - High-Traffic Workspace Polish

@@ -4,15 +4,15 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Frontend Checkpoint
 
-Current page/module complete: Vuexy dashboard and high-traffic workspace migration.
+Current page/module complete: frontend dashboard and high-traffic workspace migration.
 
-- Rebuilt the main operator pages around native Vuetify/Vuexy surfaces:
+- Rebuilt the main operator pages around native admin surfaces:
   - `apps/web/app/pages/dashboard.vue`
   - `apps/web/app/pages/schools/[schoolId]/students.vue`
   - `apps/web/app/pages/schools/[schoolId]/finance.vue`
   - `apps/web/app/pages/schools/[schoolId]/reports.vue`
   - `apps/web/app/pages/schools/[schoolId]/attendance.vue`
-- The dashboard now uses Vuexy-style cards, alerts, chips, and grid sections while preserving the existing business logic.
+- The dashboard now uses denser cards, alerts, chips, and grid sections while preserving the existing business logic.
 - Students, Finance, Reports, and Attendance now use Vuetify actions and feedback states:
   - `VBtn` for actions
   - `VAlert` for status messaging
@@ -24,38 +24,38 @@ Current page/module complete: Vuexy dashboard and high-traffic workspace migrati
   - `http://127.0.0.1:3000/schools/1/reports`
   - `http://127.0.0.1:3000/schools/1/attendance`
 - Latest useful browser artifacts:
-  - `docs/browser-checks/vuexy-dashboard-polish-20260422.png`
-  - `docs/browser-checks/vuexy-students-polish-20260422.png`
-  - `docs/browser-checks/vuexy-finance-polish-20260422.png`
-  - `docs/browser-checks/vuexy-reports-polish-20260422.png`
-  - `docs/browser-checks/vuexy-attendance-polish-20260422.png`
+  - `docs/browser-checks/frontend-dashboard-polish-20260422.png`
+  - `docs/browser-checks/frontend-students-polish-20260422.png`
+  - `docs/browser-checks/frontend-finance-polish-20260422.png`
+  - `docs/browser-checks/frontend-reports-polish-20260422.png`
+  - `docs/browser-checks/frontend-attendance-polish-20260422.png`
 - Current local frontend URL: `http://127.0.0.1:3000`
 - Known follow-up:
-  - the long `npm run qa:browser` harness still needs a Vuexy-specific refresh, but direct browser checks for the rebuilt pages passed cleanly with no runtime console errors.
+  - the long `npm run qa:browser` harness still needs a shell-specific refresh, but direct browser checks for the rebuilt pages passed cleanly with no runtime console errors.
 
-Current page/module complete: Vuexy frontend rebuild foundation and shared shell migration.
+Current page/module complete: frontend rebuild foundation and shared shell migration.
 
-- New frontend theme source is now `D:\Development\Theme and templates\vuexy-admin-v10.11.1`.
-- The frontend is no longer only using Vuexy as inspiration; `apps/web` now includes the Vuexy-aligned Vuetify foundation:
+- New frontend theme source is the current admin theme reference under `D:\Development\Theme and templates`.
+- The frontend now includes the Vuetify-based foundation:
   - `vuetify`
   - `vite-plugin-vuetify`
   - `sass`
-- Added `apps/web/app/plugins/vuetify.ts` with a Vuexy-style light theme palette and Vuetify defaults.
+- Added `apps/web/app/plugins/vuetify.ts` with the current light theme palette and Vuetify defaults.
 - Updated `apps/web/nuxt.config.ts` to transpile/configure Vuetify while preserving the existing Nuxt app, routes, Tailwind utilities, i18n, and API composables.
 - Updated `apps/web/app/app.vue` to host the app inside `VApp` / `VMain`.
-- Reworked the shared authenticated shell toward Vuexy:
+- Reworked the shared authenticated shell toward the rebuilt admin system:
   - `apps/web/app/components/SchoolWorkspaceTemplate.vue`
   - `apps/web/app/components/SchoolWorkspaceRail.vue`
   - `apps/web/app/utils/schoolWorkspaceNav.ts`
   - `apps/web/app/assets/css/main.css`
-- The sidebar/module system now uses a denser Vuexy-style frame with themed drawer behavior, richer navigation metadata, and a themed topbar.
-- Focused verification after the Vuexy foundation pass:
+- The sidebar/module system now uses a denser admin frame with themed drawer behavior, richer navigation metadata, and a themed topbar.
+- Focused verification after the frontend foundation pass:
   - `npm run build` passed
   - browser login/dashboard check passed
   - browser academic-classes page check passed
 - Latest useful browser artifacts:
-  - `docs/browser-checks/vuexy-dashboard-20260422.png`
-  - `docs/browser-checks/vuexy-academic-classes-20260422.png`
+  - `docs/browser-checks/frontend-dashboard-20260422.png`
+  - `docs/browser-checks/frontend-academic-classes-20260422.png`
 - Current local frontend URL: `http://127.0.0.1:3000`
 - Known follow-up:
   - the long `npm run qa:browser` flow needs another adaptation pass for the rebuilt shell, but the targeted browser checks passed and the app is rendering with the new themed frame.

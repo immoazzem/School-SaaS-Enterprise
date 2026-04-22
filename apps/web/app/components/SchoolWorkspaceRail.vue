@@ -151,14 +151,14 @@ function iconPath(icon: string) {
       :temporary="!mdAndUp"
       :scrim="!mdAndUp"
       width="296"
-      class="workspace-vuexy-drawer"
+      class="workspace-admin-drawer"
     >
       <div class="operation-nav operation-nav--vuetify">
         <NuxtLink class="brand" to="/dashboard">
           <span>EA</span>
           <div class="flex flex-col">
             <strong class="text-slate-900 font-semibold tracking-tight">School SaaS</strong>
-            <small class="text-[11px] uppercase tracking-[0.14em] text-slate-400">Vuexy Enterprise</small>
+            <small class="text-[11px] uppercase tracking-[0.14em] text-slate-400">Enterprise Suite</small>
           </div>
         </NuxtLink>
 

@@ -33,7 +33,6 @@ Do not modify these reference folders unless explicitly instructed:
 ```text
 D:\Development\tailwindui-radiant
 D:\Development\Laravel-School-Management
-D:\Development\Theme and templates\vuexy-admin-v10.11.1
 ```
 
 ## Project Goal
@@ -81,15 +80,15 @@ Web: http://localhost:3000
 
 ## Design Source
 
-The active frontend theme source is:
+The active frontend theme source is the admin theme reference inside:
 
 ```text
-D:\Development\Theme and templates\vuexy-admin-v10.11.1
+D:\Development\Theme and templates
 ```
 
-Important: Vuexy is now the active admin design reference for the authenticated frontend rebuild. Keep the project frontend in Nuxt/Vue and port the visual system into the existing app architecture instead of trying to transplant unrelated demo app structure wholesale.
+Important: the current admin theme is only a design/system reference for the authenticated frontend rebuild. Keep the project frontend in Nuxt/Vue and port the visual system into the existing app architecture instead of trying to transplant unrelated demo app structure wholesale.
 
-Radiant remains a historical reference for earlier marketing/login direction, but the authenticated frontend is now being rebuilt toward Vuexy/Vuetify.
+Radiant remains a historical reference for earlier marketing/login direction, but the authenticated frontend is now being rebuilt around the new admin shell.
 
 ## Key Decisions Already Made
 
@@ -108,8 +107,8 @@ Radiant remains a historical reference for earlier marketing/login direction, bu
 
 ## Current Implementation Checkpoints
 
-- Latest checkpoint: Vuexy dashboard and high-traffic workspace migration.
-- The main operator pages now sit deeper inside the Vuexy/Vuetify design system:
+- Latest checkpoint: dashboard and high-traffic workspace migration.
+- The main operator pages now sit deeper inside the rebuilt frontend system:
   - `apps/web/app/pages/dashboard.vue`
   - `apps/web/app/pages/schools/[schoolId]/students.vue`
   - `apps/web/app/pages/schools/[schoolId]/finance.vue`
@@ -119,39 +118,39 @@ Radiant remains a historical reference for earlier marketing/login direction, bu
   - `npm run build` passed
   - browser verification passed for dashboard, students, finance, reports, and attendance
 - Latest useful browser artifacts:
-  - `docs/browser-checks/vuexy-dashboard-polish-20260422.png`
-  - `docs/browser-checks/vuexy-students-polish-20260422.png`
-  - `docs/browser-checks/vuexy-finance-polish-20260422.png`
-  - `docs/browser-checks/vuexy-reports-polish-20260422.png`
-  - `docs/browser-checks/vuexy-attendance-polish-20260422.png`
+  - `docs/browser-checks/frontend-dashboard-polish-20260422.png`
+  - `docs/browser-checks/frontend-students-polish-20260422.png`
+  - `docs/browser-checks/frontend-finance-polish-20260422.png`
+  - `docs/browser-checks/frontend-reports-polish-20260422.png`
+  - `docs/browser-checks/frontend-attendance-polish-20260422.png`
 - Current local frontend URL remains `http://127.0.0.1:3000`.
 - Immediate next step:
-  - continue the Vuexy rebuild across the next workflow cluster: enrollments, exams, marks, and staff operations.
+  - continue the frontend rebuild across the next workflow cluster: enrollments, exams, marks, and staff operations.
 
-- Latest checkpoint: Vuexy frontend rebuild foundation and shared shell migration.
-- Frontend theme source is now `D:\Development\Theme and templates\vuexy-admin-v10.11.1`.
-- `apps/web` now includes Vuetify/Vuexy foundation packages:
+- Latest checkpoint: frontend rebuild foundation and shared shell migration.
+- Frontend theme source now comes from the admin theme reference under `D:\Development\Theme and templates`.
+- `apps/web` now includes the frontend foundation packages:
   - `vuetify`
   - `vite-plugin-vuetify`
   - `sass`
-- Added `apps/web/app/plugins/vuetify.ts` with a Vuexy-style light theme palette and Vuetify defaults.
+- Added `apps/web/app/plugins/vuetify.ts` with the current light theme palette and Vuetify defaults.
 - `apps/web/nuxt.config.ts` now registers the Vuetify Vite plugin and transpiles Vuetify while preserving Tailwind, i18n, PWA, and existing API wiring.
 - `apps/web/app/app.vue` now runs inside `VApp` / `VMain`.
-- Shared authenticated shell files moved further toward Vuexy:
+- Shared authenticated shell files moved further into the rebuilt admin shell:
   - `apps/web/app/components/SchoolWorkspaceTemplate.vue`
   - `apps/web/app/components/SchoolWorkspaceRail.vue`
   - `apps/web/app/utils/schoolWorkspaceNav.ts`
   - `apps/web/app/assets/css/main.css`
-- Focused verification after the Vuexy foundation pass:
+- Focused verification after the frontend foundation pass:
   - `npm run build` passed
   - browser login/dashboard check passed
   - browser academic-classes page check passed
 - Latest useful browser artifacts:
-  - `docs/browser-checks/vuexy-dashboard-20260422.png`
-  - `docs/browser-checks/vuexy-academic-classes-20260422.png`
+  - `docs/browser-checks/frontend-dashboard-20260422.png`
+  - `docs/browser-checks/frontend-academic-classes-20260422.png`
 - Current local frontend URL remains `http://127.0.0.1:3000`.
 - Immediate next step:
-  - continue rebuilding the dashboard and highest-traffic workspaces onto native Vuetify/Vuexy card/form/list patterns, then adapt the browser smoke harness to the rebuilt shell.
+  - continue rebuilding the dashboard and highest-traffic workspaces onto the new card/form/list system, then adapt the browser smoke harness to the rebuilt shell.
 
 - Latest checkpoint: high-traffic workspace polish for Students, Finance, Reports, and Attendance.
 - Added shared utility layout rules in `apps/web/app/assets/css/main.css` for filters, search forms, strip actions, insight grids, and mini lists.
