@@ -14,6 +14,48 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 
 ## 2026-04-21
 
+### Pending Checkpoint - Vuexy Frontend Rebuild Foundation
+
+Current page/module complete: Vuexy frontend rebuild foundation and shared shell migration.
+
+Scope:
+- switched the frontend design source to `D:\Development\Theme and templates\vuexy-admin-v10.11.1`.
+- installed the core Vuexy-aligned frontend packages in `apps/web`:
+  - `vuetify@3.10.8`
+  - `vite-plugin-vuetify@2.1.2`
+  - `sass@1.76.0`
+- updated `apps/web/nuxt.config.ts` to:
+  - register the Vuetify Vite plugin
+  - transpile Vuetify
+  - preserve the existing Nuxt/Tailwind/i18n/API setup
+- added `apps/web/app/plugins/vuetify.ts` with a Vuexy-style light theme palette and component defaults.
+- updated `apps/web/app/app.vue` to mount the app inside `VApp` / `VMain`.
+- migrated the shared authenticated shell toward Vuexy through:
+  - `apps/web/app/components/SchoolWorkspaceTemplate.vue`
+  - `apps/web/app/components/SchoolWorkspaceRail.vue`
+  - `apps/web/app/utils/schoolWorkspaceNav.ts`
+  - `apps/web/app/assets/css/main.css`
+- kept the backend/API contracts, auth composables, and route paths intact while changing the frontend frame.
+
+Verification:
+- `cd apps/web && npm install`: passed after adding Vuetify packages.
+- `cd apps/web && npm run build`: passed.
+- focused browser verification passed for:
+  - login to dashboard
+  - `http://127.0.0.1:3000/dashboard`
+  - `http://127.0.0.1:3000/schools/1/academic-classes`
+- screenshots saved at:
+  - `docs/browser-checks/vuexy-dashboard-20260422.png`
+  - `docs/browser-checks/vuexy-academic-classes-20260422.png`
+
+Notes:
+- the long `npm run qa:browser` flow still needs another adjustment pass for the rebuilt shell. The app itself builds and the targeted browser checks passed.
+- known Nuxt/Nitro/Node warnings remain the same classified warnings in `docs/KNOWN-BUILD-WARNINGS.md`.
+
+Next:
+- continue the Vuexy rebuild by migrating the dashboard and the highest-traffic school workspaces onto more native Vuetify/Vuexy card/form/list patterns.
+- then adapt the browser smoke harness to the rebuilt shell and checkpoint the phase cleanly.
+
 ### Pending Checkpoint - High-Traffic Workspace Polish
 
 Current page/module complete: Students, Finance, Reports, and Attendance frontend polish.

@@ -4,6 +4,33 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Frontend Checkpoint
 
+Current page/module complete: Vuexy frontend rebuild foundation and shared shell migration.
+
+- New frontend theme source is now `D:\Development\Theme and templates\vuexy-admin-v10.11.1`.
+- The frontend is no longer only using Vuexy as inspiration; `apps/web` now includes the Vuexy-aligned Vuetify foundation:
+  - `vuetify`
+  - `vite-plugin-vuetify`
+  - `sass`
+- Added `apps/web/app/plugins/vuetify.ts` with a Vuexy-style light theme palette and Vuetify defaults.
+- Updated `apps/web/nuxt.config.ts` to transpile/configure Vuetify while preserving the existing Nuxt app, routes, Tailwind utilities, i18n, and API composables.
+- Updated `apps/web/app/app.vue` to host the app inside `VApp` / `VMain`.
+- Reworked the shared authenticated shell toward Vuexy:
+  - `apps/web/app/components/SchoolWorkspaceTemplate.vue`
+  - `apps/web/app/components/SchoolWorkspaceRail.vue`
+  - `apps/web/app/utils/schoolWorkspaceNav.ts`
+  - `apps/web/app/assets/css/main.css`
+- The sidebar/module system now uses a denser Vuexy-style frame with themed drawer behavior, richer navigation metadata, and a themed topbar.
+- Focused verification after the Vuexy foundation pass:
+  - `npm run build` passed
+  - browser login/dashboard check passed
+  - browser academic-classes page check passed
+- Latest useful browser artifacts:
+  - `docs/browser-checks/vuexy-dashboard-20260422.png`
+  - `docs/browser-checks/vuexy-academic-classes-20260422.png`
+- Current local frontend URL: `http://127.0.0.1:3000`
+- Known follow-up:
+  - the long `npm run qa:browser` flow needs another adaptation pass for the rebuilt shell, but the targeted browser checks passed and the app is rendering with the new themed frame.
+
 Current page/module complete: dashboard command-center polish and restore point after markdown cleanup.
 
 - Removed stale markdown files that were no longer helping execution:

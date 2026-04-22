@@ -114,6 +114,31 @@ Build authenticated dashboards as custom Nuxt enterprise admin screens.
 
 ## Current Implementation Checkpoints
 
+- Latest checkpoint: Vuexy frontend rebuild foundation and shared shell migration.
+- Frontend theme source is now `D:\Development\Theme and templates\vuexy-admin-v10.11.1`.
+- `apps/web` now includes Vuetify/Vuexy foundation packages:
+  - `vuetify`
+  - `vite-plugin-vuetify`
+  - `sass`
+- Added `apps/web/app/plugins/vuetify.ts` with a Vuexy-style light theme palette and Vuetify defaults.
+- `apps/web/nuxt.config.ts` now registers the Vuetify Vite plugin and transpiles Vuetify while preserving Tailwind, i18n, PWA, and existing API wiring.
+- `apps/web/app/app.vue` now runs inside `VApp` / `VMain`.
+- Shared authenticated shell files moved further toward Vuexy:
+  - `apps/web/app/components/SchoolWorkspaceTemplate.vue`
+  - `apps/web/app/components/SchoolWorkspaceRail.vue`
+  - `apps/web/app/utils/schoolWorkspaceNav.ts`
+  - `apps/web/app/assets/css/main.css`
+- Focused verification after the Vuexy foundation pass:
+  - `npm run build` passed
+  - browser login/dashboard check passed
+  - browser academic-classes page check passed
+- Latest useful browser artifacts:
+  - `docs/browser-checks/vuexy-dashboard-20260422.png`
+  - `docs/browser-checks/vuexy-academic-classes-20260422.png`
+- Current local frontend URL remains `http://127.0.0.1:3000`.
+- Immediate next step:
+  - continue rebuilding the dashboard and highest-traffic workspaces onto native Vuetify/Vuexy card/form/list patterns, then adapt the browser smoke harness to the rebuilt shell.
+
 - Latest checkpoint: high-traffic workspace polish for Students, Finance, Reports, and Attendance.
 - Added shared utility layout rules in `apps/web/app/assets/css/main.css` for filters, search forms, strip actions, insight grids, and mini lists.
 - `apps/web/app/pages/schools/[schoolId]/students.vue` now exposes guardian/student status filters and uses the shared loading/table treatment.

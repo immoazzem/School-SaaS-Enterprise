@@ -1,4 +1,5 @@
 import { fileURLToPath } from 'node:url'
+import vuetify from 'vite-plugin-vuetify'
 
 const i18nConfigPath = fileURLToPath(new URL('./i18n.config.ts', import.meta.url))
 
@@ -7,6 +8,9 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   ssr: false,
   devtools: { enabled: true },
+  css: [
+    '~/assets/css/main.css',
+  ],
   modules: [
     '@nuxtjs/tailwindcss',
     '@pinia/nuxt',
@@ -19,8 +23,20 @@ export default defineNuxtConfig({
     },
   },
   tailwindcss: {
-    cssPath: '~/assets/css/main.css',
     exposeConfig: true,
+  },
+  vite: {
+    ssr: {
+      noExternal: ['vuetify'],
+    },
+    plugins: [
+      vuetify({
+        autoImport: true,
+      }),
+    ],
+  },
+  build: {
+    transpile: ['vuetify'],
   },
   i18n: {
     defaultLocale: 'en',

@@ -4,18 +4,18 @@
 
 @layer base {
   :root {
-    --color-bg: theme('colors.slate.100');
+    --color-bg: #f4f5fa;
     --color-text: theme('colors.slate.900');
     --color-primary: theme('colors.brand.600');
     --color-accent: theme('colors.brand.500');
     --color-surface: theme('colors.white');
     --color-border: theme('colors.slate.200');
-    --theme-force-recompile: 'salient-compact';
+    --theme-force-recompile: 'vuexy-compact';
   }
 
   html,
   body {
-    @apply min-h-screen min-w-[320px] m-0 bg-slate-100 text-slate-900 font-sans antialiased;
+    @apply min-h-screen min-w-[320px] m-0 bg-[#f4f5fa] text-slate-900 font-sans antialiased;
   }
 
   button,
@@ -124,7 +124,7 @@
   }
 
   .surface {
-    @apply rounded-lg bg-white ring-1 ring-slate-200 shadow-sm;
+    @apply rounded-lg bg-white ring-1 ring-slate-200/80 shadow-[0_10px_30px_rgba(15,23,42,0.06)];
   }
 
   .glass-surface {
@@ -186,15 +186,30 @@
   .workspace-shell,
   .operation-shell,
   .shell {
-    @apply flex min-h-screen bg-slate-100;
+    @apply flex min-h-screen bg-[#f4f5fa];
   }
 
   .operation-nav {
-    @apply sticky top-0 z-30 hidden h-screen w-[256px] shrink-0 flex-col gap-5 border-r border-slate-200 bg-white px-4 py-4 md:flex;
+    @apply sticky top-0 z-30 hidden h-screen w-[288px] shrink-0 flex-col gap-5 border-r border-slate-200/80 bg-white px-4 py-5 md:flex;
+    box-shadow: 18px 0 32px rgba(15, 23, 42, 0.04);
+  }
+
+  .operation-nav--vuetify {
+    @apply flex h-full w-full gap-5 border-r-0 px-4 py-5;
+    box-shadow: none;
+  }
+
+  .workspace-vuexy-drawer {
+    @apply border-r border-slate-200/80 bg-white;
+    box-shadow: 18px 0 32px rgba(15, 23, 42, 0.04);
+  }
+
+  .workspace-vuexy-drawer .v-navigation-drawer__content {
+    @apply bg-white;
   }
 
   .workspace-mobilebar {
-    @apply sticky top-0 z-30 flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 md:hidden;
+    @apply sticky top-0 z-30 flex items-center justify-between border-b border-slate-200/80 bg-white/95 px-4 py-3 backdrop-blur md:hidden;
   }
 
   .workspace-mobilebar__brand {
@@ -210,35 +225,51 @@
   }
 
   .operation-nav .brand {
-    @apply flex items-center gap-3 rounded-md px-2 py-1;
+    @apply flex items-center gap-3 rounded-lg px-2 py-1.5;
   }
 
   .operation-nav .brand span {
-    @apply grid h-9 w-9 place-items-center rounded-md bg-slate-900 text-xs font-bold text-white;
+    @apply grid h-10 w-10 place-items-center rounded-lg bg-slate-900 text-xs font-bold text-white;
   }
 
   .workspace-school-card {
-    @apply flex flex-col gap-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-3;
+    @apply flex flex-col gap-1 rounded-lg border border-slate-200 bg-slate-50/80 px-3.5 py-3.5;
+  }
+
+  .workspace-school-card__mark {
+    @apply grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-brand-600 text-xs font-bold text-white;
   }
 
   .workspace-school-select {
-    @apply mt-1 min-h-[40px] w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-700 outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-100;
+    @apply mt-1 min-h-[42px] w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-700 outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-100;
+  }
+
+  .workspace-school-select-vuetify :is(.v-field, .v-field__outline) {
+    @apply rounded-lg;
   }
 
   .nav-groups {
-    @apply flex flex-col gap-4;
+    @apply flex flex-col gap-5;
   }
 
   .nav-group {
-    @apply flex flex-col gap-1;
+    @apply flex flex-col gap-1.5;
   }
 
   .nav-group-title {
-    @apply px-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400;
+    @apply flex items-center gap-2 px-3 pb-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400;
+  }
+
+  .nav-group-title__icon {
+    @apply grid h-5 w-5 place-items-center rounded-md bg-slate-100 text-slate-500;
+  }
+
+  .nav-group-title__icon svg {
+    @apply h-3.5 w-3.5;
   }
 
   .nav-link {
-    @apply flex items-center justify-between rounded-md px-3 py-2 text-sm font-medium text-slate-600 transition-colors duration-150;
+    @apply flex items-start gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition-all duration-150;
   }
 
   .nav-link:hover {
@@ -246,11 +277,71 @@
   }
 
   .nav-link.active {
-    @apply bg-slate-900 text-white;
+    @apply bg-slate-900 text-white shadow-[0_10px_20px_rgba(15,23,42,0.18)];
   }
 
   .nav-link.disabled {
     @apply cursor-not-allowed text-slate-400 opacity-70;
+  }
+
+  .nav-link__icon {
+    @apply mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-slate-100 text-slate-500 transition-colors;
+  }
+
+  .nav-link.active .nav-link__icon {
+    @apply bg-white/10 text-white;
+  }
+
+  .nav-link__icon svg {
+    @apply h-4 w-4;
+  }
+
+  .nav-link__copy {
+    @apply flex min-w-0 flex-1 flex-col gap-0.5;
+  }
+
+  .workspace-nav-list {
+    @apply rounded-none bg-transparent p-0;
+  }
+
+  .workspace-nav-item {
+    @apply min-h-0 px-0;
+  }
+
+  .workspace-nav-item :is(.v-list-item__prepend, .v-list-item__content) {
+    @apply self-start;
+  }
+
+  .workspace-nav-item .v-list-item__content {
+    @apply min-w-0;
+  }
+
+  .workspace-nav-item .v-list-item-title {
+    @apply overflow-visible whitespace-normal;
+  }
+
+  .workspace-nav-item.v-list-item--active {
+    @apply bg-slate-900 text-white shadow-[0_10px_20px_rgba(15,23,42,0.18)];
+  }
+
+  .workspace-nav-item.v-list-item--active .nav-link__icon {
+    @apply bg-white/10 text-white;
+  }
+
+  .workspace-nav-item.v-list-item--active .nav-link__copy small {
+    @apply text-slate-300;
+  }
+
+  .nav-link__copy strong {
+    @apply truncate text-sm font-semibold;
+  }
+
+  .nav-link__copy small {
+    @apply truncate text-xs font-medium text-slate-400;
+  }
+
+  .nav-link.active .nav-link__copy small {
+    @apply text-slate-300;
   }
 
   .context-links {
@@ -265,6 +356,71 @@
 
   .workspace-content-inner {
     @apply mx-auto flex w-full flex-col gap-5;
+  }
+
+  .workspace-content-inner--framed {
+    @apply gap-6;
+  }
+
+  .workspace-topbar {
+    @apply sticky top-0 z-20 flex flex-col gap-4 rounded-lg border border-slate-200/80 bg-white/90 px-4 py-4 shadow-[0_10px_30px_rgba(15,23,42,0.05)] backdrop-blur md:flex-row md:items-center md:justify-between;
+  }
+
+  .workspace-topbar__meta {
+    @apply flex min-w-0 flex-col gap-2;
+  }
+
+  .workspace-breadcrumbs {
+    @apply flex flex-wrap items-center gap-2 p-0 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400;
+  }
+
+  .workspace-breadcrumbs :is(.v-breadcrumbs-item, .v-breadcrumbs-divider) {
+    @apply p-0 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400 opacity-100;
+  }
+
+  .workspace-breadcrumbs .v-breadcrumbs-divider {
+    @apply mx-2;
+  }
+
+  .workspace-topbar__titles {
+    @apply flex min-w-0 flex-col gap-1;
+  }
+
+  .workspace-topbar__titles h1 {
+    @apply m-0 truncate text-xl font-display font-semibold tracking-tight text-slate-900 md:text-2xl;
+  }
+
+  .workspace-topbar__titles p {
+    @apply m-0 text-sm text-slate-500;
+  }
+
+  .workspace-topbar__eyebrow {
+    @apply m-0 text-[11px] font-semibold uppercase tracking-[0.14em] text-brand-700;
+  }
+
+  .workspace-topbar__actions {
+    @apply flex flex-wrap items-center gap-2.5 md:justify-end;
+  }
+
+  .workspace-topbar__school {
+    @apply inline-flex h-auto items-center gap-2.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2;
+  }
+
+  .workspace-topbar__school-dot {
+    @apply h-2.5 w-2.5 rounded-full bg-emerald-500;
+  }
+
+  .workspace-topbar__school strong,
+  .workspace-topbar__user span {
+    @apply block text-sm font-semibold text-slate-900;
+  }
+
+  .workspace-topbar__school small {
+    @apply block text-xs text-slate-500;
+  }
+
+  .workspace-topbar__user {
+    @apply hidden h-auto rounded-lg border border-slate-200 bg-white px-3 py-2 lg:inline-flex;
   }
 
   .workspace-header {
@@ -305,7 +461,7 @@
 
   .summary-item,
   .summary-grid > article {
-    @apply relative flex flex-col gap-2 rounded-lg border border-slate-200 bg-white p-4 text-left shadow-sm;
+    @apply relative flex flex-col gap-2 rounded-lg border border-slate-200 bg-white p-4 text-left shadow-[0_8px_24px_rgba(15,23,42,0.05)];
   }
 
   .summary-item > span:first-of-type,
@@ -326,7 +482,7 @@
 
   .record-form,
   .panel {
-    @apply w-full max-w-4xl;
+    @apply w-full max-w-none;
   }
 
   .record-form h2,
@@ -453,7 +609,7 @@
   }
 
   .module-tile {
-    @apply flex cursor-pointer flex-col gap-1.5 rounded-lg border border-slate-200 bg-white p-4 text-left transition-colors duration-200 hover:bg-slate-50 hover:border-slate-300;
+    @apply flex cursor-pointer flex-col gap-1.5 rounded-lg border border-slate-200 bg-white p-4 text-left transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-50 hover:border-slate-300 hover:shadow-[0_12px_28px_rgba(15,23,42,0.08)];
   }
 
   .module-tile strong {
