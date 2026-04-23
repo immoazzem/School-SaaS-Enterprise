@@ -2,6 +2,22 @@
 
 ## Latest Resume Point
 
+- Phase operations browser recovery completed on 2026-04-23.
+- Important fixes:
+  - `apps/api/app/Http/Controllers/Api/PromotionController.php` now safely reuses/restores existing target-year enrollments during promotion execution, including soft-deleted rows that were causing duplicate-key failures under seeded data.
+  - `apps/api/routes/api.php` now exposes `GET /api/v1/schools/{school}/promotions` for promotion-batch listing used by QA prep.
+  - `apps/web/scripts/browser-phase-ops.mjs` now targets the exact newly created marks row during verification instead of the first visible verify button.
+- Environment note:
+  - `school-api.test` had started returning `502` because the isolated Herd PHP 8.5 FastCGI listener on `127.0.0.1:9085` was down; it was manually restored and the site is healthy again.
+- Verified this pass:
+  - `cd apps/api && php artisan test --filter=PhaseSixPromotionApiTest`
+  - `cd apps/web && npm.cmd run qa:phase-ops`
+  - `cd apps/web && npm.cmd run build`
+- Useful artifact:
+  - `docs/browser-checks/phase-ops-suite-20260423021914.png`
+- Immediate next step:
+  - continue browser mutation QA into invitations, finance exception paths, staff edits, and enterprise admin operations.
+
 - Offline school workspace helpers were restored on 2026-04-23:
   - `apps/web/composables/useNetworkStatus.ts`
   - `apps/web/composables/useOfflineDraft.ts`

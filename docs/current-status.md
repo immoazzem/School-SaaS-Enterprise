@@ -4,6 +4,31 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Frontend Checkpoint
 
+Current page/module complete: school operations phase-suite recovery, promotion safety on seeded data, and full browser QA for marks, reports, promotions, notifications, and portals.
+
+- Restored the local Herd PHP FastCGI path for `school-api.test` after the host started returning `502 Bad Gateway` because the isolated PHP 8.5 listener on `127.0.0.1:9085` was down.
+- Hardened `apps/api/app/Http/Controllers/Api/PromotionController.php` so promotion execution can safely reuse or restore existing target-year enrollments instead of failing on duplicate unique-key collisions under the seeded ten-year data set.
+- Added a promotion batch index endpoint through:
+  - `apps/api/routes/api.php`
+  - `apps/api/app/Http/Controllers/Api/PromotionController.php`
+- Hardened `apps/web/scripts/browser-phase-ops.mjs` so the marks verification step now targets the exact row created during the test instead of whichever verify button happens to appear first.
+- Full browser phase QA now passes for:
+  - marks create + verify
+  - reports publish + queue + file check
+  - promotions preview + draft + execute + rollback
+  - notifications load
+  - student portal load
+  - parent portal load
+- Latest useful browser artifact:
+  - `docs/browser-checks/phase-ops-suite-20260423021914.png`
+- Verification after this pass:
+  - `cd apps/api && php artisan test --filter=PhaseSixPromotionApiTest` passed
+  - `cd apps/web && npm.cmd run qa:phase-ops` passed
+  - `cd apps/web && npm.cmd run build` passed
+- Known follow-up:
+  - the browser phase suite is now green, but the Herd PHP FastCGI listener is still an environment dependency worth keeping an eye on when `school-api.test` behaves oddly again.
+  - next work should continue deeper mutation QA on invitations, finance exception flows, staff edits, and admin operations.
+
 Current page/module complete: school operations hardening for offline helpers, marks/reports browser QA, and promotion execution safety.
 
 - Restored the missing offline workspace building blocks that `marks` and `attendance` already referenced:

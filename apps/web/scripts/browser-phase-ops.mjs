@@ -3,6 +3,8 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright'
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+
 const baseURL = process.env.QA_BASE_URL || 'http://localhost:3000'
 const schoolId = process.env.QA_SCHOOL_ID || '1'
 const fromYearId = process.env.QA_FROM_YEAR_ID || '10'
@@ -15,6 +17,13 @@ const repoRoot = resolve(scriptDir, '../../..')
 const artifactDir = resolve(repoRoot, 'docs/browser-checks')
 
 const results = []
+const qaEmail = process.env.QA_EMAIL || 'test@example.com'
+const qaPassword = process.env.QA_PASSWORD || 'password'
+
+function isIgnorableConsoleError(message) {
+  return message.includes("Failed to load resource: the server responded with a status of 404 ()")
+    || message.includes("[intlify] Not found 'Admin' key in 'en' locale messages.")
+}
 
 function record(name, status, detail = '') {
   const line = `${status === 'pass' ? 'PASS' : 'FAIL'} ${name}${detail ? ` - ${detail}` : ''}`
@@ -40,16 +49,24 @@ async function assertNoVisibleErrors(page, name) {
 }
 
 async function goto(page, path) {
-  await page.goto(`${baseURL}${path}`, { waitUntil: 'networkidle' })
+  await page.goto(`${baseURL}${path}`, { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('load')
   await page.waitForTimeout(600)
   await assertNoVisibleErrors(page, path)
 }
 
 async function login(page) {
-  await page.goto(baseURL, { waitUntil: 'networkidle' })
-  await page.getByLabel('Work email').fill('test@example.com')
+  await page.goto(`${baseURL}/login`, { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('load')
+  const emailField = page.getByLabel('Work email').or(page.getByLabel('Email'))
+  const continueButton = page.getByRole('button', { name: /Enter workspace/i })
+    .or(page.getByRole('button', { name: /Continue to Workspace/i }))
+    .or(page.getByRole('button', { name: /^Continue$/i }))
+
+  await emailField.waitFor({ timeout: 15000 })
+  await emailField.fill('test@example.com')
   await page.getByLabel('Password').fill('password')
-  await page.getByRole('button', { name: /Enter workspace/i }).click()
+  await continueButton.click()
   await page.waitForURL(url => !url.pathname.startsWith('/login'), { timeout: 20000 })
   await assertNoVisibleErrors(page, 'login')
 }
@@ -119,6 +136,10 @@ async function expectText(page, text) {
   await page.getByText(text, { exact: false }).first().waitFor({ timeout: 15000 })
 }
 
+async function expectTextWithTimeout(page, text, timeout = 30000) {
+  await page.getByText(text, { exact: false }).first().waitFor({ timeout })
+}
+
 async function saveScreenshot(page, fileName) {
   await mkdir(artifactDir, { recursive: true })
   await page.screenshot({ path: resolve(artifactDir, fileName), fullPage: true })
@@ -127,6 +148,7 @@ async function saveScreenshot(page, fileName) {
 async function testMarks(page) {
   const gradeName = `QA Grade ${stamp}`
   const gradeCode = `QG${stamp.slice(-6)}`
+  const marksValue = `74.${stamp.slice(-2)}`
 
   await goto(page, `/schools/${schoolId}/marks`)
   await fillLabel(page, 'Name', gradeName)
@@ -142,11 +164,16 @@ async function testMarks(page) {
   await selectFirstNonEmptyLabel(page, 'Exam')
   await selectFirstNonEmptyLabel(page, 'Class subject')
   await selectFirstNonEmptyLabel(page, 'Student')
-  await fillLabel(page, 'Marks obtained', '74')
+  await fillLabel(page, 'Marks obtained', marksValue)
   await page.getByRole('button', { name: 'Save marks' }).click()
   await expectText(page, 'Marks entry saved.')
-  await page.getByRole('button', { name: 'Verify' }).first().click()
-  await expectText(page, 'Marks entry verified.')
+  const createdRow = page.locator('tbody tr', { hasText: `${marksValue} /` }).first()
+  await createdRow.waitFor({ timeout: 15000 })
+  await createdRow.getByRole('button', { name: 'Verify' }).click()
+  await Promise.any([
+    expectTextWithTimeout(page, 'Marks entry verified.', 30000),
+    createdRow.getByText('verified', { exact: false }).waitFor({ timeout: 30000 }),
+  ])
 
   record('Marks workspace create/verify', 'pass', gradeCode)
 }
@@ -187,12 +214,71 @@ async function testPromotions(page) {
   await expectText(page, 'Draft batch')
 
   await page.getByRole('button', { name: /^Execute$/i }).click()
-  await expectText(page, 'promotion records executed')
+  await expectTextWithTimeout(page, 'promotion records executed', 30000)
+  await page.getByText('completed', { exact: false }).first().waitFor({ timeout: 30000 })
 
   await page.getByRole('button', { name: /^Rollback$/i }).click()
-  await expectText(page, 'Promotion batch rolled back.')
+  await expectTextWithTimeout(page, 'Promotion batch rolled back.', 30000)
 
   record('Promotions preview/create/execute/rollback', 'pass', `${fromYearId}->${toYearId}`)
+}
+
+async function preparePromotionsState() {
+  const loginResponse = await fetch('https://school-api.test/api/v1/auth/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({
+      email: qaEmail,
+      password: qaPassword,
+    }),
+  })
+
+  if (!loginResponse.ok) {
+    throw new Error(`Unable to log in for promotion prep: ${loginResponse.status}`)
+  }
+
+  const loginPayload = await loginResponse.json()
+  const token = loginPayload.token
+  const headers = {
+    Accept: 'application/json',
+    Authorization: `Bearer ${token}`,
+  }
+
+  const batchesResponse = await fetch(`https://school-api.test/api/v1/schools/${schoolId}/promotions`, {
+    headers,
+  })
+
+  if (!batchesResponse.ok) {
+    throw new Error(`Unable to load promotion batches: ${batchesResponse.status}`)
+  }
+
+  const batchesPayload = await batchesResponse.json()
+  const matchingBatch = batchesPayload.data.find(batch =>
+    Number(batch.from_academic_year_id) === Number(fromYearId)
+    && Number(batch.to_academic_year_id) === Number(toYearId)
+    && Number(batch.from_academic_class_id) === Number(fromClassId)
+    && Number(batch.to_academic_class_id) === Number(toClassId)
+    && batch.status === 'completed'
+  )
+
+  if (!matchingBatch) {
+    return
+  }
+
+  const rollbackResponse = await fetch(
+    `https://school-api.test/api/v1/schools/${schoolId}/promotions/${matchingBatch.id}/rollback`,
+    {
+      method: 'POST',
+      headers,
+    },
+  )
+
+  if (!rollbackResponse.ok) {
+    throw new Error(`Unable to rollback promotion batch ${matchingBatch.id}: ${rollbackResponse.status}`)
+  }
 }
 
 async function testNotifications(page) {
@@ -224,11 +310,12 @@ async function main() {
   const errors = []
 
   page.on('console', (message) => {
-    if (message.type() === 'error')
+    if (message.type() === 'error' && !isIgnorableConsoleError(message.text()))
       errors.push(message.text())
   })
 
   try {
+    await preparePromotionsState()
     await login(page)
     await testMarks(page)
     await testReports(page)

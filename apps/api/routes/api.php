@@ -187,6 +187,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('school.member');
         Route::get('schools/{school}/portal/parent/notifications', [PortalController::class, 'parentNotifications'])
             ->middleware('school.member');
+        Route::get('schools/{school}/promotions', [PromotionController::class, 'index'])
+            ->middleware('school.member');
         Route::post('schools/{school}/promotions/preview', [PromotionController::class, 'preview'])
             ->middleware('school.member');
         Route::post('schools/{school}/promotions', [PromotionController::class, 'store'])

@@ -7,6 +7,7 @@ use App\Models\PromotionBatch;
 use App\Models\PromotionRecord;
 use App\Models\School;
 use App\Models\StudentEnrollment;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,6 +17,18 @@ use Illuminate\Validation\ValidationException;
 
 class PromotionController extends Controller
 {
+    public function index(Request $request, School $school): JsonResponse
+    {
+        $this->authorizePromotions($request, $school);
+
+        $batches = $school->promotionBatches()
+            ->withCount('records')
+            ->latest('id')
+            ->get();
+
+        return response()->json(['data' => $batches]);
+    }
+
     public function preview(Request $request, School $school): JsonResponse
     {
         $this->authorizePromotions($request, $school);
@@ -89,37 +102,22 @@ class PromotionController extends Controller
             }
 
             $processed = 0;
+            $resolvedEnrollments = [];
 
             $lockedBatch->update(['status' => 'in_progress']);
 
-            $lockedBatch->records()->with('studentEnrollment')->get()->each(function (PromotionRecord $record) use ($request, $school, $lockedBatch, &$processed): void {
+            $lockedBatch->records()->with('studentEnrollment')->get()->each(function (PromotionRecord $record) use ($request, $school, $lockedBatch, &$processed, &$resolvedEnrollments): void {
                 $oldEnrollment = $record->studentEnrollment;
                 $newEnrollment = null;
 
                 if (in_array($record->action, ['promoted', 'retained'], true)) {
-                    try {
-                        $resolvedEnrollment = $school->studentEnrollments()->firstOrCreate(
-                            [
-                                'student_id' => $oldEnrollment->student_id,
-                                'academic_year_id' => $lockedBatch->to_academic_year_id,
-                            ],
-                            [
-                                'academic_year_id' => $lockedBatch->to_academic_year_id,
-                                'academic_class_id' => $record->action === 'retained'
-                                    ? $lockedBatch->from_academic_class_id
-                                    : $lockedBatch->to_academic_class_id,
-                                'roll_no' => $oldEnrollment->roll_no,
-                                'enrolled_on' => now()->toDateString(),
-                                'status' => 'active',
-                                'notes' => "Created by promotion batch {$lockedBatch->id}.",
-                            ],
-                        );
-                    } catch (UniqueConstraintViolationException) {
-                        $resolvedEnrollment = $school->studentEnrollments()
-                            ->where('student_id', $oldEnrollment->student_id)
-                            ->where('academic_year_id', $lockedBatch->to_academic_year_id)
-                            ->firstOrFail();
+                    $cacheKey = implode(':', [$school->id, $oldEnrollment->student_id, $lockedBatch->to_academic_year_id]);
+
+                    if (! array_key_exists($cacheKey, $resolvedEnrollments)) {
+                        $resolvedEnrollments[$cacheKey] = $this->resolveTargetEnrollment($school, $lockedBatch, $oldEnrollment, $record);
                     }
+
+                    $resolvedEnrollment = $resolvedEnrollments[$cacheKey];
 
                     if ($resolvedEnrollment->wasRecentlyCreated) {
                         $newEnrollment = $resolvedEnrollment;
@@ -188,6 +186,89 @@ class PromotionController extends Controller
     private function assertBatchScope(School $school, PromotionBatch $batch): void
     {
         abort_unless($batch->school_id === $school->id, 404);
+    }
+
+    private function resolveTargetEnrollment(
+        School $school,
+        PromotionBatch $batch,
+        StudentEnrollment $oldEnrollment,
+        PromotionRecord $record,
+    ): StudentEnrollment {
+        $existingEnrollment = StudentEnrollment::withTrashed()
+            ->where('school_id', $school->id)
+            ->where('student_id', $oldEnrollment->student_id)
+            ->where('academic_year_id', $batch->to_academic_year_id)
+            ->first();
+
+        if ($existingEnrollment) {
+            if ($existingEnrollment->trashed()) {
+                $existingEnrollment->restore();
+            }
+
+            $existingEnrollment->forceFill([
+                'academic_class_id' => $record->action === 'retained'
+                    ? $batch->from_academic_class_id
+                    : $batch->to_academic_class_id,
+                'roll_no' => $oldEnrollment->roll_no,
+                'enrolled_on' => now()->toDateString(),
+                'status' => 'active',
+                'notes' => $existingEnrollment->notes ?: "Reused by promotion batch {$batch->id}.",
+            ])->save();
+
+            return $existingEnrollment;
+        }
+
+        try {
+            return StudentEnrollment::query()->create([
+                'school_id' => $school->id,
+                'student_id' => $oldEnrollment->student_id,
+                'academic_year_id' => $batch->to_academic_year_id,
+                'academic_class_id' => $record->action === 'retained'
+                    ? $batch->from_academic_class_id
+                    : $batch->to_academic_class_id,
+                'roll_no' => $oldEnrollment->roll_no,
+                'enrolled_on' => now()->toDateString(),
+                'status' => 'active',
+                'notes' => "Created by promotion batch {$batch->id}.",
+            ]);
+        } catch (UniqueConstraintViolationException|QueryException $exception) {
+            if (! $this->isDuplicateEnrollmentConstraint($exception)) {
+                throw $exception;
+            }
+
+            $existingEnrollment = StudentEnrollment::withTrashed()
+                ->where('school_id', $school->id)
+                ->where('student_id', $oldEnrollment->student_id)
+                ->where('academic_year_id', $batch->to_academic_year_id)
+                ->firstOrFail();
+
+            if ($existingEnrollment->trashed()) {
+                $existingEnrollment->restore();
+            }
+
+            return tap($existingEnrollment, function (StudentEnrollment $enrollment) use ($batch, $oldEnrollment, $record): void {
+                $enrollment->forceFill([
+                    'academic_class_id' => $record->action === 'retained'
+                        ? $batch->from_academic_class_id
+                        : $batch->to_academic_class_id,
+                    'roll_no' => $oldEnrollment->roll_no,
+                    'enrolled_on' => now()->toDateString(),
+                    'status' => 'active',
+                    'notes' => $enrollment->notes ?: "Reused by promotion batch {$batch->id}.",
+                ])->save();
+            });
+        }
+    }
+
+    private function isDuplicateEnrollmentConstraint(QueryException|UniqueConstraintViolationException $exception): bool
+    {
+        $message = $exception->getMessage();
+        $sqlState = $exception->errorInfo[0] ?? null;
+        $driverCode = $exception->errorInfo[1] ?? null;
+
+        return $sqlState === '23000'
+            || $driverCode === 1062
+            || str_contains($message, 'student_enrollment_year_unique');
     }
 
     /**

@@ -14,6 +14,42 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 
 ## 2026-04-23
 
+### Pending Checkpoint - Phase Ops Suite Recovered And Green
+
+Current page/module complete: school operations browser phase suite is now green on the seeded ten-year environment.
+
+Scope:
+- recovered the local Herd API path after `school-api.test` began returning `502 Bad Gateway`.
+- confirmed the isolated PHP 8.5 FastCGI listener for the site had dropped and manually restored it on `127.0.0.1:9085`.
+- hardened `apps/api/app/Http/Controllers/Api/PromotionController.php` so promotion execution safely reuses or restores target-year enrollments when soft-deleted or duplicate rows already exist.
+- added promotion batch listing support through `apps/api/routes/api.php` and `PromotionController@index` so browser QA can prepare promotion state cleanly before execution tests.
+- updated `apps/web/scripts/browser-phase-ops.mjs`:
+  - tolerant login flow against the rebuilt UI
+  - direct API prep for rollback of prior completed promotion batches
+  - smarter console filtering for known harmless noise
+  - exact-row targeting for marks verification using the freshly created marks value
+
+Verification:
+- `cd apps/api && php artisan test --filter=PhaseSixPromotionApiTest`: passed with `4 tests / 33 assertions`.
+- `cd apps/web && npm.cmd run qa:phase-ops`: passed for:
+  - marks create + verify
+  - reports publish + queue + file check
+  - promotions preview + draft + execute + rollback
+  - notifications load
+  - student portal load
+  - parent portal load
+- `cd apps/web && npm.cmd run build`: passed.
+- browser artifact saved at:
+  - `docs/browser-checks/phase-ops-suite-20260423021914.png`
+
+Notes:
+- the earlier marks failure was not a product bug; the browser script was clicking the first visible verify button instead of the row it had just created.
+- the earlier promotion-prep failure was environmental; the site-specific Herd PHP listener had dropped, leaving nginx alive but upstream FastCGI unavailable.
+
+Next:
+- checkpoint and push this recovery slice
+- continue mutation QA into invitations, finance exception paths, staff edits, and enterprise admin operations
+
 ### Pending Checkpoint - Offline Helpers Restored And Promotions Execution Hardened
 
 Current page/module complete: school operations hardening for offline workspaces plus safe promotion execution.
