@@ -12,6 +12,54 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 - Mention the current page/module in progress and phase completion notes.
 - Use visible agent-browser checks during UI phases when the dev server is available.
 
+## 2026-04-23
+
+### Pending Checkpoint - Nested Routes Repaired And Setup Mutation QA Passing
+
+Current page/module complete: nested admin and school workspace routes now resolve correctly, and the core academic setup modules passed super-admin create/archive browser QA.
+
+Scope:
+- repaired Nuxt route nesting by moving:
+  - `apps/web/pages/admin.vue` -> `apps/web/pages/admin/index.vue`
+  - `apps/web/pages/schools.vue` -> `apps/web/pages/schools/index.vue`
+- fixed `apps/web/pages/admin/index.vue` metric notes so health, active-school, and failed-job values render through bound strings instead of literal moustache text.
+- re-verified the nested route families that had been silently rendering the wrong parent screens:
+  - `/admin`
+  - `/admin/schools`
+  - `/admin/users`
+  - `/schools/1/academic-classes`
+  - `/schools/1/academic-sections`
+  - `/schools/1/academic-years`
+- completed super-admin mutation QA for the school setup flows:
+  - academic classes create/archive
+  - academic sections create/archive
+  - academic years create/archive
+  - subjects create/archive
+  - student groups create/archive
+  - shifts create/archive
+  - designations create/archive
+
+Verification:
+- `cd apps/web && npm run build`: passed.
+- browser verification passed with no console errors and no `4xx/5xx` responses for:
+  - `/admin`
+  - `/admin/schools`
+  - `/admin/users`
+  - `/schools/1/academic-classes`
+  - `/schools/1/academic-sections`
+  - `/schools/1/academic-years`
+- browser artifacts saved at:
+  - `docs/browser-checks/admin-schools-20260423.png`
+  - `docs/browser-checks/nested-routes-qa-20260423.png`
+
+Notes:
+- this fixed a meaningful hidden defect: child pages existed, but parent route files were swallowing them because the file-based structure was wrong.
+- a few initial failed screenshots were generated before the route repair and can be ignored; they were selector/routing diagnostics, not the final state.
+- build still emits the previously known Nuxt/Nitro warnings already tracked in `docs/KNOWN-BUILD-WARNINGS.md`.
+
+Next:
+- continue deeper mutation QA on the remaining school-scoped flows, starting with enrollments, students, employees, exams, reports, and finance exception cases.
+
 ## 2026-04-22
 
 ### Pending Checkpoint - Root Operator Pages Moved Off Mock Data

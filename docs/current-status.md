@@ -4,6 +4,39 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Frontend Checkpoint
 
+Current page/module complete: nested admin and school workspaces repaired, with super-admin mutation QA passing for the core academic setup flows.
+
+- Repaired Nuxt file-based nesting so child workspace routes render their own pages instead of falling back to the parent overview:
+  - moved `apps/web/pages/admin.vue` to `apps/web/pages/admin/index.vue`
+  - moved `apps/web/pages/schools.vue` to `apps/web/pages/schools/index.vue`
+- Fixed the enterprise admin overview metrics in `apps/web/pages/admin/index.vue` so dynamic metric notes render real values instead of literal moustache strings.
+- Super-admin browser verification now confirms the repaired nested routes load correctly:
+  - `/admin`
+  - `/admin/schools`
+  - `/admin/users`
+  - `/schools/1/academic-classes`
+  - `/schools/1/academic-sections`
+  - `/schools/1/academic-years`
+- Super-admin mutation QA passed for the school setup modules:
+  - academic classes
+  - academic sections
+  - academic years
+  - subjects
+  - student groups
+  - shifts
+  - designations
+- Latest useful browser artifacts:
+  - `docs/browser-checks/admin-schools-20260423.png`
+  - `docs/browser-checks/nested-routes-qa-20260423.png`
+- Verification after this pass:
+  - `cd apps/web && npm run build` passed
+  - super-admin nested route/browser sweep completed with no console errors or `4xx/5xx` responses
+- Known follow-up:
+  - the hidden routing bug is fixed, but the project is still not at the honest end-state of “whole project finished”.
+  - next work should continue mutation QA deeper into school operations, people, exams, reports, and finance exception flows.
+
+## Latest Frontend Checkpoint
+
 Current page/module complete: root operator pages converted from mock-driven dashboards to live super-admin verified portfolio surfaces.
 
 - Replaced the remaining root-level mock-backed pages with live API-backed operator views:

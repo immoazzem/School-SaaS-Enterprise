@@ -93,16 +93,16 @@ onMounted(loadAdmin)
 
     <VRow class="mb-2">
       <VCol cols="12" md="3">
-        <SchoolMetricCard title="System status" :value="health?.status || (loading ? 'Loading' : 'Unavailable')" delta="" tone="success" icon="tabler-shield-check" note="Database {{ health?.database || 'unknown' }}" />
+        <SchoolMetricCard title="System status" :value="health?.status || (loading ? 'Loading' : 'Unavailable')" delta="" tone="success" icon="tabler-shield-check" :note="`Database ${health?.database || 'unknown'}`" />
       </VCol>
       <VCol cols="12" md="3">
-        <SchoolMetricCard title="Schools" :value="String(stats?.schools ?? 0)" delta="" tone="primary" icon="tabler-building-community" note="Active {{ stats?.active_schools ?? 0 }}" />
+        <SchoolMetricCard title="Schools" :value="String(stats?.schools ?? 0)" delta="" tone="primary" icon="tabler-building-community" :note="`Active ${stats?.active_schools ?? 0}`" />
       </VCol>
       <VCol cols="12" md="3">
         <SchoolMetricCard title="Users" :value="String(stats?.users ?? 0)" delta="" tone="warning" icon="tabler-users" note="Portfolio accounts" />
       </VCol>
       <VCol cols="12" md="3">
-        <SchoolMetricCard title="Queue" :value="String(jobs?.pending ?? 0)" delta="" tone="info" icon="tabler-clock" note="Failed {{ jobs?.failed ?? 0 }}" />
+        <SchoolMetricCard title="Queue" :value="String(jobs?.pending ?? 0)" delta="" tone="info" icon="tabler-clock" :note="`Failed ${jobs?.failed ?? 0}`" />
       </VCol>
     </VRow>
 

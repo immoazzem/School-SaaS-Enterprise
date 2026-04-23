@@ -1,5 +1,27 @@
 # School SaaS Enterprise: Codex Session Context
 
+## Latest Resume Point
+
+- Nested frontend route repair completed on 2026-04-23.
+- Important fix:
+  - `apps/web/pages/admin.vue` was moved to `apps/web/pages/admin/index.vue`
+  - `apps/web/pages/schools.vue` was moved to `apps/web/pages/schools/index.vue`
+  This fixed a hidden Nuxt file-routing bug where nested child routes like `/admin/schools` and `/schools/1/academic-classes` were rendering the wrong parent overview pages.
+- `apps/web/pages/admin/index.vue` also had its metric note bindings fixed so dynamic notes no longer show literal moustache text.
+- Super-admin browser mutation QA passed for:
+  - academic classes
+  - academic sections
+  - academic years
+  - subjects
+  - student groups
+  - shifts
+  - designations
+- Useful artifacts from this repair:
+  - `docs/browser-checks/admin-schools-20260423.png`
+  - `docs/browser-checks/nested-routes-qa-20260423.png`
+- Immediate next step:
+  - continue deeper mutation QA on enrollments, students, employees, exams, reports, and finance edge flows from the repaired nested workspace baseline.
+
 ## Purpose
 
 Use this file at the start of every new Codex session to minimize token usage and continue the project without re-explaining the full conversation.
