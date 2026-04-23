@@ -2,6 +2,21 @@
 
 ## Latest Resume Point
 
+- Enterprise admin browser harness completed on 2026-04-23.
+- Added:
+  - `apps/web/scripts/browser-admin-ops.mjs`
+  - `qa:admin-ops` in `apps/web/package.json`
+- Verified this pass:
+  - `cd apps/web && npm.cmd run qa:admin-ops`
+  - `cd apps/web && npm.cmd run build`
+- The admin harness now proves:
+  - enterprise admin route cluster loads for the super-admin
+  - school invitation create/revoke works end to end
+- Useful artifact:
+  - `docs/browser-checks/admin-ops-suite-20260423023146.png`
+- Immediate next step:
+  - continue mutation QA on staff edits/archive flows, finance exception paths, and school onboarding actions.
+
 - Phase operations browser recovery completed on 2026-04-23.
 - Important fixes:
   - `apps/api/app/Http/Controllers/Api/PromotionController.php` now safely reuses/restores existing target-year enrollments during promotion execution, including soft-deleted rows that were causing duplicate-key failures under seeded data.

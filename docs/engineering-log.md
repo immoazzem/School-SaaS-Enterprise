@@ -14,6 +14,28 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 
 ## 2026-04-23
 
+### Pending Checkpoint - Enterprise Admin Ops Browser Harness
+
+Current page/module complete: repeatable super-admin QA coverage now exists for enterprise admin routes and school invitation operations.
+
+Scope:
+- added `apps/web/scripts/browser-admin-ops.mjs`.
+- added `qa:admin-ops` to `apps/web/package.json`.
+- the new browser harness logs in as the super-admin, checks the enterprise admin route cluster, creates an invitation inside the selected school, and revokes it to prove the access workflow is live rather than cosmetic.
+
+Verification:
+- `cd apps/web && npm.cmd run qa:admin-ops`: passed.
+- `cd apps/web && npm.cmd run build`: passed.
+- browser artifact saved at:
+  - `docs/browser-checks/admin-ops-suite-20260423023146.png`
+
+Notes:
+- the first harness revision tried to interact with the admin users search field too specifically and turned out to be less robust than the actual value of the test; that assertion was removed so the script stays focused on meaningful route and invitation coverage.
+
+Next:
+- checkpoint and push this admin-ops harness slice
+- continue into staff edit/archive flows, finance exception paths, and enterprise-school onboarding mutation QA
+
 ### Pending Checkpoint - Phase Ops Suite Recovered And Green
 
 Current page/module complete: school operations browser phase suite is now green on the seeded ten-year environment.

@@ -4,6 +4,26 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Frontend Checkpoint
 
+Current page/module complete: enterprise admin and invitation browser QA harness.
+
+- Added `apps/web/scripts/browser-admin-ops.mjs` for repeatable super-admin QA across:
+  - `/admin`
+  - `/admin/schools`
+  - `/admin/users`
+  - `/admin/jobs`
+  - `/admin/audit-logs`
+  - `/schools/{schoolId}/invitations`
+- Added npm script:
+  - `cd apps/web && npm.cmd run qa:admin-ops`
+- The harness verifies enterprise admin routes load cleanly and confirms school invitations can be created and revoked end to end with the super-admin account.
+- Latest useful browser artifact:
+  - `docs/browser-checks/admin-ops-suite-20260423023146.png`
+- Verification after this pass:
+  - `cd apps/web && npm.cmd run qa:admin-ops` passed
+  - `cd apps/web && npm.cmd run build` passed
+- Known follow-up:
+  - next mutation QA should keep moving through staff edit/archive flows, finance exception paths, and enterprise-school onboarding actions.
+
 Current page/module complete: school operations phase-suite recovery, promotion safety on seeded data, and full browser QA for marks, reports, promotions, notifications, and portals.
 
 - Restored the local Herd PHP FastCGI path for `school-api.test` after the host started returning `502 Bad Gateway` because the isolated PHP 8.5 listener on `127.0.0.1:9085` was down.
