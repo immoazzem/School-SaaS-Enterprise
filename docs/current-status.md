@@ -4,6 +4,33 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Frontend Checkpoint
 
+Current page/module complete: super-admin mutation QA passed across students, enrollments, employees, exams, and finance, with the enrollment picker fixed for seeded enterprise-scale data.
+
+- Fixed `apps/web/pages/schools/[schoolId]/enrollments.vue` so the enrollment form loads up to 100 active students instead of the default first page only.
+- This repaired a real workflow defect where newly created students were missing from the enrollment dropdown once the seeded data set grew past the API default page size.
+- Super-admin browser mutation QA now passes for:
+  - guardian create
+  - student create
+  - enrollment create
+  - employee create
+  - exam type create
+  - exam create
+  - exam schedule create
+  - fee category create
+  - fee structure create
+  - manual invoice create
+  - bulk invoice queue
+- Latest useful browser artifact:
+  - `docs/browser-checks/mutation-suite-20260423.png`
+- Verification after this pass:
+  - `cd apps/web && npm.cmd run build` passed
+  - browser mutation suite completed with no console errors or `4xx/5xx` responses
+- Known follow-up:
+  - the critical academic and finance mutation path is now green for the super-admin.
+  - next work should continue into reports, marks verification, employee/archive edits, promotions, notifications, and portal-specific user journeys.
+
+## Latest Frontend Checkpoint
+
 Current page/module complete: nested admin and school workspaces repaired, with super-admin mutation QA passing for the core academic setup flows.
 
 - Repaired Nuxt file-based nesting so child workspace routes render their own pages instead of falling back to the parent overview:

@@ -83,7 +83,7 @@ async function loadWorkspace() {
 
   try {
     const [studentList, yearList, classList, sectionList, groupList, shiftList] = await Promise.all([
-      api.request<ListResponse<Student>>(`/schools/${schoolId.value}/students?status=active`),
+      api.request<ListResponse<Student>>(`/schools/${schoolId.value}/students?status=active&per_page=100`),
       api.request<ListResponse<AcademicYear>>(`/schools/${schoolId.value}/academic-years?status=active`),
       api.request<ListResponse<AcademicClass>>(`/schools/${schoolId.value}/academic-classes`),
       api.request<ListResponse<AcademicSection>>(`/schools/${schoolId.value}/academic-sections?status=active`),

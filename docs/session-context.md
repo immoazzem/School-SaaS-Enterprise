@@ -2,6 +2,21 @@
 
 ## Latest Resume Point
 
+- Super-admin mutation suite completed on 2026-04-23 across:
+  - guardians
+  - students
+  - enrollments
+  - employees
+  - exams
+  - fee categories / structures / invoice creation / bulk invoice queue
+- Important fix:
+  - `apps/web/pages/schools/[schoolId]/enrollments.vue` now loads active students with `per_page=100`.
+  - This fixed an enterprise-scale workflow bug where newly created students disappeared from the enrollment dropdown once the seeded data set exceeded the first API page.
+- Useful artifact from this pass:
+  - `docs/browser-checks/mutation-suite-20260423.png`
+- Immediate next step:
+  - continue browser mutation QA into reports, marks verification, promotions, notifications, and portal-specific flows.
+
 - Nested frontend route repair completed on 2026-04-23.
 - Important fix:
   - `apps/web/pages/admin.vue` was moved to `apps/web/pages/admin/index.vue`

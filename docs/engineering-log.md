@@ -14,6 +14,42 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 
 ## 2026-04-23
 
+### Pending Checkpoint - Multi-Module Mutation QA And Enrollment Picker Fix
+
+Current page/module complete: the super-admin mutation suite now passes across students, enrollments, employees, exams, and finance, and the enrollment picker now scales to the seeded enterprise data set.
+
+Scope:
+- fixed `apps/web/pages/schools/[schoolId]/enrollments.vue` so the student picker requests `per_page=100` for active students.
+- this resolved a real cross-module defect: after creating a new student, the enrollment form could not see that student because only the API default first page of students was loaded.
+- ran a browser mutation sweep against the repaired school workspace using the seeded super-admin account:
+  - guardian create
+  - student create
+  - enrollment create
+  - employee create
+  - exam type create
+  - exam create
+  - exam schedule create
+  - fee category create
+  - fee structure create
+  - manual invoice create
+  - bulk invoice queue
+
+Verification:
+- browser mutation suite passed with no console errors and no `4xx/5xx` responses.
+- browser artifact saved at:
+  - `docs/browser-checks/mutation-suite-20260423.png`
+- `cd apps/web && npm.cmd run build`: passed.
+
+Notes:
+- the build still completes with the same previously known Nuxt/Nitro warnings:
+  - duplicated `useAppConfig`
+  - `nuxt:module-preload-polyfill` sourcemap warning
+  - Node `DEP0155`
+- the new defect was not cosmetic; it only showed up once the ten-year seeded data exceeded the first page of students, which is exactly why this mutation pass mattered.
+
+Next:
+- continue mutation QA into reports, marks verification, promotions, notifications/invitations, and student/parent portal journeys.
+
 ### Pending Checkpoint - Nested Routes Repaired And Setup Mutation QA Passing
 
 Current page/module complete: nested admin and school workspace routes now resolve correctly, and the core academic setup modules passed super-admin create/archive browser QA.
