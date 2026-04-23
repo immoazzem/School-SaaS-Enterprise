@@ -117,6 +117,51 @@ class PhaseSixPromotionApiTest extends TestCase
             ->assertJsonValidationErrors('batch');
     }
 
+    public function test_promotion_execute_reuses_existing_target_year_enrollment_without_duplicate_failure(): void
+    {
+        [$user, $school, $fromYear, $toYear, $fromClass, $toClass, $passedEnrollment] = $this->promotionFixture();
+
+        Sanctum::actingAs($user);
+
+        $existingTargetEnrollment = $school->studentEnrollments()->create([
+            'student_id' => $passedEnrollment->student_id,
+            'academic_year_id' => $toYear->id,
+            'academic_class_id' => $toClass->id,
+            'roll_no' => $passedEnrollment->roll_no,
+            'enrolled_on' => '2027-01-10',
+            'status' => 'active',
+            'notes' => 'Pre-existing target enrollment.',
+        ]);
+
+        $batchId = $this->postJson("/api/v1/schools/{$school->id}/promotions", [
+            'from_academic_year_id' => $fromYear->id,
+            'to_academic_year_id' => $toYear->id,
+            'from_academic_class_id' => $fromClass->id,
+            'to_academic_class_id' => $toClass->id,
+        ])->assertCreated()->json('data.id');
+
+        $this->postJson("/api/v1/schools/{$school->id}/promotions/{$batchId}/execute")
+            ->assertOk()
+            ->assertJsonPath('data.status', 'completed');
+
+        $this->assertDatabaseCount('student_enrollments', 4);
+        $this->assertDatabaseHas('student_enrollments', [
+            'id' => $existingTargetEnrollment->id,
+            'student_id' => $passedEnrollment->student_id,
+            'academic_year_id' => $toYear->id,
+        ]);
+
+        $this->postJson("/api/v1/schools/{$school->id}/promotions/{$batchId}/rollback")
+            ->assertOk()
+            ->assertJsonPath('data.status', 'rolled_back');
+
+        $this->assertDatabaseHas('student_enrollments', [
+            'id' => $existingTargetEnrollment->id,
+            'student_id' => $passedEnrollment->student_id,
+            'academic_year_id' => $toYear->id,
+        ]);
+    }
+
     private function promotionFixture(): array
     {
         $user = User::factory()->create();

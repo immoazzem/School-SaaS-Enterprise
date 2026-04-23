@@ -14,6 +14,42 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 
 ## 2026-04-23
 
+### Pending Checkpoint - Offline Helpers Restored And Promotions Execution Hardened
+
+Current page/module complete: school operations hardening for offline workspaces plus safe promotion execution.
+
+Scope:
+- restored the missing frontend helpers/components that the rebuilt school workspaces were already coded against:
+  - `useNetworkStatus`
+  - `useOfflineDraft`
+  - `useOfflineQueue`
+  - `OfflineNotice`
+  - `OfflineQueuePanel`
+- fixed enterprise-scale selectors:
+  - `apps/web/pages/schools/[schoolId]/attendance.vue` now loads enrollments with `per_page=100`
+  - `apps/web/pages/schools/[schoolId]/promotions.vue` now loads complete academic-year/class option lists before filtering
+- added `apps/web/scripts/browser-phase-ops.mjs` for marks, reports, promotions, notifications, and portal QA
+- confirmed browser pass for:
+  - marks create + verify
+  - reports publish + queue + file check
+- found and fixed a real backend defect in promotion execution:
+  - the execute endpoint could throw a duplicate target-year enrollment `500`
+  - hardened `apps/api/app/Http/Controllers/Api/PromotionController.php` with safer batch locking and duplicate-enrollment recovery
+  - added regression coverage in `apps/api/tests/Feature/PhaseSixPromotionApiTest.php`
+
+Verification:
+- `cd apps/api && php artisan test --filter=PhaseSixPromotionApiTest`: passed.
+- `cd apps/web && npm.cmd run build`: passed.
+
+Notes:
+- the live local API host became unstable after recycling the PHP workers; `school-api.test` started returning `502 Bad Gateway`.
+- because of that host/runtime issue, the full browser `qa:phase-ops` script could not be completed end to end even though marks/reports passed and the promotion controller is green in PHPUnit.
+
+Next:
+- re-stabilize the local API host
+- rerun `npm.cmd run qa:phase-ops`
+- continue into notifications and student/parent portal flows from the same phase script
+
 ### Pending Checkpoint - Multi-Module Mutation QA And Enrollment Picker Fix
 
 Current page/module complete: the super-admin mutation suite now passes across students, enrollments, employees, exams, and finance, and the enrollment picker now scales to the seeded enterprise data set.

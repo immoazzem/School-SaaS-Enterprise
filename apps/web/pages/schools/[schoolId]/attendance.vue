@@ -91,7 +91,7 @@ function enrollmentLabel(enrollment: StudentEnrollment) {
 
 async function loadEnrollments() {
   const response = await api.request<ListResponse<StudentEnrollment>>(
-    `/schools/${schoolId.value}/student-enrollments?status=active`,
+    `/schools/${schoolId.value}/student-enrollments?status=active&per_page=100`,
   )
   enrollments.value = response.data
 }

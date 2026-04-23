@@ -2,6 +2,27 @@
 
 ## Latest Resume Point
 
+- Offline school workspace helpers were restored on 2026-04-23:
+  - `apps/web/composables/useNetworkStatus.ts`
+  - `apps/web/composables/useOfflineDraft.ts`
+  - `apps/web/composables/useOfflineQueue.ts`
+  - `apps/web/components/OfflineNotice.vue`
+  - `apps/web/components/OfflineQueuePanel.vue`
+- Important fixes:
+  - `apps/web/pages/schools/[schoolId]/attendance.vue` now loads active enrollments with `per_page=100`
+  - `apps/web/pages/schools/[schoolId]/promotions.vue` now loads full academic-year/class lists before frontend filtering
+  - `apps/api/app/Http/Controllers/Api/PromotionController.php` was hardened so promotion execution no longer fails in PHPUnit when target-year enrollments already exist or collide
+- New QA helper:
+  - `apps/web/scripts/browser-phase-ops.mjs`
+- Verified this pass:
+  - `cd apps/api && php artisan test --filter=PhaseSixPromotionApiTest`
+  - `cd apps/web && npm.cmd run build`
+  - browser pass for marks and reports inside `qa:phase-ops`
+- Immediate next step:
+  - re-stabilize the local API host (`school-api.test` started returning `502` after PHP worker recycling)
+  - rerun `npm.cmd run qa:phase-ops`
+  - continue into notifications and student/parent portal flows
+
 - Super-admin mutation suite completed on 2026-04-23 across:
   - guardians
   - students

@@ -92,12 +92,12 @@ async function loadOptions() {
 
   try {
     const [yearResponse, classResponse] = await Promise.all([
-      api.request<ListResponse<AcademicYear>>(`/schools/${schoolId.value}/academic-years?status=active&per_page=100`),
-      api.request<ListResponse<AcademicClass>>(`/schools/${schoolId.value}/academic-classes?status=active&per_page=100`),
+      api.request<ListResponse<AcademicYear>>(`/schools/${schoolId.value}/academic-years?per_page=100`),
+      api.request<ListResponse<AcademicClass>>(`/schools/${schoolId.value}/academic-classes?per_page=100`),
     ])
 
     academicYears.value = yearResponse.data
-    academicClasses.value = classResponse.data
+    academicClasses.value = classResponse.data.filter(item => item.status === 'active')
 
     if (!form.from_academic_year_id && academicYears.value[0]) {
       form.from_academic_year_id = String(academicYears.value[0].id)

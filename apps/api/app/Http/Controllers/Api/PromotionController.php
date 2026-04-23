@@ -7,6 +7,7 @@ use App\Models\PromotionBatch;
 use App\Models\PromotionRecord;
 use App\Models\School;
 use App\Models\StudentEnrollment;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -74,33 +75,55 @@ class PromotionController extends Controller
         $this->authorizePromotions($request, $school);
         $this->assertBatchScope($school, $batch);
 
-        if ($batch->status !== 'draft') {
-            throw ValidationException::withMessages([
-                'batch' => 'Promotion batch cannot be executed more than once.',
-            ]);
-        }
-
         $batch = DB::transaction(function () use ($request, $school, $batch): PromotionBatch {
+            /** @var PromotionBatch $lockedBatch */
+            $lockedBatch = PromotionBatch::query()
+                ->whereKey($batch->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($lockedBatch->status !== 'draft') {
+                throw ValidationException::withMessages([
+                    'batch' => 'Promotion batch cannot be executed more than once.',
+                ]);
+            }
+
             $processed = 0;
 
-            $batch->update(['status' => 'in_progress']);
+            $lockedBatch->update(['status' => 'in_progress']);
 
-            $batch->records()->with('studentEnrollment')->get()->each(function (PromotionRecord $record) use ($request, $school, $batch, &$processed): void {
+            $lockedBatch->records()->with('studentEnrollment')->get()->each(function (PromotionRecord $record) use ($request, $school, $lockedBatch, &$processed): void {
                 $oldEnrollment = $record->studentEnrollment;
                 $newEnrollment = null;
 
                 if (in_array($record->action, ['promoted', 'retained'], true)) {
-                    $newEnrollment = $school->studentEnrollments()->create([
-                        'student_id' => $oldEnrollment->student_id,
-                        'academic_year_id' => $batch->to_academic_year_id,
-                        'academic_class_id' => $record->action === 'retained'
-                            ? $batch->from_academic_class_id
-                            : $batch->to_academic_class_id,
-                        'roll_no' => $oldEnrollment->roll_no,
-                        'enrolled_on' => now()->toDateString(),
-                        'status' => 'active',
-                        'notes' => "Created by promotion batch {$batch->id}.",
-                    ]);
+                    try {
+                        $resolvedEnrollment = $school->studentEnrollments()->firstOrCreate(
+                            [
+                                'student_id' => $oldEnrollment->student_id,
+                                'academic_year_id' => $lockedBatch->to_academic_year_id,
+                            ],
+                            [
+                                'academic_year_id' => $lockedBatch->to_academic_year_id,
+                                'academic_class_id' => $record->action === 'retained'
+                                    ? $lockedBatch->from_academic_class_id
+                                    : $lockedBatch->to_academic_class_id,
+                                'roll_no' => $oldEnrollment->roll_no,
+                                'enrolled_on' => now()->toDateString(),
+                                'status' => 'active',
+                                'notes' => "Created by promotion batch {$lockedBatch->id}.",
+                            ],
+                        );
+                    } catch (UniqueConstraintViolationException) {
+                        $resolvedEnrollment = $school->studentEnrollments()
+                            ->where('student_id', $oldEnrollment->student_id)
+                            ->where('academic_year_id', $lockedBatch->to_academic_year_id)
+                            ->firstOrFail();
+                    }
+
+                    if ($resolvedEnrollment->wasRecentlyCreated) {
+                        $newEnrollment = $resolvedEnrollment;
+                    }
                 }
 
                 $oldEnrollment->update(['status' => 'completed']);
@@ -111,17 +134,17 @@ class PromotionController extends Controller
                 $processed++;
             });
 
-            $batch->update([
+            $lockedBatch->update([
                 'status' => 'completed',
                 'processed_count' => $processed,
                 'processed_at' => now(),
             ]);
 
-            $this->recordAudit($request, $school, 'promotion.executed', $batch, [
+            $this->recordAudit($request, $school, 'promotion.executed', $lockedBatch, [
                 'processed_count' => $processed,
             ]);
 
-            return $batch->fresh()->load('records.studentEnrollment.student:id,full_name,admission_no', 'records.newEnrollment');
+            return $lockedBatch->fresh()->load('records.studentEnrollment.student:id,full_name,admission_no', 'records.newEnrollment');
         });
 
         return response()->json(['data' => $batch]);

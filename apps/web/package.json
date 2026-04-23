@@ -8,6 +8,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "qa:browser": "node scripts/browser-workflow-smoke.mjs",
+    "qa:phase-ops": "node scripts/browser-phase-ops.mjs",
     "postinstall": "nuxt prepare && npm run build:icons",
     "build:icons": "tsx plugins/iconify/build-icons.ts"
   },

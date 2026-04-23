@@ -3,7 +3,7 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { chromium } from 'playwright'
 
-const baseURL = process.env.QA_BASE_URL || 'http://127.0.0.1:3000'
+const baseURL = process.env.QA_BASE_URL || 'http://localhost:3000'
 const schoolId = process.env.QA_SCHOOL_ID || '1'
 const stamp = process.env.QA_STAMP || new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14)
 const scriptDir = dirname(fileURLToPath(import.meta.url))
@@ -43,14 +43,15 @@ async function goto(page, path) {
 
 async function login(page) {
   await page.goto(baseURL, { waitUntil: 'networkidle' })
-  const emailField = page.getByLabel('Email address').or(page.getByLabel('Email'))
-  const continueButton = page.getByRole('button', { name: /Continue to Workspace/i })
+  const emailField = page.getByLabel('Work email').or(page.getByLabel('Email'))
+  const continueButton = page.getByRole('button', { name: /Enter workspace/i })
+    .or(page.getByRole('button', { name: /Continue to Workspace/i }))
     .or(page.getByRole('button', { name: /^Continue$/i }))
 
   await emailField.fill('test@example.com')
   await page.getByLabel('Password').fill('password')
   await continueButton.click()
-  await page.waitForURL('**/dashboard', { timeout: 20000 })
+  await page.waitForURL(url => !url.pathname.startsWith('/login'), { timeout: 20000 })
   await assertNoVisibleErrors(page, 'login')
 }
 

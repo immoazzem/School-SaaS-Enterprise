@@ -4,6 +4,31 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Frontend Checkpoint
 
+Current page/module complete: school operations hardening for offline helpers, marks/reports browser QA, and promotion execution safety.
+
+- Restored the missing offline workspace building blocks that `marks` and `attendance` already referenced:
+  - `apps/web/composables/useNetworkStatus.ts`
+  - `apps/web/composables/useOfflineDraft.ts`
+  - `apps/web/composables/useOfflineQueue.ts`
+  - `apps/web/components/OfflineNotice.vue`
+  - `apps/web/components/OfflineQueuePanel.vue`
+- Fixed large-seed selector limits:
+  - `apps/web/pages/schools/[schoolId]/attendance.vue` now loads active enrollments with `per_page=100`
+  - `apps/web/pages/schools/[schoolId]/promotions.vue` now loads the full academic-year/class option sets before frontend filtering
+- Added `apps/web/scripts/browser-phase-ops.mjs` for the next browser mutation cluster and updated `apps/web/scripts/browser-workflow-smoke.mjs` to match the rebuilt login flow and localhost default.
+- Browser QA passed for:
+  - marks create + verify
+  - reports publish + queue + file check
+- Promotion execution no longer fails in the API test suite when a target-year enrollment already exists or collides during execution:
+  - hardened `apps/api/app/Http/Controllers/Api/PromotionController.php`
+  - expanded `apps/api/tests/Feature/PhaseSixPromotionApiTest.php`
+- Verification after this pass:
+  - `cd apps/api && php artisan test --filter=PhaseSixPromotionApiTest` passed
+  - `cd apps/web && npm.cmd run build` passed
+- Known follow-up:
+  - after recycling the local PHP workers to shake out stale code, the local API host became unstable (`school-api.test` started returning `502 Bad Gateway`).
+  - browser auth and the full `qa:phase-ops` suite need a rerun once the local API host is healthy again.
+
 Current page/module complete: super-admin mutation QA passed across students, enrollments, employees, exams, and finance, with the enrollment picker fixed for seeded enterprise-scale data.
 
 - Fixed `apps/web/pages/schools/[schoolId]/enrollments.vue` so the enrollment form loads up to 100 active students instead of the default first page only.
