@@ -7,6 +7,7 @@ const i18nConfigPath = fileURLToPath(new URL('./i18n.config.ts', import.meta.url
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   ssr: false,
+  ...(process.env.NUXT_BUILD_DIR ? { buildDir: process.env.NUXT_BUILD_DIR } : {}),
 
   app: {
     head: {
@@ -100,6 +101,7 @@ export default defineNuxtConfig({
   },
 
   vite: {
+    ...(process.env.VITE_CACHE_DIR ? { cacheDir: process.env.VITE_CACHE_DIR } : {}),
     define: { 'process.env': {} },
 
     resolve: {

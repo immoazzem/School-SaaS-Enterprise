@@ -1291,6 +1291,26 @@ Verification:
 
 Current page after finishing this phase: extended operations QA.
 
+### Local App Run Checkpoint
+
+Current page/module complete: local app runtime verification.
+
+Scope:
+- API is running at `http://127.0.0.1:8010`.
+- Frontend preview is running at `http://127.0.0.1:3000`.
+- Added optional `NUXT_BUILD_DIR` and `VITE_CACHE_DIR` support for Windows cache fallback runs.
+- Ignored alternate Nuxt/Vite cache folders so local runtime cache experiments stay out of Git.
+
+Verification:
+- API `/up`: 200.
+- Frontend `/login`: 200.
+- Browser login with `superadmin@example.com / password` reached the dashboard.
+- Browser network confirmed 200 responses from `/api/v1/auth/login` and `/api/v1/schools/1/dashboard/summary`.
+- Browser console errors: none.
+- `npm run build`: passed with the existing classified Nuxt/Nitro/Node warnings.
+
+Current page after finishing this phase: local preview/dashboard runtime.
+
 ```text
 Read D:\Development\School-SaaS-Enterprise-CONTEXT.md and D:\Development\School-SaaS-Enterprise\docs\current-status.md.
 Continue from the current status.

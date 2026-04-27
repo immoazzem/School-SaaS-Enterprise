@@ -2,9 +2,11 @@
 .output
 .data
 .nuxt
+.nuxt-*
 .nitro
 .cache
 dist
+.vite-*
 
 # Node dependencies
 node_modules

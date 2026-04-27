@@ -1854,3 +1854,9 @@ Verification: `php artisan db:seed --class=DemoDataSeeder --force` passed; agent
 Scope: added `apps/web/scripts/browser-extended-ops.mjs` and `npm run qa:extended-ops` to cover mutation-heavy browser flows that were not part of the previous route smoke. The suite verifies payment gateway create/update, document upload plus signed-link retrieval, assignment creation, graded submission recording, assignment update, and timetable create/update/archive. While running the suite, the shared workspace shell CSS was fixed so the permanent left rail no longer overlays desktop content or intercepts form controls after scrolling.
 
 Verification: `npm run qa:extended-ops` passed and saved `docs/browser-checks/extended-ops-suite-20260427093228.png`. `npm run build` passed with the existing classified Nuxt/Nitro/Node warnings.
+
+### Local App Run Checkpoint
+
+Scope: ran the API on `http://127.0.0.1:8010` and the rebuilt frontend preview on `http://127.0.0.1:3000` without changing the installed Node version. Added optional Nuxt/Vite cache directory environment hooks and ignored alternate local cache folders so Windows dev-server cache experiments do not pollute Git status.
+
+Verification: API `/up` returned 200; frontend `/login` returned 200; browser login as `superadmin@example.com` reached the dashboard and loaded `/api/v1/auth/login` plus `/api/v1/schools/1/dashboard/summary` with 200 responses and no browser console errors. `npm run build` passed after rerunning with filesystem permission needed for Nuxt cache cleanup, with the existing classified Nuxt/Nitro/Node warnings.

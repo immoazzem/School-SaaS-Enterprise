@@ -15,9 +15,11 @@ coverage/
 
 # Nuxt / Node builds
 .nuxt/
+.nuxt-*/
 .output/
 dist/
 .vite/
+.vite-*/
 
 # Logs and OS files
 *.log
