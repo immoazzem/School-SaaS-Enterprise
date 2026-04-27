@@ -1311,6 +1311,26 @@ Verification:
 
 Current page after finishing this phase: local preview/dashboard runtime.
 
+### White Page Runtime Fix
+
+Current page/module complete: local frontend white-page recovery.
+
+Scope:
+- Local PWA/service-worker behavior now self-cleans old workers unless `NUXT_ENABLE_PWA=true`.
+- Dev service-worker registration is disabled by default to avoid stale bundles while rebuilding locally.
+- API is running at `http://127.0.0.1:8010`.
+- Frontend preview is running at `http://127.0.0.1:3000`.
+
+Verification:
+- `npm run build`: passed with existing classified Nuxt/Nitro/Node warnings.
+- `/sw.js`: returns the self-destroying unregister worker.
+- Browser smoke loaded `/login` and found the email field.
+- Browser login with `superadmin@example.com / password` reached the dashboard.
+- Browser network confirmed 200 responses from `/api/v1/auth/login` and `/api/v1/schools/1/dashboard/summary`.
+- Browser console errors: none.
+
+Current page after finishing this phase: local frontend white-page recovery.
+
 ```text
 Read D:\Development\School-SaaS-Enterprise-CONTEXT.md and D:\Development\School-SaaS-Enterprise\docs\current-status.md.
 Continue from the current status.

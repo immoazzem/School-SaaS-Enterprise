@@ -1860,3 +1860,9 @@ Verification: `npm run qa:extended-ops` passed and saved `docs/browser-checks/ex
 Scope: ran the API on `http://127.0.0.1:8010` and the rebuilt frontend preview on `http://127.0.0.1:3000` without changing the installed Node version. Added optional Nuxt/Vite cache directory environment hooks and ignored alternate local cache folders so Windows dev-server cache experiments do not pollute Git status.
 
 Verification: API `/up` returned 200; frontend `/login` returned 200; browser login as `superadmin@example.com` reached the dashboard and loaded `/api/v1/auth/login` plus `/api/v1/schools/1/dashboard/summary` with 200 responses and no browser console errors. `npm run build` passed after rerunning with filesystem permission needed for Nuxt cache cleanup, with the existing classified Nuxt/Nitro/Node warnings.
+
+### White Page Runtime Fix
+
+Scope: fixed the local white-page condition caused by stale PWA service-worker cache after repeated frontend rebuilds. Local builds now emit a self-destroying service worker unless `NUXT_ENABLE_PWA=true` is set, and dev-mode service worker registration is disabled by default. Production PWA behavior remains opt-in through that environment flag.
+
+Verification: `npm run build` passed with the existing classified Nuxt/Nitro/Node warnings; `http://127.0.0.1:3000/sw.js` now serves the unregistering cleanup worker; browser smoke loaded `/login`, found the email field, and login as `superadmin@example.com` reached the dashboard with 200 responses from `/api/v1/auth/login` and `/api/v1/schools/1/dashboard/summary` and no browser console errors.

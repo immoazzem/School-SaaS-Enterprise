@@ -3,6 +3,7 @@ import svgLoader from 'vite-svg-loader'
 import vuetify from 'vite-plugin-vuetify'
 
 const i18nConfigPath = fileURLToPath(new URL('./i18n.config.ts', import.meta.url))
+const enablePwa = process.env.NUXT_ENABLE_PWA === 'true'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -176,6 +177,7 @@ export default defineNuxtConfig({
   },
   
   pwa: {
+    selfDestroying: !enablePwa,
     registerType: 'autoUpdate',
     manifest: {
       name: 'School SaaS Enterprise',
@@ -214,7 +216,7 @@ export default defineNuxtConfig({
       ],
     },
     devOptions: {
-      enabled: true,
+      enabled: enablePwa,
       type: 'module',
     },
   },
