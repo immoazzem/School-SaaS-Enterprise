@@ -1162,11 +1162,11 @@ Local server note: Herd Desktop was not running in this Codex shell, so the brow
 Git status: Phase 6 Promotion workflow UI checkpoint is ready to commit and push.
 Next page/module: Phase 6 promotion hardening for large batches/job dispatch, lifecycle guardrails, and fuller browser execution demo data.
 
-### Phase 7E IndexedDB Offline Queue Foundation
+### Phase 7E Offline Queue Foundation
 
 Current page/module complete: Phase 7E queued offline sync foundation, routes `/schools/{schoolId}/attendance` and `/schools/{schoolId}/marks`.
 
-Scope: extended the PWA/offline slice from local drafts into a visible IndexedDB-backed write queue:
+Scope: extended the PWA/offline slice from local drafts into a visible browser-storage-backed write queue:
 - added `useOfflineQueue()` for durable queued writes with status, attempts, timestamps, endpoint, method, and payload metadata.
 - added `OfflineQueuePanel` for pending, failed, and conflicted local records.
 - Attendance now queues offline submissions and can replay them manually or when the browser returns online.
@@ -1174,7 +1174,7 @@ Scope: extended the PWA/offline slice from local drafts into a visible IndexedDB
 - successful sync removes queue records; validation/duplicate failures remain visible as conflicts; other sync errors remain visible as failed records.
 - updated `docs/phase-7e-offline-pwa-plan.md` from planned queue design to implemented queue foundation plus remaining hardening.
 
-Verification: `npm run build` from `apps/web` passed with the existing classified Nuxt/Nitro/Node warnings. Browser smoke used API `http://127.0.0.1:8030/api` and web `http://127.0.0.1:3000`; agent-browser opened `/schools/1/attendance`, queued an offline attendance record for `Assignment Demo Student` on `2026-04-21`, saved `docs/browser-checks/offline-attendance-queue.png`, returned online, synced the queue, and confirmed IndexedDB queue records were cleared. The Marks page loaded with queue wiring present; the current seeded school has no exam/class-subject options for a complete marks submission smoke test.
+Verification: `npm run build` from `apps/web` passed with the existing classified Nuxt/Nitro/Node warnings. Browser smoke used API `http://127.0.0.1:8030/api` and web `http://127.0.0.1:3000`; agent-browser opened `/schools/1/attendance`, queued an offline attendance record for `Assignment Demo Student` on `2026-04-21`, saved `docs/browser-checks/offline-attendance-queue.png`, returned online, synced the queue, and confirmed browser queue records were cleared. The Marks page loaded with queue wiring present; the current seeded school has no exam/class-subject options for a complete marks submission smoke test.
 
 Phase 7E status: PWA, offline drafts, and first queued write replay foundation are complete for Attendance and Marks. Remaining Phase 7E hardening: login-expiry stop flow, richer local-vs-server conflict review, service worker update deployment notes, and automated queue tests.
 
@@ -1191,7 +1191,7 @@ Scope: tightened the offline queue replay behavior:
 - Attendance and Marks now show accurate success/error messages based on that summary.
 - `OfflineQueuePanel` now shows ready/failed/conflict/auth-required counts, friendly status labels, attempt counts, and retained error text.
 
-Verification: `npm run build` from `apps/web` passed with the existing classified Nuxt/Nitro/Node warnings. Browser smoke used API `http://127.0.0.1:8030/api` and web `http://127.0.0.1:3000`; agent-browser queued a duplicate offline Attendance record for `Assignment Demo Student` on `2026-04-20`, synced online, confirmed the record stayed in IndexedDB as `conflict` with one attempt and retained error text, confirmed the page showed “1 attendance record need review before they can sync,” and saved `docs/browser-checks/offline-attendance-conflict.png`.
+Verification: `npm run build` from `apps/web` passed with the existing classified Nuxt/Nitro/Node warnings. Browser smoke used API `http://127.0.0.1:8030/api` and web `http://127.0.0.1:3000`; agent-browser queued a duplicate offline Attendance record for `Assignment Demo Student` on `2026-04-20`, synced online, confirmed the record stayed in the browser queue as `conflict` with one attempt and retained error text, confirmed the page showed “1 attendance record need review before they can sync,” and saved `docs/browser-checks/offline-attendance-conflict.png`.
 
 Phase 7E remaining hardening: one-click sign-in-again path from queue records, richer conflict review UI, service worker update deployment notes, and queue-focused automated tests.
 
@@ -1206,7 +1206,7 @@ Scope:
 - Preserve existing API contracts in `apps/web/app/composables/useApi.ts` unless a coordinated backend change is made.
 - Preserve auth/session behavior through `useAuth()`, Pinia auth store, and `useApi()` bearer token injection.
 - Preserve the Phase 7E queue behavior in Attendance and Marks while redesigning UI surfaces:
-  - queued writes are stored in IndexedDB.
+  - queued writes are stored in durable browser storage.
   - conflicts and auth-required records must remain visible.
   - records must not be silently discarded.
 - Dashboard design entry point: `apps/web/app/pages/dashboard.vue`.
@@ -1330,6 +1330,30 @@ Verification:
 - Browser console errors: none.
 
 Current page after finishing this phase: local frontend white-page recovery.
+
+### Phase 7E Queue Recovery UX And QA
+
+Current page/module complete: Phase 7E offline queue recovery hardening, routes `/schools/{schoolId}/attendance` and `/schools/{schoolId}/marks`.
+
+Scope:
+- Extended `useOfflineQueue()` with `syncing`, `auth_required`, attempt counts, last-attempt timestamps, retry reset, and stricter replay behavior.
+- API auth failures now mark the affected queue record as `auth_required` and stop replay instead of continuing with a stale session.
+- `OfflineQueuePanel` now shows per-status counts, friendly labels, attempt counts, retained errors, local payload review, retry controls, discard controls, and a sign-in-again action.
+- Attendance and Marks now expose queue retry and sign-in-again recovery actions.
+- Login now honors a safe local `redirect` query so auth recovery can return the operator to the same workspace after sign-in.
+- Added `apps/web/scripts/browser-offline-queue-recovery.mjs` and `npm run qa:offline-queue`.
+- Corrected `docs/phase-7e-offline-pwa-plan.md` so the implemented queue storage is documented truthfully as durable browser storage through localStorage; IndexedDB remains future hardening before larger offline capture is enabled.
+- Documented service-worker deployment/recovery notes in `docs/phase-7e-offline-pwa-plan.md`.
+
+Verification:
+- `npm run build`: passed with the existing classified Nuxt/Nitro/Node warnings.
+- Restarted the local Nuxt dev server after build cache churn; `/login` is reachable again at `http://localhost:3000/login`.
+- `npm run qa:offline-queue`: passed.
+- Browser QA injected auth-required and conflict queue records, verified payload review, retried a conflicted record, followed sign-in-again back to `/login?redirect=/schools/1/attendance`, and saved `docs/browser-checks/offline-queue-recovery-20260427111712.png`.
+
+Phase 7E status: offline queue recovery UX is now implemented and browser-tested for Attendance. Remaining hardening: move larger queues to IndexedDB, add server-side local-vs-server conflict comparison endpoints/UI, and extend the same browser queue QA to Marks once stable seeded marks options are guaranteed.
+
+Current page after finishing this phase: Phase 7E offline queue recovery.
 
 ```text
 Read D:\Development\School-SaaS-Enterprise-CONTEXT.md and D:\Development\School-SaaS-Enterprise\docs\current-status.md.

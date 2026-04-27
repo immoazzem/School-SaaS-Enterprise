@@ -20,14 +20,14 @@ export default defineNuxtRouteMiddleware(async to => {
   }
 
   if (!session.token.value)
-    return navigateTo('/login')
+    return navigateTo({ path: '/login', query: { redirect: to.fullPath } })
 
   if (!session.user.value && !session.loading.value) {
     try {
       await session.fetchMe()
     }
     catch {
-      return navigateTo('/login')
+      return navigateTo({ path: '/login', query: { redirect: to.fullPath } })
     }
   }
 })

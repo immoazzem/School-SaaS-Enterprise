@@ -203,8 +203,9 @@ async function syncMarksQueue() {
   )
   const retainedConflicts = marksQueueEntries.value.filter((entry) => entry.status === 'conflict').length
   const retainedFailures = marksQueueEntries.value.filter((entry) => entry.status === 'failed').length
+  const retainedAuthRequired = marksQueueEntries.value.filter((entry) => entry.status === 'auth_required').length
 
-  if (summary.authRequired) {
+  if (summary.authRequired || retainedAuthRequired) {
     error.value = 'Marks sync paused because your session expired. Sign in again, then sync the remaining queue.'
   } else if (summary.conflicts || retainedConflicts) {
     const count = summary.conflicts || retainedConflicts
@@ -219,6 +220,16 @@ async function syncMarksQueue() {
   }
 
   await loadWorkspace()
+}
+
+function retryQueuedMark(id: string) {
+  offlineQueue.markPending(id)
+  success.value = 'Marks queue item is ready to retry.'
+}
+
+async function signInForMarksQueue() {
+  await useSession().logout()
+  await navigateTo({ path: '/login', query: { redirect: route.fullPath } })
 }
 
 async function saveMark() {
@@ -365,6 +376,8 @@ onMounted(() => {
         :entries="marksQueueEntries"
         :syncing="offlineQueue.syncing.value"
         @discard="offlineQueue.remove"
+        @retry="retryQueuedMark"
+        @sign-in="signInForMarksQueue"
         @sync="syncMarksQueue"
       />
 

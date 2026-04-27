@@ -5,6 +5,7 @@ definePageMeta({
 })
 
 const session = useSession()
+const route = useRoute()
 const form = ref({
   email: 'test@example.com',
   password: 'password',
@@ -14,12 +15,21 @@ const form = ref({
 const isPasswordVisible = ref(false)
 const errorMessage = ref('')
 
+const redirectPath = computed(() => {
+  const redirect = Array.isArray(route.query.redirect) ? route.query.redirect[0] : route.query.redirect
+
+  if (!redirect || !redirect.startsWith('/') || redirect.startsWith('//'))
+    return '/'
+
+  return redirect
+})
+
 async function handleLogin() {
   errorMessage.value = ''
 
   try {
     await session.login(form.value.email, form.value.password)
-    await navigateTo('/')
+    await navigateTo(redirectPath.value)
   }
   catch (error: any) {
     errorMessage.value = error?.data?.message || error?.data?.errors?.email?.[0] || 'We could not sign you in with those credentials.'

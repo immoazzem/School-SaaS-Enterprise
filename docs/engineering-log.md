@@ -1769,12 +1769,12 @@ Phase 7E status: PWA and offline draft foundation is complete. Full automatic qu
 
 Next: commit and push this Phase 7E foundation checkpoint, then continue with queued sync or the next v3 priority.
 
-### Phase 7E IndexedDB Offline Queue Foundation
+### Phase 7E Offline Queue Foundation
 
 Current page/module complete: Phase 7E queued offline sync foundation, routes `/schools/{schoolId}/attendance` and `/schools/{schoolId}/marks`.
 
 Scope: implemented the first durable offline write queue:
-- added `apps/web/app/composables/useOfflineQueue.ts` backed by IndexedDB.
+- added `apps/web/app/composables/useOfflineQueue.ts` backed by durable browser storage.
 - added `apps/web/app/components/OfflineQueuePanel.vue`.
 - wired Attendance offline saves into queued `POST /schools/{school}/student-attendance-records` requests.
 - wired Marks offline saves into queued `POST /schools/{school}/marks-entries` requests.
@@ -1782,7 +1782,7 @@ Scope: implemented the first durable offline write queue:
 - retained failed/conflicted records for review instead of silently discarding them.
 - updated Phase 7E docs to distinguish implemented queue behavior from remaining conflict-review hardening.
 
-Verification: `npm run build` passed from `apps/web`. Browser smoke used Nuxt at `http://127.0.0.1:3000` and API at `http://127.0.0.1:8030/api`; agent-browser verified an Attendance queued record while offline, saved `docs/browser-checks/offline-attendance-queue.png`, returned online, synced successfully, and confirmed IndexedDB queue records were empty afterward. Marks route loaded with queue integration present, but full marks sync was not smoke-tested because the current seeded browser school has no exam/class-subject options.
+Verification: `npm run build` passed from `apps/web`. Browser smoke used Nuxt at `http://127.0.0.1:3000` and API at `http://127.0.0.1:8030/api`; agent-browser verified an Attendance queued record while offline, saved `docs/browser-checks/offline-attendance-queue.png`, returned online, synced successfully, and confirmed browser queue records were empty afterward. Marks route loaded with queue integration present, but full marks sync was not smoke-tested because the current seeded browser school has no exam/class-subject options.
 
 Phase 7E status: PWA/offline foundation plus first queued write replay foundation are complete. Remaining work: conflict resolution UI, `401` login-expiry stop flow, service worker update documentation, and queue-focused automated tests.
 
@@ -1866,3 +1866,18 @@ Verification: API `/up` returned 200; frontend `/login` returned 200; browser lo
 Scope: fixed the local white-page condition caused by stale PWA service-worker cache after repeated frontend rebuilds. Local builds now emit a self-destroying service worker unless `NUXT_ENABLE_PWA=true` is set, and dev-mode service worker registration is disabled by default. Production PWA behavior remains opt-in through that environment flag.
 
 Verification: `npm run build` passed with the existing classified Nuxt/Nitro/Node warnings; `http://127.0.0.1:3000/sw.js` now serves the unregistering cleanup worker; browser smoke loaded `/login`, found the email field, and login as `superadmin@example.com` reached the dashboard with 200 responses from `/api/v1/auth/login` and `/api/v1/schools/1/dashboard/summary` and no browser console errors.
+
+### Phase 7E Queue Recovery UX And QA
+
+Scope: completed the next offline queue hardening slice for Attendance and Marks:
+- `useOfflineQueue()` now supports `syncing`, `auth_required`, attempt counts, last-attempt timestamps, retry reset, and replay stop on auth expiry.
+- `OfflineQueuePanel` now exposes status counts, friendly labels, local payload review, retry, discard, and sign-in-again actions.
+- Attendance and Marks now wire queue retry plus sign-in-again recovery.
+- Login now supports safe local redirect return paths.
+- Added `apps/web/scripts/browser-offline-queue-recovery.mjs` and `npm run qa:offline-queue`.
+- Corrected `docs/phase-7e-offline-pwa-plan.md` to document current queue storage accurately as localStorage-backed durable browser storage, with IndexedDB left as the next scale-up step.
+- Added service-worker deploy/recovery notes to the Phase 7E plan.
+
+Verification: `npm run build` passed with the existing classified Nuxt/Nitro/Node warnings. The local Nuxt dev server on port 3000 was restarted after build cache churn. `npm run qa:offline-queue` passed; the browser suite injected auth-required and conflict queue records, verified local payload review, retried the conflict, followed sign-in-again to `/login?redirect=/schools/1/attendance`, and saved `docs/browser-checks/offline-queue-recovery-20260427111712.png`.
+
+Phase 7E status: recovery UX and browser QA are complete for Attendance. Remaining hardening is IndexedDB migration for larger queues, server-backed local-vs-server conflict comparison, and Marks-specific queue browser QA once seeded marks choices are stable.

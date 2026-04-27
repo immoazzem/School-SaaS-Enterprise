@@ -213,8 +213,9 @@ async function syncAttendanceQueue() {
   )
   const retainedConflicts = attendanceQueueEntries.value.filter((entry) => entry.status === 'conflict').length
   const retainedFailures = attendanceQueueEntries.value.filter((entry) => entry.status === 'failed').length
+  const retainedAuthRequired = attendanceQueueEntries.value.filter((entry) => entry.status === 'auth_required').length
 
-  if (summary.authRequired) {
+  if (summary.authRequired || retainedAuthRequired) {
     error.value = 'Attendance sync paused because your session expired. Sign in again, then sync the remaining queue.'
   } else if (summary.conflicts || retainedConflicts) {
     const count = summary.conflicts || retainedConflicts
@@ -229,6 +230,16 @@ async function syncAttendanceQueue() {
   }
 
   await loadRecords()
+}
+
+function retryQueuedAttendance(id: string) {
+  offlineQueue.markPending(id)
+  success.value = 'Attendance queue item is ready to retry.'
+}
+
+async function signInForAttendanceQueue() {
+  await useSession().logout()
+  await navigateTo({ path: '/login', query: { redirect: route.fullPath } })
 }
 
 function editRecord(record: StudentAttendanceRecord) {
@@ -364,6 +375,8 @@ onMounted(() => {
         :entries="attendanceQueueEntries"
         :syncing="offlineQueue.syncing.value"
         @discard="offlineQueue.remove"
+        @retry="retryQueuedAttendance"
+        @sign-in="signInForAttendanceQueue"
         @sync="syncAttendanceQueue"
       />
 
