@@ -50,8 +50,11 @@ async function goto(page, path) {
 
 async function login(page) {
   await goto(page, '/login')
-  await page.getByLabel('Work email').or(page.getByLabel('Email')).fill(qaEmail)
-  await page.getByLabel('Password').fill(qaPassword)
+  const emailField = page.locator('input[type="email"]').first()
+  const passwordField = page.locator('input[type="password"]').first()
+  await emailField.waitFor({ timeout: 15000 })
+  await emailField.fill(qaEmail)
+  await passwordField.fill(qaPassword)
   await page.getByRole('button', { name: /Enter workspace/i })
     .or(page.getByRole('button', { name: /Continue to Workspace/i }))
     .or(page.getByRole('button', { name: /^Continue$/i }))

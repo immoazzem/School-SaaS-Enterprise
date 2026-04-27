@@ -15,6 +15,7 @@ const stamp = process.env.QA_STAMP || new Date().toISOString().replace(/[-:.TZ]/
 const scriptDir = dirname(fileURLToPath(import.meta.url))
 const repoRoot = resolve(scriptDir, '../../..')
 const artifactDir = resolve(repoRoot, 'docs/browser-checks')
+const apiBase = process.env.QA_API_BASE || 'http://127.0.0.1:8010/api/v1'
 
 const results = []
 const qaEmail = process.env.QA_EMAIL || 'test@example.com'
@@ -22,6 +23,7 @@ const qaPassword = process.env.QA_PASSWORD || 'password'
 
 function isIgnorableConsoleError(message) {
   return message.includes("Failed to load resource: the server responded with a status of 404 ()")
+    || message.includes('Failed to load resource: the server responded with a status of 404 (Not Found)')
     || message.includes("[intlify] Not found 'Admin' key in 'en' locale messages.")
 }
 
@@ -58,14 +60,15 @@ async function goto(page, path) {
 async function login(page) {
   await page.goto(`${baseURL}/login`, { waitUntil: 'domcontentloaded' })
   await page.waitForLoadState('load')
-  const emailField = page.getByLabel('Work email').or(page.getByLabel('Email'))
+  const emailField = page.locator('input[type="email"]').first()
+  const passwordField = page.locator('input[type="password"]').first()
   const continueButton = page.getByRole('button', { name: /Enter workspace/i })
     .or(page.getByRole('button', { name: /Continue to Workspace/i }))
     .or(page.getByRole('button', { name: /^Continue$/i }))
 
   await emailField.waitFor({ timeout: 15000 })
-  await emailField.fill('test@example.com')
-  await page.getByLabel('Password').fill('password')
+  await emailField.fill(qaEmail)
+  await passwordField.fill(qaPassword)
   await continueButton.click()
   await page.waitForURL(url => !url.pathname.startsWith('/login'), { timeout: 20000 })
   await assertNoVisibleErrors(page, 'login')
@@ -224,7 +227,7 @@ async function testPromotions(page) {
 }
 
 async function preparePromotionsState() {
-  const loginResponse = await fetch('https://school-api.test/api/v1/auth/login', {
+  const loginResponse = await fetch(`${apiBase}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -247,7 +250,7 @@ async function preparePromotionsState() {
     Authorization: `Bearer ${token}`,
   }
 
-  const batchesResponse = await fetch(`https://school-api.test/api/v1/schools/${schoolId}/promotions`, {
+  const batchesResponse = await fetch(`${apiBase}/schools/${schoolId}/promotions`, {
     headers,
   })
 
@@ -269,7 +272,7 @@ async function preparePromotionsState() {
   }
 
   const rollbackResponse = await fetch(
-    `https://school-api.test/api/v1/schools/${schoolId}/promotions/${matchingBatch.id}/rollback`,
+    `${apiBase}/schools/${schoolId}/promotions/${matchingBatch.id}/rollback`,
     {
       method: 'POST',
       headers,

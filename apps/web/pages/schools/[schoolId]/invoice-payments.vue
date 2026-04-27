@@ -117,8 +117,8 @@ onMounted(loadWorkspace)
       <form class="surface record-form" @submit.prevent="recordPayment">
         <h2>Record payment</h2>
         <div class="field">
-          <label>Invoice</label>
-          <select v-model="form.student_invoice_id" required>
+          <label for="invoice-payment-invoice">Invoice</label>
+          <select id="invoice-payment-invoice" v-model="form.student_invoice_id" required>
             <option value="">Select invoice</option>
             <option v-for="invoice in invoices" :key="invoice.id" :value="invoice.id">
               {{ invoice.invoice_no }} / {{ invoice.total }} / {{ invoice.status }}
@@ -126,13 +126,13 @@ onMounted(loadWorkspace)
           </select>
         </div>
         <div class="form-row">
-          <div class="field"><label>Amount</label><input v-model="form.amount" required type="number" min="0.01" step="0.01" /></div>
-          <div class="field"><label>Paid on</label><input v-model="form.paid_on" required type="date" /></div>
+          <div class="field"><label for="invoice-payment-amount">Amount</label><input id="invoice-payment-amount" v-model="form.amount" required type="number" min="0.01" step="0.01" /></div>
+          <div class="field"><label for="invoice-payment-paid-on">Paid on</label><input id="invoice-payment-paid-on" v-model="form.paid_on" required type="date" /></div>
         </div>
         <div class="form-row">
           <div class="field">
-            <label>Method</label>
-            <select v-model="form.payment_method">
+            <label for="invoice-payment-method">Method</label>
+            <select id="invoice-payment-method" v-model="form.payment_method">
               <option value="cash">Cash</option>
               <option value="bkash">bKash</option>
               <option value="nagad">Nagad</option>
@@ -142,9 +142,9 @@ onMounted(loadWorkspace)
               <option value="other">Other</option>
             </select>
           </div>
-          <div class="field"><label>Transaction ref</label><input v-model="form.transaction_ref" type="text" /></div>
+          <div class="field"><label for="invoice-payment-transaction-ref">Transaction ref</label><input id="invoice-payment-transaction-ref" v-model="form.transaction_ref" type="text" /></div>
         </div>
-        <div class="field"><label>Notes</label><input v-model="form.notes" type="text" /></div>
+        <div class="field"><label for="invoice-payment-notes">Notes</label><input id="invoice-payment-notes" v-model="form.notes" type="text" /></div>
         <VAlert v-if="error" type="error" variant="tonal">{{ error }}</VAlert>
         <VAlert v-if="success" type="success" variant="tonal">{{ success }}</VAlert>
         <VBtn color="primary" :loading="saving" type="submit">Record payment</VBtn>

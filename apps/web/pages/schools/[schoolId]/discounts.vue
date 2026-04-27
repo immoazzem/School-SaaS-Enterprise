@@ -168,22 +168,22 @@ onMounted(loadWorkspace)
       <form class="surface record-form" @submit.prevent="savePolicy">
         <h2>Discount policy</h2>
         <div class="form-row">
-          <div class="field"><label>Name</label><input v-model="policyForm.name" required type="text" /></div>
-          <div class="field"><label>Code</label><input v-model="policyForm.code" required type="text" /></div>
+          <div class="field"><label for="discount-policy-name">Name</label><input id="discount-policy-name" v-model="policyForm.name" required type="text" /></div>
+          <div class="field"><label for="discount-policy-code">Code</label><input id="discount-policy-code" v-model="policyForm.code" required type="text" /></div>
         </div>
         <div class="form-row">
           <div class="field">
-            <label>Type</label>
-            <select v-model="policyForm.discount_type">
+            <label for="discount-policy-type">Type</label>
+            <select id="discount-policy-type" v-model="policyForm.discount_type">
               <option value="flat">Flat</option>
               <option value="percent">Percent</option>
             </select>
           </div>
-          <div class="field"><label>Amount</label><input v-model="policyForm.amount" required type="number" min="0" step="0.01" /></div>
+          <div class="field"><label for="discount-policy-amount">Amount</label><input id="discount-policy-amount" v-model="policyForm.amount" required type="number" min="0" step="0.01" /></div>
         </div>
         <div class="field">
-          <label>Category scope</label>
-          <select v-model="policyForm.applies_to_category_ids" multiple>
+          <label for="discount-policy-category-scope">Category scope</label>
+          <select id="discount-policy-category-scope" v-model="policyForm.applies_to_category_ids" multiple>
             <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
           </select>
         </div>
@@ -194,8 +194,8 @@ onMounted(loadWorkspace)
       <form class="surface record-form" @submit.prevent="saveStudentDiscount">
         <h2>Assign student discount</h2>
         <div class="field">
-          <label>Student enrollment</label>
-          <select v-model="studentDiscountForm.student_enrollment_id" required>
+          <label for="student-discount-enrollment">Student enrollment</label>
+          <select id="student-discount-enrollment" v-model="studentDiscountForm.student_enrollment_id" required>
             <option value="">Select enrollment</option>
             <option v-for="enrollment in enrollments" :key="enrollment.id" :value="enrollment.id">
               {{ enrollment.student?.full_name || enrollment.student_id }} / {{ enrollment.roll_no || 'No roll' }}
@@ -203,20 +203,20 @@ onMounted(loadWorkspace)
           </select>
         </div>
         <div class="field">
-          <label>Policy</label>
-          <select v-model="studentDiscountForm.discount_policy_id" required>
+          <label for="student-discount-policy">Policy</label>
+          <select id="student-discount-policy" v-model="studentDiscountForm.discount_policy_id" required>
             <option value="">Select policy</option>
             <option v-for="policy in policies" :key="policy.id" :value="policy.id">{{ policy.name }}</option>
           </select>
         </div>
         <div class="field">
-          <label>Academic year</label>
-          <select v-model="studentDiscountForm.academic_year_id" required>
+          <label for="student-discount-academic-year">Academic year</label>
+          <select id="student-discount-academic-year" v-model="studentDiscountForm.academic_year_id" required>
             <option value="">Select year</option>
             <option v-for="year in academicYears" :key="year.id" :value="year.id">{{ year.name }}</option>
           </select>
         </div>
-        <div class="field"><label>Notes</label><input v-model="studentDiscountForm.notes" type="text" /></div>
+        <div class="field"><label for="student-discount-notes">Notes</label><input id="student-discount-notes" v-model="studentDiscountForm.notes" type="text" /></div>
         <VBtn color="primary" :loading="savingDiscount" type="submit">Assign discount</VBtn>
       </form>
     </section>

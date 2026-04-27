@@ -11,6 +11,11 @@ const repoRoot = resolve(scriptDir, '../../..')
 const artifactDir = resolve(repoRoot, 'docs/browser-checks')
 
 const results = []
+const qaContext = {
+  enrollmentRoll: '',
+  guardianName: '',
+  studentName: '',
+}
 
 function record(name, status, detail = '') {
   const line = `${status === 'pass' ? 'PASS' : 'FAIL'} ${name}${detail ? ` - ${detail}` : ''}`
@@ -36,21 +41,24 @@ async function assertNoVisibleErrors(page, name) {
 }
 
 async function goto(page, path) {
-  await page.goto(`${baseURL}${path}`, { waitUntil: 'networkidle' })
+  await page.goto(`${baseURL}${path}`, { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('load')
   await page.waitForTimeout(450)
   await assertNoVisibleErrors(page, path)
 }
 
 async function login(page) {
-  await page.goto(baseURL, { waitUntil: 'networkidle' })
-  const emailField = page.getByLabel('Work email').or(page.getByLabel('Email'))
-  const continueButton = page.getByRole('button', { name: /Enter workspace/i })
-    .or(page.getByRole('button', { name: /Continue to Workspace/i }))
-    .or(page.getByRole('button', { name: /^Continue$/i }))
+  await page.goto(`${baseURL}/login`, { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('load')
+  await page.waitForTimeout(700)
+  const emailField = page.locator('input[type="email"]').first()
+  const passwordField = page.locator('input[type="password"]').first()
+  const continueButton = page.locator('form button[type="submit"]').first()
 
+  await emailField.waitFor({ timeout: 15000 })
   await emailField.fill('test@example.com')
-  await page.getByLabel('Password').fill('password')
-  await continueButton.click()
+  await passwordField.fill('password')
+  await continueButton.click({ force: true })
   await page.waitForURL(url => !url.pathname.startsWith('/login'), { timeout: 20000 })
   await assertNoVisibleErrors(page, 'login')
 }
@@ -244,30 +252,67 @@ async function testStudentGuardian(page) {
   await fillLabel(page, 'Phone', '+8801799999999', 1)
   await clickButton(page, 'Update student')
   await expectText(page, 'Student updated.')
-  await archiveRow(page, student)
-  await page.locator('input[placeholder="Search"]').first().fill(guardian)
-  await page.getByRole('button', { name: 'Search' }).first().click()
-  await archiveRow(page, guardian)
+  qaContext.guardianName = guardian
+  qaContext.studentName = student
   record('Guardians/students create/update/archive', 'pass', stamp)
+}
+
+async function testEnrollment(page) {
+  const roll = `QA-ROLL-${stamp.slice(-6)}`
+  await goto(page, `/schools/${schoolId}/enrollments`)
+  await selectLabel(page, 'Student', qaContext.studentName)
+  await selectFirstNonEmptyLabel(page, 'Academic year')
+  await selectFirstNonEmptyLabel(page, 'Class')
+  await fillLabel(page, 'Roll no', roll)
+  await fillLabel(page, 'Enrolled on', '2026-04-21')
+  await clickButton(page, 'Save enrollment')
+  await expectText(page, 'Enrollment saved.')
+  qaContext.enrollmentRoll = roll
+  record('Enrollment create', 'pass', roll)
 }
 
 async function testAttendance(page) {
   const day = String((Number(stamp.slice(-2)) % 27) + 1).padStart(2, '0')
   const attendanceDate = `2026-08-${day}`
+  const attendanceRow = () => page.getByRole('row').filter({ hasText: qaContext.studentName }).filter({ hasText: attendanceDate }).first()
   await goto(page, `/schools/${schoolId}/attendance`)
-  await selectFirstNonEmptyLabel(page, 'Student enrollment')
+  await selectLabel(page, 'Student enrollment', qaContext.studentName)
   await fillLabel(page, 'Date', attendanceDate)
   await selectLabel(page, 'Status', 'Late')
   await fillLabel(page, 'Remarks', `QA attendance ${stamp}`)
   await clickButton(page, 'Save attendance')
   await expectText(page, 'Attendance saved.')
-  await page.getByRole('row').filter({ hasText: attendanceDate }).getByRole('button', { name: 'Edit' }).click()
+  await attendanceRow().getByRole('button', { name: 'Edit' }).click()
   await selectLabel(page, 'Status', 'Present')
   await fillLabel(page, 'Remarks', `QA attendance updated ${stamp}`)
   await clickButton(page, 'Update attendance')
   await expectText(page, 'Attendance updated.')
-  await page.getByRole('row').filter({ hasText: attendanceDate }).getByRole('button', { name: 'Delete' }).click()
+  await attendanceRow().getByRole('button', { name: 'Delete' }).click()
   record('Attendance create/update/delete', 'pass', stamp)
+}
+
+async function cleanupStudentFixtures(page) {
+  if (qaContext.enrollmentRoll) {
+    await goto(page, `/schools/${schoolId}/enrollments`)
+    await page.locator('input[placeholder="Search student or roll"]').fill(qaContext.studentName)
+    await page.getByRole('button', { name: 'Search' }).click()
+    await archiveRow(page, qaContext.studentName)
+  }
+
+  if (qaContext.studentName) {
+    await goto(page, `/schools/${schoolId}/students`)
+    await page.locator('input[placeholder="Search"]').nth(1).fill(qaContext.studentName)
+    await page.getByRole('button', { name: 'Search' }).nth(1).click()
+    await archiveRow(page, qaContext.studentName)
+  }
+
+  if (qaContext.guardianName) {
+    await page.locator('input[placeholder="Search"]').first().fill(qaContext.guardianName)
+    await page.getByRole('button', { name: 'Search' }).first().click()
+    await archiveRow(page, qaContext.guardianName)
+  }
+
+  record('Student fixture cleanup', 'pass', qaContext.studentName || stamp)
 }
 
 async function testCalendar(page) {
@@ -361,10 +406,12 @@ try {
   await runStep('Subjects', testSubject, page)
   await runStep('Groups shifts designations', testGroupShiftDesignation, page)
   await runStep('Students guardians', testStudentGuardian, page)
+  await runStep('Enrollment', testEnrollment, page)
   await runStep('Attendance', testAttendance, page)
   await runStep('Calendar', testCalendar, page)
   await runStep('Finance', testFinance, page)
   await runStep('Reports', testReports, page)
+  await runStep('Fixture cleanup', cleanupStudentFixtures, page)
 
   if (browserErrors.length) {
     throw new Error(`Browser console errors: ${browserErrors.join(' | ')}`)

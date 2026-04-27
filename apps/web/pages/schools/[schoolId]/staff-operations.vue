@@ -299,15 +299,15 @@ onMounted(loadWorkspace)
           </div>
           <div class="form-row">
             <div class="field">
-              <label>Employee</label>
-              <select v-model="salaryForm.employee_id" required>
+              <label for="salary-employee">Employee</label>
+              <select id="salary-employee" v-model="salaryForm.employee_id" required>
                 <option value="">Select employee</option>
                 <option v-for="employee in employees" :key="employee.id" :value="employee.id">{{ employee.full_name }}</option>
               </select>
             </div>
             <div class="field">
-              <label>Academic year</label>
-              <select v-model="salaryForm.academic_year_id" required>
+              <label for="salary-academic-year">Academic year</label>
+              <select id="salary-academic-year" v-model="salaryForm.academic_year_id" required>
                 <option value="">Select year</option>
                 <option v-for="year in academicYears" :key="year.id" :value="year.id">{{ year.name }}</option>
               </select>
@@ -315,32 +315,32 @@ onMounted(loadWorkspace)
           </div>
           <div class="form-row">
             <div class="field">
-              <label>Month</label>
-              <input v-model="salaryForm.month" required type="month" />
+              <label for="salary-month">Month</label>
+              <input id="salary-month" v-model="salaryForm.month" required type="month" />
             </div>
             <div class="field">
-              <label>Basic amount</label>
-              <input v-model="salaryForm.basic_amount" required min="0" type="number" />
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="field">
-              <label>HRA</label>
-              <input v-model="salaryForm.hra" min="0" type="number" />
-            </div>
-            <div class="field">
-              <label>Medical</label>
-              <input v-model="salaryForm.medical" min="0" type="number" />
+              <label for="salary-basic-amount">Basic amount</label>
+              <input id="salary-basic-amount" v-model="salaryForm.basic_amount" required min="0" type="number" />
             </div>
           </div>
           <div class="form-row">
             <div class="field">
-              <label>Provident fund</label>
-              <input v-model="salaryForm.provident_fund" min="0" type="number" />
+              <label for="salary-hra">HRA</label>
+              <input id="salary-hra" v-model="salaryForm.hra" min="0" type="number" />
             </div>
             <div class="field">
-              <label>Income tax</label>
-              <input v-model="salaryForm.income_tax" min="0" type="number" />
+              <label for="salary-medical">Medical</label>
+              <input id="salary-medical" v-model="salaryForm.medical" min="0" type="number" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label for="salary-provident-fund">Provident fund</label>
+              <input id="salary-provident-fund" v-model="salaryForm.provident_fund" min="0" type="number" />
+            </div>
+            <div class="field">
+              <label for="salary-income-tax">Income tax</label>
+              <input id="salary-income-tax" v-model="salaryForm.income_tax" min="0" type="number" />
             </div>
           </div>
           <button class="button" type="submit" :disabled="savingSalary">{{ savingSalary ? 'Saving salary' : 'Save salary' }}</button>
@@ -352,20 +352,20 @@ onMounted(loadWorkspace)
             <h2>Record day status</h2>
           </div>
           <div class="field">
-            <label>Employee</label>
-            <select v-model="attendanceForm.employee_id" required>
+            <label for="staff-attendance-employee">Employee</label>
+            <select id="staff-attendance-employee" v-model="attendanceForm.employee_id" required>
               <option value="">Select employee</option>
               <option v-for="employee in employees" :key="employee.id" :value="employee.id">{{ employee.full_name }}</option>
             </select>
           </div>
           <div class="form-row">
             <div class="field">
-              <label>Date</label>
-              <input v-model="attendanceForm.date" required type="date" />
+              <label for="staff-attendance-date">Date</label>
+              <input id="staff-attendance-date" v-model="attendanceForm.date" required type="date" />
             </div>
             <div class="field">
-              <label>Status</label>
-              <select v-model="attendanceForm.status">
+              <label for="staff-attendance-status">Status</label>
+              <select id="staff-attendance-status" v-model="attendanceForm.status">
                 <option value="present">Present</option>
                 <option value="absent">Absent</option>
                 <option value="late">Late</option>
@@ -376,12 +376,12 @@ onMounted(loadWorkspace)
           </div>
           <div class="form-row">
             <div class="field">
-              <label>Check in</label>
-              <input v-model="attendanceForm.check_in_time" type="time" />
+              <label for="staff-attendance-check-in">Check in</label>
+              <input id="staff-attendance-check-in" v-model="attendanceForm.check_in_time" type="time" />
             </div>
             <div class="field">
-              <label>Check out</label>
-              <input v-model="attendanceForm.check_out_time" type="time" />
+              <label for="staff-attendance-check-out">Check out</label>
+              <input id="staff-attendance-check-out" v-model="attendanceForm.check_out_time" type="time" />
             </div>
           </div>
           <button class="button" type="submit" :disabled="savingAttendance">{{ savingAttendance ? 'Saving attendance' : 'Save attendance' }}</button>
@@ -396,17 +396,17 @@ onMounted(loadWorkspace)
           </div>
           <div class="form-row">
             <div class="field">
-              <label>Name</label>
-              <input v-model="leaveTypeForm.name" required type="text" placeholder="Casual Leave" />
+              <label for="leave-type-name">Name</label>
+              <input id="leave-type-name" v-model="leaveTypeForm.name" required type="text" placeholder="Casual Leave" />
             </div>
             <div class="field">
-              <label>Code</label>
-              <input v-model="leaveTypeForm.code" required type="text" placeholder="CL" />
+              <label for="leave-type-code">Code</label>
+              <input id="leave-type-code" v-model="leaveTypeForm.code" required type="text" placeholder="CL" />
             </div>
           </div>
           <div class="field">
-            <label>Max days</label>
-            <input v-model="leaveTypeForm.max_days_per_year" min="0" max="255" type="number" />
+            <label for="leave-type-max-days">Max days</label>
+            <input id="leave-type-max-days" v-model="leaveTypeForm.max_days_per_year" min="0" max="255" type="number" />
           </div>
           <button class="button" type="submit" :disabled="savingLeaveType">{{ savingLeaveType ? 'Saving type' : 'Save leave type' }}</button>
         </form>
@@ -417,31 +417,31 @@ onMounted(loadWorkspace)
             <h2>Assign annual balance</h2>
           </div>
           <div class="field">
-            <label>Employee</label>
-            <select v-model="leaveBalanceForm.employee_id" required>
+            <label for="leave-balance-employee">Employee</label>
+            <select id="leave-balance-employee" v-model="leaveBalanceForm.employee_id" required>
               <option value="">Select employee</option>
               <option v-for="employee in employees" :key="employee.id" :value="employee.id">{{ employee.full_name }}</option>
             </select>
           </div>
           <div class="form-row">
             <div class="field">
-              <label>Leave type</label>
-              <select v-model="leaveBalanceForm.leave_type_id" required>
+              <label for="leave-balance-type">Leave type</label>
+              <select id="leave-balance-type" v-model="leaveBalanceForm.leave_type_id" required>
                 <option value="">Select leave type</option>
                 <option v-for="leaveType in leaveTypes" :key="leaveType.id" :value="leaveType.id">{{ leaveType.name }}</option>
               </select>
             </div>
             <div class="field">
-              <label>Academic year</label>
-              <select v-model="leaveBalanceForm.academic_year_id" required>
+              <label for="leave-balance-academic-year">Academic year</label>
+              <select id="leave-balance-academic-year" v-model="leaveBalanceForm.academic_year_id" required>
                 <option value="">Select year</option>
                 <option v-for="year in academicYears" :key="year.id" :value="year.id">{{ year.name }}</option>
               </select>
             </div>
           </div>
           <div class="field">
-            <label>Total days</label>
-            <input v-model="leaveBalanceForm.total_days" min="0" max="255" type="number" />
+            <label for="leave-balance-total-days">Total days</label>
+            <input id="leave-balance-total-days" v-model="leaveBalanceForm.total_days" min="0" max="255" type="number" />
           </div>
           <button class="button" type="submit" :disabled="savingLeaveBalance">{{ savingLeaveBalance ? 'Saving balance' : 'Save balance' }}</button>
         </form>
@@ -454,34 +454,34 @@ onMounted(loadWorkspace)
         </div>
         <div class="form-row">
           <div class="field">
-            <label>Employee</label>
-            <select v-model="leaveApplicationForm.employee_id" required>
+            <label for="leave-application-employee">Employee</label>
+            <select id="leave-application-employee" v-model="leaveApplicationForm.employee_id" required>
               <option value="">Select employee</option>
               <option v-for="employee in employees" :key="employee.id" :value="employee.id">{{ employee.full_name }}</option>
             </select>
           </div>
           <div class="field">
-            <label>Leave type</label>
-            <select v-model="leaveApplicationForm.leave_type_id" required>
+            <label for="leave-application-type">Leave type</label>
+            <select id="leave-application-type" v-model="leaveApplicationForm.leave_type_id" required>
               <option value="">Select leave type</option>
               <option v-for="leaveType in leaveTypes" :key="leaveType.id" :value="leaveType.id">{{ leaveType.name }}</option>
             </select>
           </div>
         </div>
         <div class="form-row">
-          <div class="field">
-            <label>From</label>
-            <input v-model="leaveApplicationForm.from_date" required type="date" />
+            <div class="field">
+              <label for="leave-application-from">From</label>
+              <input id="leave-application-from" v-model="leaveApplicationForm.from_date" required type="date" />
+            </div>
+            <div class="field">
+              <label for="leave-application-to">To</label>
+              <input id="leave-application-to" v-model="leaveApplicationForm.to_date" required type="date" />
+            </div>
           </div>
           <div class="field">
-            <label>To</label>
-            <input v-model="leaveApplicationForm.to_date" required type="date" />
+            <label for="leave-application-reason">Reason</label>
+            <input id="leave-application-reason" v-model="leaveApplicationForm.reason" required type="text" />
           </div>
-        </div>
-        <div class="field">
-          <label>Reason</label>
-          <input v-model="leaveApplicationForm.reason" required type="text" />
-        </div>
         <button class="button" type="submit" :disabled="savingLeaveApplication">{{ savingLeaveApplication ? 'Submitting leave' : 'Submit leave' }}</button>
       </form>
 

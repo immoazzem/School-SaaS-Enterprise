@@ -2,6 +2,32 @@
 
 ## Latest Resume Point
 
+- Ops mutation and full browser QA recovery completed on 2026-04-25.
+- Added:
+  - `apps/web/scripts/browser-ops-mutation.mjs`
+  - `qa:ops-mutation` in `apps/web/package.json`
+- Important fixes:
+  - staff operations, invoice payments, and discounts now have stable label/id associations for accessibility and browser automation.
+  - admin school onboarding now shows row-level loading and success feedback.
+  - browser login helpers now target the rebuilt form controls reliably.
+  - the full smoke workflow now creates an enrollment before taking attendance and then cleans up the test enrollment/student/guardian fixtures.
+  - phase QA now uses `QA_API_BASE` instead of hard-coding `school-api.test`.
+- Verified this pass:
+  - `cd apps/web && npm.cmd run qa:ops-mutation`
+  - `cd apps/web && npm.cmd run qa:admin-ops`
+  - `cd apps/web && npm.cmd run qa:phase-ops`
+  - `cd apps/web && npm.cmd run qa:browser`
+  - `cd apps/web && npm.cmd run build`
+- Useful artifacts:
+  - `docs/browser-checks/ops-mutation-suite-20260423070417.png`
+  - `docs/browser-checks/admin-ops-suite-20260423070417.png`
+  - `docs/browser-checks/phase-ops-suite-20260423071329.png`
+  - `docs/browser-checks/workflow-smoke-20260425013902.png`
+- Environment note:
+  - stable local browser QA used `NUXT_PUBLIC_API_BASE=http://127.0.0.1:8010/api` with Laravel served via `php -S 127.0.0.1:8010 -t public public/index.php`.
+- Immediate next step:
+  - continue mutation QA into payment gateways, documents, assignments, timetable, calendar edge cases, and role-specific portal actions.
+
 - Enterprise admin browser harness completed on 2026-04-23.
 - Added:
   - `apps/web/scripts/browser-admin-ops.mjs`

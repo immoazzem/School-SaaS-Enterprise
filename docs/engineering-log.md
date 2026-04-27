@@ -12,6 +12,47 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 - Mention the current page/module in progress and phase completion notes.
 - Use visible agent-browser checks during UI phases when the dev server is available.
 
+## 2026-04-25
+
+### Pending Checkpoint - Ops Mutation And Full Browser QA Recovery
+
+Current page/module complete: staff operations, finance mutation paths, enterprise onboarding, phase ops, and the full browser smoke workflow are green again on the rebuilt frontend.
+
+Scope:
+- added `apps/web/scripts/browser-ops-mutation.mjs`.
+- added `qa:ops-mutation` to `apps/web/package.json`.
+- fixed label associations and stable field ids in:
+  - `apps/web/pages/schools/[schoolId]/staff-operations.vue`
+  - `apps/web/pages/schools/[schoolId]/invoice-payments.vue`
+  - `apps/web/pages/schools/[schoolId]/discounts.vue`
+- improved `apps/web/pages/admin/schools.vue` so school onboarding has row-level loading and a visible success state.
+- hardened existing browser harnesses:
+  - `apps/web/scripts/browser-admin-ops.mjs`
+  - `apps/web/scripts/browser-phase-ops.mjs`
+  - `apps/web/scripts/browser-workflow-smoke.mjs`
+- repaired the full smoke workflow so it creates a student enrollment before attendance and cleans up the test student/guardian/enrollment afterward.
+
+Verification:
+- `cd apps/web && npm.cmd run qa:ops-mutation`: passed.
+- `cd apps/web && npm.cmd run qa:admin-ops`: passed.
+- `cd apps/web && npm.cmd run qa:phase-ops`: passed.
+- `cd apps/web && npm.cmd run qa:browser`: passed with 12 workflow checks.
+- `cd apps/web && npm.cmd run build`: passed.
+- browser artifacts saved at:
+  - `docs/browser-checks/ops-mutation-suite-20260423070417.png`
+  - `docs/browser-checks/admin-ops-suite-20260423070417.png`
+  - `docs/browser-checks/phase-ops-suite-20260423071329.png`
+  - `docs/browser-checks/workflow-smoke-20260425013902.png`
+
+Notes:
+- Herd/`school-api.test` became unstable during this pass, so local browser QA was stabilized by pointing the frontend to `http://127.0.0.1:8010/api` and serving Laravel with `php -S 127.0.0.1:8010 -t public public/index.php`.
+- The old smoke test was hiding a workflow mistake: it tried to take attendance for a student that had not been enrolled yet. The smoke script now follows the product data model.
+- `npm run build` still emits the same known Nuxt/Nitro warnings already tracked elsewhere.
+
+Next:
+- checkpoint and push this QA recovery slice.
+- continue into the next uncovered mutation cluster: payment gateways, documents, assignments, timetable, and role-specific portal mutations.
+
 ## 2026-04-23
 
 ### Pending Checkpoint - Enterprise Admin Ops Browser Harness

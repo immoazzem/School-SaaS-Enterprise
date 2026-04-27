@@ -19,7 +19,9 @@ const api = useApi()
 const { canAccessEnterpriseAdmin } = useEnterpriseAccess()
 const schools = ref<AdminSchool[]>([])
 const loading = ref(false)
+const onboardingId = ref<number | null>(null)
 const error = ref('')
+const success = ref('')
 
 async function loadSchools() {
   if (!canAccessEnterpriseAdmin.value) {
@@ -46,8 +48,20 @@ async function onboardSchool(id: number) {
   if (!canAccessEnterpriseAdmin.value)
     return
 
-  await api.request(`/admin/schools/${id}/onboard`, { method: 'POST' })
-  await loadSchools()
+  onboardingId.value = id
+  error.value = ''
+  success.value = ''
+  try {
+    await api.request(`/admin/schools/${id}/onboard`, { method: 'POST' })
+    success.value = 'School onboarding completed.'
+    await loadSchools()
+  }
+  catch (onboardError) {
+    error.value = onboardError instanceof Error ? onboardError.message : 'Unable to onboard school.'
+  }
+  finally {
+    onboardingId.value = null
+  }
 }
 
 onMounted(loadSchools)
@@ -65,6 +79,7 @@ onMounted(loadSchools)
       Portfolio school administration is limited to enterprise super admins.
     </VAlert>
     <VAlert v-else-if="error" type="error" variant="tonal" class="mb-4">{{ error }}</VAlert>
+    <VAlert v-else-if="success" type="success" variant="tonal" class="mb-4">{{ success }}</VAlert>
     <VCard class="school-signal-card">
       <VCardText class="pt-2">
         <VTable class="school-data-table">
@@ -78,7 +93,7 @@ onMounted(loadSchools)
               <td>{{ school.students_count ?? 0 }}</td>
               <td class="d-flex gap-2">
                 <VBtn size="small" variant="outlined" color="default" :to="`/schools/${school.id}/students`">Open</VBtn>
-                <VBtn size="small" color="primary" @click="onboardSchool(school.id)">Onboard</VBtn>
+                <VBtn size="small" color="primary" :loading="onboardingId === school.id" @click="onboardSchool(school.id)">Onboard</VBtn>
               </td>
             </tr>
             <tr v-if="!schools.length && !loading"><td colspan="6">{{ canAccessEnterpriseAdmin ? 'No schools returned.' : 'Enterprise access required.' }}</td></tr>

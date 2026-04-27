@@ -4,6 +4,40 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Frontend Checkpoint
 
+Current page/module complete: staff, finance, admin onboarding, phase-ops, and full school-workflow browser QA recovery.
+
+- Added `apps/web/scripts/browser-ops-mutation.mjs` for repeatable super-admin mutation QA across:
+  - employee create/edit/archive
+  - staff salary and attendance records
+  - finance category, fee structure, manual invoice, invoice payment, and discount policy
+  - enterprise school onboarding action
+- Hardened the rebuilt UI for automation and accessibility by associating labels/ids in:
+  - `apps/web/pages/schools/[schoolId]/staff-operations.vue`
+  - `apps/web/pages/schools/[schoolId]/invoice-payments.vue`
+  - `apps/web/pages/schools/[schoolId]/discounts.vue`
+- Improved `apps/web/pages/admin/schools.vue` so onboarding actions show row loading and a clear success state.
+- Hardened browser QA scripts for the rebuilt frontend:
+  - login now targets the real submit control
+  - smoke QA creates an enrollment before attendance, then cleans up student fixtures
+  - phase QA uses `QA_API_BASE` instead of a hard-coded `school-api.test`
+- Latest useful browser artifacts:
+  - `docs/browser-checks/ops-mutation-suite-20260423070417.png`
+  - `docs/browser-checks/admin-ops-suite-20260423070417.png`
+  - `docs/browser-checks/phase-ops-suite-20260423071329.png`
+  - `docs/browser-checks/workflow-smoke-20260425013902.png`
+- Verification after this pass:
+  - `cd apps/web && npm.cmd run qa:ops-mutation` passed
+  - `cd apps/web && npm.cmd run qa:admin-ops` passed
+  - `cd apps/web && npm.cmd run qa:phase-ops` passed
+  - `cd apps/web && npm.cmd run qa:browser` passed with 12 workflow checks
+  - `cd apps/web && npm.cmd run build` passed
+- Environment note:
+  - for stable local browser QA, the frontend is currently pointed at `http://127.0.0.1:8010/api` and the Laravel API was served with `php -S 127.0.0.1:8010 -t public public/index.php` when Herd/FastCGI became unstable.
+- Known follow-up:
+  - continue the next module-by-module mutation pass into remaining edge flows: payment gateways, documents, assignments, timetable, calendar edge cases, and role-specific portal mutations.
+
+## Latest Frontend Checkpoint
+
 Current page/module complete: enterprise admin and invitation browser QA harness.
 
 - Added `apps/web/scripts/browser-admin-ops.mjs` for repeatable super-admin QA across:
