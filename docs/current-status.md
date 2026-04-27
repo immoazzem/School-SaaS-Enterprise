@@ -1273,6 +1273,24 @@ Verification:
 
 ## New Session Startup Prompt
 
+### Extended Operations Mutation QA Checkpoint
+
+Current page/module complete: extended operational browser QA for payment gateways, documents, assignments, submissions, and timetable.
+
+Scope:
+- Added `apps/web/scripts/browser-extended-ops.mjs`.
+- Added `npm run qa:extended-ops`.
+- The browser harness logs in as the super user, creates/updates a Stripe payment gateway config, uploads a document and requests its signed link, creates an assignment, records a graded submission, updates the assignment, then creates/updates/archives a timetable period.
+- Fixed the shared workspace shell CSS so the permanent left rail no longer overlays/intercepts page form controls on desktop.
+- Moved browser upload fixture generation to the OS temp folder so only durable screenshots are kept under `docs/browser-checks`.
+
+Verification:
+- `npm run qa:extended-ops`: passed.
+- Screenshot saved: `docs/browser-checks/extended-ops-suite-20260427093228.png`.
+- `npm run build`: passed with the existing classified Nuxt/Nitro/Node warnings.
+
+Current page after finishing this phase: extended operations QA.
+
 ```text
 Read D:\Development\School-SaaS-Enterprise-CONTEXT.md and D:\Development\School-SaaS-Enterprise\docs\current-status.md.
 Continue from the current status.

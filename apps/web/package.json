@@ -11,6 +11,7 @@
     "qa:admin-ops": "node scripts/browser-admin-ops.mjs",
     "qa:ops-mutation": "node scripts/browser-ops-mutation.mjs",
     "qa:phase-ops": "node scripts/browser-phase-ops.mjs",
+    "qa:extended-ops": "node scripts/browser-extended-ops.mjs",
     "postinstall": "nuxt prepare && npm run build:icons",
     "build:icons": "tsx plugins/iconify/build-icons.ts"
   },

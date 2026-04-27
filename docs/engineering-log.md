@@ -1848,3 +1848,9 @@ Scope: expanded `DemoDataSeeder` into a deterministic five-year school simulatio
 Demo data volume after seeding: 5 academic years, 5 classes, 50 students, 241 enrollments, 4,322 student attendance records, 8 employees, 961 staff attendance records, 51 assignments, 10 exams, 101 schedules, 4,801 marks, 481 result summaries, 1,561 invoices, 1,524 payments, 416 salary records, 40 leave applications, 96 promotion records, 21 calendar events, and 6 documents.
 
 Verification: `php artisan db:seed --class=DemoDataSeeder --force` passed; agent-browser verified the loaded dashboard and saved `docs/browser-checks/dashboard-after-five-year-loaded.png`; agent-browser route smoke loaded every current school workspace route without visible error copy; `vendor\bin\pint --test` passed; `php artisan test` passed with 117 tests / 702 assertions; `npm run build` passed with the existing classified Nuxt/Nitro/Node warnings.
+
+### Extended Operations Mutation QA Checkpoint
+
+Scope: added `apps/web/scripts/browser-extended-ops.mjs` and `npm run qa:extended-ops` to cover mutation-heavy browser flows that were not part of the previous route smoke. The suite verifies payment gateway create/update, document upload plus signed-link retrieval, assignment creation, graded submission recording, assignment update, and timetable create/update/archive. While running the suite, the shared workspace shell CSS was fixed so the permanent left rail no longer overlays desktop content or intercepts form controls after scrolling.
+
+Verification: `npm run qa:extended-ops` passed and saved `docs/browser-checks/extended-ops-suite-20260427093228.png`. `npm run build` passed with the existing classified Nuxt/Nitro/Node warnings.

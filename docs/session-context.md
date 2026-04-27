@@ -1453,6 +1453,21 @@ Latest verification:
 - `php artisan test`: passed with 117 tests / 702 assertions.
 - `npm run build`: passed with the existing classified Nuxt/Nitro/Node warnings.
 
+Current checkpoint: extended operations mutation QA.
+
+Latest changes:
+
+- Added `apps/web/scripts/browser-extended-ops.mjs`.
+- Added `npm run qa:extended-ops`.
+- Fixed the shared workspace shell/rail CSS in `apps/web/assets/styles/styles.scss` so desktop page content is offset from the permanent left rail and controls remain clickable.
+- Browser upload fixtures now use the OS temp folder; only screenshots stay in `docs/browser-checks`.
+
+Latest verification:
+
+- `npm run qa:extended-ops`: passed for payment gateways, documents, assignments/submissions, and timetable mutation flows.
+- Browser proof saved at `docs/browser-checks/extended-ops-suite-20260427093228.png`.
+- `npm run build`: passed with the existing classified Nuxt/Nitro/Node warnings.
+
 ## Recommended First Prompt For A New Session
 
 ```text
