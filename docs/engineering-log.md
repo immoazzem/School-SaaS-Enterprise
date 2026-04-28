@@ -1914,3 +1914,32 @@ Verification:
 Browser evidence: `workflow-smoke-20260428013440.png`, `extended-ops-suite-20260428014056.png`, `admin-ops-suite-20260428014132.png`, `ops-mutation-suite-20260428014200.png`, and `phase-ops-suite-20260428014248.png`.
 
 QA note: the first broad workflow run needed a longer command timeout with the larger local dataset; rerunning with a ten-minute cap passed without code changes.
+
+### Clean Database Ten-Year Professional QA
+
+Scope: cleared the local MySQL database with `php artisan migrate:fresh --seed --force`, then rebuilt the deterministic ten-year school simulation from a clean schema. This verified the app can bootstrap from zero instead of relying on previous demo rows. During the browser pass, stale Nuxt dev-server processes and cold SPA hydration exposed a white-page/selector timing false negative, so the local dev server was restarted cleanly and the browser QA login helpers were hardened.
+
+Clean simulation data after seeding: 13 users, 1 school, 10 academic years, 5 classes, 48 students, 480 enrollments, 8,640 student attendance records, 8 employees, 1,920 staff attendance records, 100 assignments, 20 exams, 9,600 marks, 3,360 invoices, 3,278 payments, 896 salary records, 96 promotion records, 40 calendar events, and 10 documents.
+
+Fixes:
+- `apps/web/scripts/browser-workflow-smoke.mjs`
+- `apps/web/scripts/browser-admin-ops.mjs`
+- `apps/web/scripts/browser-extended-ops.mjs`
+- `apps/web/scripts/browser-ops-mutation.mjs`
+- `apps/web/scripts/browser-phase-ops.mjs`
+
+The login helpers now wait longer for cold Nuxt hydration and use a pathname-based browser condition after login, which is more reliable than URL-event waiting during SPA navigation.
+
+Verification:
+- `php artisan migrate:fresh --seed --force`: passed.
+- `php artisan db:seed --class=DemoDataSeeder --force`: passed.
+- `php artisan test`: passed with 118 tests / 710 assertions.
+- `npm run qa:browser`: passed with 12 workflow checks.
+- `npm run qa:extended-ops`: passed.
+- `npm run qa:admin-ops`: passed.
+- `npm run qa:ops-mutation`: passed.
+- `npm run qa:phase-ops`: passed.
+- `npm run qa:offline-queue`: passed.
+- `npm run build`: passed with the existing classified Nuxt/Nitro/Node warnings.
+
+Browser evidence: `workflow-smoke-20260428032129.png`, `extended-ops-suite-20260428033014.png`, `admin-ops-suite-20260428033136.png`, `ops-mutation-suite-20260428033242.png`, `phase-ops-suite-20260428033438.png`, and `offline-queue-recovery-20260428033745.png`.

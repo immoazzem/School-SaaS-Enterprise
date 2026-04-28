@@ -52,7 +52,7 @@ async function assertNoVisibleErrors(page, name) {
 
 async function goto(page, path) {
   await page.goto(`${baseURL}${path}`, { waitUntil: 'domcontentloaded' })
-  await page.waitForLoadState('load')
+  await page.waitForLoadState('networkidle', { timeout: 60000 }).catch(() => page.waitForLoadState('load'))
   await page.waitForTimeout(600)
   await assertNoVisibleErrors(page, path)
 }
@@ -66,11 +66,11 @@ async function login(page) {
     .or(page.getByRole('button', { name: /Continue to Workspace/i }))
     .or(page.getByRole('button', { name: /^Continue$/i }))
 
-  await emailField.waitFor({ timeout: 15000 })
+  await emailField.waitFor({ timeout: 60000 })
   await emailField.fill(qaEmail)
   await passwordField.fill(qaPassword)
   await continueButton.click()
-  await page.waitForURL(url => !url.pathname.startsWith('/login'), { timeout: 20000 })
+  await page.waitForFunction(() => !window.location.pathname.startsWith('/login'), { timeout: 60000 })
   await assertNoVisibleErrors(page, 'login')
 }
 

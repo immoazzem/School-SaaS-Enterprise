@@ -49,17 +49,16 @@ async function goto(page, path) {
 
 async function login(page) {
   await page.goto(`${baseURL}/login`, { waitUntil: 'domcontentloaded' })
-  await page.waitForLoadState('load')
-  await page.waitForTimeout(700)
+  await page.waitForLoadState('networkidle', { timeout: 60000 }).catch(() => page.waitForLoadState('load'))
   const emailField = page.locator('input[type="email"]').first()
   const passwordField = page.locator('input[type="password"]').first()
   const continueButton = page.locator('form button[type="submit"]').first()
 
-  await emailField.waitFor({ timeout: 15000 })
+  await emailField.waitFor({ timeout: 60000 })
   await emailField.fill('test@example.com')
   await passwordField.fill('password')
   await continueButton.click({ force: true })
-  await page.waitForURL(url => !url.pathname.startsWith('/login'), { timeout: 20000 })
+  await page.waitForFunction(() => !window.location.pathname.startsWith('/login'), { timeout: 60000 })
   await assertNoVisibleErrors(page, 'login')
 }
 

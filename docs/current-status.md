@@ -1405,6 +1405,51 @@ Verification:
 
 Current page after finishing this phase: full QA and simulation.
 
+### Clean Database Ten-Year QA Checkpoint
+
+Current page/module complete: professional QA after clean database reset and deterministic ten-year simulation.
+
+Scope:
+- Cleared the local MySQL database with `php artisan migrate:fresh --seed --force`.
+- Re-seeded the deterministic ten-year `DemoDataSeeder` dataset from a clean schema.
+- Restarted the local Nuxt dev server on `http://localhost:3000` after stale server processes caused a white-page/cold-start symptom.
+- Hardened the browser QA login helpers so cold Nuxt hydration and SPA navigation do not create false negatives on slower local starts.
+- Re-ran the full backend suite, build, and all current browser QA suites against the clean ten-year dataset.
+
+Clean simulation volume:
+- 13 users, 1 school, 10 academic years, 5 classes, 48 students, 480 enrollments.
+- 8,640 student attendance records, 8 employees, 1,920 staff attendance records.
+- 100 assignments, 20 exams, 9,600 marks.
+- 3,360 invoices, 3,278 payments, 896 salary records.
+- 96 promotion records, 40 calendar events, 10 documents.
+
+Fixes:
+- Updated `apps/web/scripts/browser-workflow-smoke.mjs`, `browser-admin-ops.mjs`, `browser-extended-ops.mjs`, `browser-ops-mutation.mjs`, and `browser-phase-ops.mjs`.
+- Login waits now tolerate cold Nuxt startup with 60-second email-field waits and pathname-based SPA navigation checks.
+
+Verification:
+- `php artisan migrate:fresh --seed --force`: passed.
+- `php artisan db:seed --class=DemoDataSeeder --force`: passed.
+- `php artisan test`: passed with 118 tests / 710 assertions.
+- `npm run qa:browser`: passed with 12 workflow checks.
+- `npm run qa:extended-ops`: passed.
+- `npm run qa:admin-ops`: passed.
+- `npm run qa:ops-mutation`: passed.
+- `npm run qa:phase-ops`: passed.
+- `npm run qa:offline-queue`: passed.
+- `npm run build`: passed with the existing classified Nuxt/Nitro/Node warnings.
+- Local app is running at `http://localhost:3000/login`; API health is reachable at `http://127.0.0.1:8010/up`.
+
+Browser evidence saved:
+- `docs/browser-checks/workflow-smoke-20260428032129.png`
+- `docs/browser-checks/extended-ops-suite-20260428033014.png`
+- `docs/browser-checks/admin-ops-suite-20260428033136.png`
+- `docs/browser-checks/ops-mutation-suite-20260428033242.png`
+- `docs/browser-checks/phase-ops-suite-20260428033438.png`
+- `docs/browser-checks/offline-queue-recovery-20260428033745.png`
+
+Current page after finishing this phase: clean database ten-year professional QA.
+
 ```text
 Read D:\Development\School-SaaS-Enterprise-CONTEXT.md and D:\Development\School-SaaS-Enterprise\docs\current-status.md.
 Continue from the current status.

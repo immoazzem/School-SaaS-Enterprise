@@ -62,14 +62,14 @@ async function login(page) {
   await goto(page, '/login')
   const emailField = page.locator('input[type="email"]').first()
   const passwordField = page.locator('input[type="password"]').first()
-  await emailField.waitFor({ timeout: 15000 })
+  await emailField.waitFor({ timeout: 60000 })
   await emailField.fill(qaEmail)
   await passwordField.fill(qaPassword)
   await page.getByRole('button', { name: /Enter workspace/i })
     .or(page.getByRole('button', { name: /Continue to Workspace/i }))
     .or(page.getByRole('button', { name: /^Continue$/i }))
     .click()
-  await page.waitForURL(url => !url.pathname.startsWith('/login'), { timeout: 20000 })
+  await page.waitForFunction(() => !window.location.pathname.startsWith('/login'), { timeout: 60000 })
 }
 
 async function expectText(page, text, timeout = 15000) {
