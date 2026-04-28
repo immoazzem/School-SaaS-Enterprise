@@ -1485,6 +1485,49 @@ Browser evidence saved:
 
 Current page after finishing this phase: deep frontend alignment QA.
 
+### Solid Full-Stack QA Checkpoint
+
+Current page/module complete: solid full-stack QA after the frontend alignment hardening.
+
+Scope:
+- Reconfirmed the local frontend and API were reachable before the run.
+- Verified the Laravel API route surface after the previous versioning work.
+- Cleared and rebuilt the local MySQL database from migrations and seeders, then loaded the deterministic ten-year demo dataset.
+- Ran backend unit/feature tests, backend style checks, frontend production build, visual layout audit, full browser workflows, and database integrity checks.
+
+Verification:
+- `vendor\bin\pint --test`: passed.
+- `php artisan test`: passed with 118 tests / 710 assertions.
+- `php artisan route:list --path=api/v1`: passed, showing 251 versioned API routes.
+- `php artisan migrate:fresh --seed --force`: passed.
+- `php artisan db:seed --class=DemoDataSeeder --force`: passed.
+- `npm run build`: passed with the existing classified Nuxt/Nitro/Node dependency warnings.
+- `npm run qa:visual-layout`: passed, 38 routes x 4 viewports.
+- `npm run qa:browser`: passed with 12 workflow checks.
+- `npm run qa:extended-ops`: passed.
+- `npm run qa:admin-ops`: passed.
+- `npm run qa:ops-mutation`: passed.
+- `npm run qa:phase-ops`: passed.
+- `npm run qa:offline-queue`: passed.
+
+Database integrity after QA:
+- 1 school, 13 users, 49 students, 49 guardians, 9 employees.
+- 481 enrollments, 8,640 student attendance records, 9,601 marks.
+- 3,362 invoices, 3,279 payments, 4 report exports.
+- 0 failed jobs, 0 orphan enrollments, 0 orphan invoices.
+
+Browser evidence saved:
+- `docs/browser-checks/visual-layout-20260428T152245/report.json`
+- `docs/browser-checks/workflow-smoke-20260428153241.png`
+- `docs/browser-checks/extended-ops-suite-20260428153858.png`
+- `docs/browser-checks/admin-ops-suite-20260428153858.png`
+- `docs/browser-checks/ops-mutation-suite-20260428153945.png`
+- `docs/browser-checks/phase-ops-suite-20260428154033.png`
+- `docs/browser-checks/offline-queue-recovery-20260428154325.png`
+- `docs/browser-checks/solid-fullstack-login-20260428155000.png`
+
+Current page after finishing this phase: solid full-stack QA.
+
 ```text
 Read D:\Development\School-SaaS-Enterprise-CONTEXT.md and D:\Development\School-SaaS-Enterprise\docs\current-status.md.
 Continue from the current status.

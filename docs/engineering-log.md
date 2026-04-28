@@ -1968,3 +1968,26 @@ Verification:
 - `npm run qa:offline-queue`: passed.
 
 Browser evidence: `visual-layout-20260428T144125/report.json`, `workflow-smoke-20260428145954.png`, `extended-ops-suite-20260428150620.png`, `admin-ops-suite-20260428150647.png`, `ops-mutation-suite-20260428150707.png`, `phase-ops-suite-20260428150747.png`, and `offline-queue-recovery-20260428151031.png`.
+
+### Solid Full-Stack QA
+
+Scope: ran a full-stack verification after the visual alignment fixes, using a freshly rebuilt local MySQL database and the deterministic ten-year demo dataset.
+
+Verification:
+- `vendor\bin\pint --test`: passed.
+- `php artisan test`: passed with 118 tests / 710 assertions.
+- `php artisan route:list --path=api/v1`: passed, showing 251 versioned API routes.
+- `php artisan migrate:fresh --seed --force`: passed.
+- `php artisan db:seed --class=DemoDataSeeder --force`: passed.
+- `npm run build`: passed with the existing classified Nuxt/Nitro/Node dependency warnings.
+- `npm run qa:visual-layout`: passed, 38 routes across 4 viewports.
+- `npm run qa:browser`: passed with 12 workflow checks.
+- `npm run qa:extended-ops`: passed.
+- `npm run qa:admin-ops`: passed.
+- `npm run qa:ops-mutation`: passed.
+- `npm run qa:phase-ops`: passed.
+- `npm run qa:offline-queue`: passed.
+
+Database integrity: 1 school, 13 users, 49 students, 49 guardians, 9 employees, 481 enrollments, 8,640 attendance records, 9,601 marks, 3,362 invoices, 3,279 payments, 4 report exports, 0 failed jobs, 0 orphan enrollments, and 0 orphan invoices.
+
+Browser evidence: `visual-layout-20260428T152245/report.json`, `workflow-smoke-20260428153241.png`, `extended-ops-suite-20260428153858.png`, `admin-ops-suite-20260428153858.png`, `ops-mutation-suite-20260428153945.png`, `phase-ops-suite-20260428154033.png`, `offline-queue-recovery-20260428154325.png`, and `solid-fullstack-login-20260428155000.png`.
