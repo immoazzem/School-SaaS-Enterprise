@@ -127,8 +127,18 @@ class PortalController extends Controller
     {
         $this->ensureStudentPortal($request, $school);
 
-        return $school->students()
+        $student = $school->students()
             ->where('email', $request->user()->email)
+            ->first();
+
+        if ($student) {
+            return $student;
+        }
+
+        abort_unless($request->user()->hasSchoolPermission($school, 'students.manage'), 404);
+
+        return $school->students()
+            ->orderBy('full_name')
             ->firstOrFail();
     }
 
@@ -136,8 +146,18 @@ class PortalController extends Controller
     {
         $this->ensureParentPortal($request, $school);
 
-        return $school->guardians()
+        $guardian = $school->guardians()
             ->where('email', $request->user()->email)
+            ->first();
+
+        if ($guardian) {
+            return $guardian;
+        }
+
+        abort_unless($request->user()->hasSchoolPermission($school, 'students.manage'), 404);
+
+        return $school->guardians()
+            ->orderBy('full_name')
             ->firstOrFail();
     }
 

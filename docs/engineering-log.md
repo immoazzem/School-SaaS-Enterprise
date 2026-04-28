@@ -1943,3 +1943,28 @@ Verification:
 - `npm run build`: passed with the existing classified Nuxt/Nitro/Node warnings.
 
 Browser evidence: `workflow-smoke-20260428032129.png`, `extended-ops-suite-20260428033014.png`, `admin-ops-suite-20260428033136.png`, `ops-mutation-suite-20260428033242.png`, `phase-ops-suite-20260428033438.png`, and `offline-queue-recovery-20260428033745.png`.
+
+### Deep Frontend Alignment QA
+
+Scope: after the user reported broken page alignment, added a real visual layout audit instead of relying only on workflow success. The new `npm run qa:visual-layout` script logs in as the super-admin, visits 38 admin/school routes at desktop, laptop, tablet, and mobile widths, and fails on document horizontal overflow, drawer overlap, offscreen key containers, and visible runtime/API error copy.
+
+Findings and fixes:
+- Many school workspace pages used shared classes such as `surface`, `workspace-grid`, `record-form`, `record-list`, `panel`, and `table-wrap`, but those classes were not styled consistently. Mobile pages collapsed into raw forms/tables and tables widened the document.
+- Added the shared workspace styling layer in `apps/web/assets/styles/styles.scss`: cards, responsive grids, input/select/textarea styling, form actions, filters, summary cards, table wrappers, status pills, and mobile stacking.
+- Contained direct legacy tables in `record-list`/`panel` so table overflow stays inside the card instead of causing page-level horizontal scrolling.
+- Portal preview pages showed raw 404s for a super-admin because the portal API only searched for a student/guardian by the current user's email. `PortalController` now lets authorized school operators preview the first available student/guardian record when no self-matching portal identity exists.
+- Ran Pint, which normalized older formatting drift in `DemoDataSeeder.php`.
+
+Verification:
+- `npm run qa:visual-layout`: passed, 38 routes across 4 viewports.
+- `php artisan test`: passed with 118 tests / 710 assertions.
+- `vendor\bin\pint --test`: passed.
+- `npm run build`: passed with the existing classified Nuxt/Nitro/Node warnings.
+- `npm run qa:browser`: passed.
+- `npm run qa:extended-ops`: passed.
+- `npm run qa:admin-ops`: passed.
+- `npm run qa:ops-mutation`: passed.
+- `npm run qa:phase-ops`: passed, including student and parent portal loads.
+- `npm run qa:offline-queue`: passed.
+
+Browser evidence: `visual-layout-20260428T144125/report.json`, `workflow-smoke-20260428145954.png`, `extended-ops-suite-20260428150620.png`, `admin-ops-suite-20260428150647.png`, `ops-mutation-suite-20260428150707.png`, `phase-ops-suite-20260428150747.png`, and `offline-queue-recovery-20260428151031.png`.

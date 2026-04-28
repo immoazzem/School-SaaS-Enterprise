@@ -13,6 +13,7 @@
     "qa:phase-ops": "node scripts/browser-phase-ops.mjs",
     "qa:extended-ops": "node scripts/browser-extended-ops.mjs",
     "qa:offline-queue": "node scripts/browser-offline-queue-recovery.mjs",
+    "qa:visual-layout": "node scripts/browser-visual-layout-audit.mjs",
     "postinstall": "nuxt prepare && npm run build:icons",
     "build:icons": "tsx plugins/iconify/build-icons.ts"
   },

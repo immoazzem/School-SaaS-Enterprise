@@ -1450,6 +1450,41 @@ Browser evidence saved:
 
 Current page after finishing this phase: clean database ten-year professional QA.
 
+### Deep Frontend Alignment QA Checkpoint
+
+Current page/module complete: deep visual alignment QA across the school workspace and admin surfaces.
+
+Scope:
+- Added `npm run qa:visual-layout` with `apps/web/scripts/browser-visual-layout-audit.mjs`.
+- Audited 38 authenticated routes across desktop, laptop, tablet, and mobile viewports.
+- Fixed the shared school workspace UI layer so `surface`, `workspace-grid`, `record-form`, `record-list`, `panel`, `summary-grid`, `table-wrap`, filters, buttons, and native form controls render consistently.
+- Contained wide tables inside scrollable card/table regions so mobile pages no longer widen the whole document.
+- Fixed super-admin portal preview behavior by letting authorized school operators preview the first available student/guardian record when the logged-in operator is not themselves a student or guardian.
+- Ran Pint formatting on the demo seeder after the formatter found older style drift.
+
+Verification:
+- `npm run qa:visual-layout`: passed, 38 routes x 4 viewports.
+- `php artisan test`: passed with 118 tests / 710 assertions.
+- `vendor\bin\pint --test`: passed.
+- `npm run build`: passed with the existing classified Nuxt/Nitro/Node warnings.
+- `npm run qa:browser`: passed with 12 workflow checks.
+- `npm run qa:extended-ops`: passed.
+- `npm run qa:admin-ops`: passed.
+- `npm run qa:ops-mutation`: passed.
+- `npm run qa:phase-ops`: passed, including student and parent portal loads.
+- `npm run qa:offline-queue`: passed.
+
+Browser evidence saved:
+- `docs/browser-checks/visual-layout-20260428T144125/report.json`
+- `docs/browser-checks/workflow-smoke-20260428145954.png`
+- `docs/browser-checks/extended-ops-suite-20260428150620.png`
+- `docs/browser-checks/admin-ops-suite-20260428150647.png`
+- `docs/browser-checks/ops-mutation-suite-20260428150707.png`
+- `docs/browser-checks/phase-ops-suite-20260428150747.png`
+- `docs/browser-checks/offline-queue-recovery-20260428151031.png`
+
+Current page after finishing this phase: deep frontend alignment QA.
+
 ```text
 Read D:\Development\School-SaaS-Enterprise-CONTEXT.md and D:\Development\School-SaaS-Enterprise\docs\current-status.md.
 Continue from the current status.

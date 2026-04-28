@@ -11,6 +11,7 @@ use App\Models\AuditLog;
 use App\Models\CalendarEvent;
 use App\Models\ClassSubject;
 use App\Models\Designation;
+use App\Models\DiscountPolicy;
 use App\Models\Employee;
 use App\Models\EmployeeAttendanceRecord;
 use App\Models\Exam;
@@ -726,7 +727,7 @@ class DemoDataSeeder extends Seeder
             );
         }
 
-        $discountPolicy = \App\Models\DiscountPolicy::query()->updateOrCreate(
+        $discountPolicy = DiscountPolicy::query()->updateOrCreate(
             ['school_id' => $school->id, 'code' => 'MERIT-25'],
             [
                 'name' => 'Merit Waiver',
@@ -739,7 +740,7 @@ class DemoDataSeeder extends Seeder
         );
 
         foreach ([1, 7, 13, 19] as $studentIndex) {
-            if (!isset($enrollments[2026][$studentIndex])) {
+            if (! isset($enrollments[2026][$studentIndex])) {
                 continue;
             }
 
@@ -1031,17 +1032,17 @@ class DemoDataSeeder extends Seeder
         }
 
         foreach ([1, 5, 9] as $studentIndex) {
-            if (!isset($enrollments[2026][$studentIndex])) {
+            if (! isset($enrollments[2026][$studentIndex])) {
                 continue;
             }
 
             $student = $enrollments[2026][$studentIndex]->student()->first();
-            if (!$student?->email) {
+            if (! $student?->email) {
                 continue;
             }
 
             $recipient = User::query()->where('email', $student->email)->first();
-            if (!$recipient) {
+            if (! $recipient) {
                 continue;
             }
 
