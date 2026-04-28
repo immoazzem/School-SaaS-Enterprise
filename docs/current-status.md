@@ -1377,6 +1377,34 @@ Phase 7E status: the v3 Phase 7E offline/PWA scope is complete for the current A
 
 Current page after finishing this phase: Phase 7E IndexedDB offline queue.
 
+### Full QA And Ten-Year Simulation Checkpoint
+
+Current page/module complete: full local QA pass after Phase 7E completion.
+
+Scope:
+- Re-seeded the local MySQL database with the deterministic ten-year `DemoDataSeeder` dataset.
+- Verified the data simulation volume across academics, students, attendance, staff, assignments, exams, marks, finance, payroll, promotions, calendar, and documents.
+- Ran the full Laravel backend test suite.
+- Ran all current frontend browser QA suites against the local Nuxt app and API.
+
+Verification:
+- `php artisan db:seed --class=DemoDataSeeder --force`: passed.
+- Data spot check after seeding: 20 academic years, 15 classes, 59 students, 533 enrollments, 8,644 student attendance records, 13 employees, 1,922 staff attendance records, 103 assignments, 21 exams, 9,602 marks, 3,365 invoices, 3,279 payments, 898 salary records, 1,020 promotion records, 43 calendar events, and 15 documents.
+- `php artisan test`: passed with 118 tests / 710 assertions.
+- `npm run qa:browser`: passed with 12 browser workflow checks.
+- `npm run qa:extended-ops`: passed with payment gateway, document, assignment/submission, and timetable checks.
+- `npm run qa:admin-ops`: passed with admin route/search and invitation revoke checks.
+- `npm run qa:ops-mutation`: passed with employee, staff ops, finance, invoice payment, discount, and admin onboarding checks.
+- `npm run qa:phase-ops`: passed with marks, reports, promotions, notifications, student portal, and parent portal checks.
+- Browser evidence saved:
+  - `docs/browser-checks/workflow-smoke-20260428013440.png`
+  - `docs/browser-checks/extended-ops-suite-20260428014056.png`
+  - `docs/browser-checks/admin-ops-suite-20260428014132.png`
+  - `docs/browser-checks/ops-mutation-suite-20260428014200.png`
+  - `docs/browser-checks/phase-ops-suite-20260428014248.png`
+
+Current page after finishing this phase: full QA and simulation.
+
 ```text
 Read D:\Development\School-SaaS-Enterprise-CONTEXT.md and D:\Development\School-SaaS-Enterprise\docs\current-status.md.
 Continue from the current status.

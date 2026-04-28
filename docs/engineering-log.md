@@ -1895,3 +1895,22 @@ Scope: completed the remaining Phase 7E offline queue hardening slice for the cu
 Verification: `npm run build` passed with the existing classified Nuxt/Nitro/Node warnings. The local Nuxt dev server was restarted on `http://localhost:3000`, `/login` returned 200, and `npm run qa:offline-queue` passed for Attendance and Marks. Screenshots saved at `docs/browser-checks/offline-queue-recovery-20260428010653.png` and `docs/browser-checks/offline-queue-recovery-20260428011644.png`.
 
 Phase 7E status: complete for the current v3 Attendance/Marks offline scope. Remaining ideas are future hardening, not current blockers: dedicated comparison endpoints, field-level merge choices, and more offline-enabled modules.
+
+### Full QA And Ten-Year Simulation
+
+Scope: ran the post-Phase 7 QA pass against the local app and deterministic ten-year demo dataset.
+
+Simulation data after seeding: 20 academic years, 15 classes, 59 students, 533 enrollments, 8,644 student attendance records, 13 employees, 1,922 staff attendance records, 103 assignments, 21 exams, 9,602 marks, 3,365 invoices, 3,279 payments, 898 salary records, 1,020 promotion records, 43 calendar events, and 15 documents.
+
+Verification:
+- `php artisan db:seed --class=DemoDataSeeder --force`: passed.
+- `php artisan test`: passed with 118 tests / 710 assertions.
+- `npm run qa:browser`: passed with 12 browser workflow checks.
+- `npm run qa:extended-ops`: passed.
+- `npm run qa:admin-ops`: passed.
+- `npm run qa:ops-mutation`: passed.
+- `npm run qa:phase-ops`: passed.
+
+Browser evidence: `workflow-smoke-20260428013440.png`, `extended-ops-suite-20260428014056.png`, `admin-ops-suite-20260428014132.png`, `ops-mutation-suite-20260428014200.png`, and `phase-ops-suite-20260428014248.png`.
+
+QA note: the first broad workflow run needed a longer command timeout with the larger local dataset; rerunning with a ten-minute cap passed without code changes.
