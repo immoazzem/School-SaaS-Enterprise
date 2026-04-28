@@ -1,8 +1,8 @@
 # Phase 7E Offline Support / PWA Plan
 
-**Last updated:** April 20, 2026  
+**Last updated:** April 28, 2026  
 **Active plan:** `docs/enterprise-plan-v3.md`  
-**Current status:** PWA foundation and first durable browser queue slice implemented; conflict/auth recovery is now covered by browser QA.
+**Current status:** PWA foundation, IndexedDB-backed queue storage, conflict/auth recovery, and Attendance/Marks browser QA are implemented.
 
 ## Scope
 
@@ -11,7 +11,7 @@ Phase 7E exists for schools with unreliable connectivity. The first slice keeps 
 - Attendance
 - Marks entry
 
-This now includes visible queued write replay for Attendance and Marks. The next hardening slice should improve conflict resolution, permission expiry handling, and user-visible recovery for failed records.
+This now includes visible queued write replay for Attendance and Marks. The queue survives reload through IndexedDB, migrates old localStorage queue records forward, and shows local-vs-server comparison for common Attendance and Marks conflicts.
 
 ## Implemented Foundation
 
@@ -25,7 +25,7 @@ This now includes visible queued write replay for Attendance and Marks. The next
 - Attendance form can save, restore, and clear a local draft.
 - Marks form can save, restore, and clear a local draft.
 - Attendance and Marks save actions preserve a draft instead of attempting API writes while offline.
-- Shared `useOfflineQueue()` composable backed by durable browser storage.
+- Shared `useOfflineQueue()` composable backed by IndexedDB, with localStorage migration/fallback for constrained browsers.
 - Shared `OfflineQueuePanel` component for queued, failed, and conflicted records.
 - Attendance offline submissions are queued with endpoint, method, payload, attempts, and status metadata.
 - Marks offline submissions are queued with endpoint, method, payload, attempts, and status metadata.
@@ -36,15 +36,18 @@ This now includes visible queued write replay for Attendance and Marks. The next
 - Queue sync returns a summary to the page so users see whether records synced, failed, conflicted, or need a fresh login.
 - The queue panel shows per-status counts, friendly status labels, attempt counts, and retained error messages.
 - The queue panel shows local payload review for failed, conflicted, and auth-required records.
+- The queue panel shows server snapshot comparison for Attendance and Marks conflicts when a matching server record is found.
 - Conflict/failed records can be marked ready for retry after review.
 - Auth-required records expose a one-click sign-in-again path that clears the local session and returns to the current workspace after login.
-- `npm run qa:offline-queue` verifies the auth-required/conflict review, retry, and sign-in-again flow in a real browser.
+- `npm run qa:offline-queue` verifies the auth-required/conflict review, retry, legacy storage migration, IndexedDB persistence, and sign-in-again flow in a real browser for Attendance and Marks.
 
 ## Implemented Queue Design
 
 The current queue implementation:
 
-- uses namespaced `localStorage` for durable queued writes. IndexedDB remains the preferred future storage when queues expand beyond Attendance and Marks or start carrying larger payloads.
+- uses namespaced IndexedDB records for durable queued writes.
+- migrates legacy `localStorage` queue records into IndexedDB on first load.
+- falls back to localStorage if IndexedDB is unavailable.
 - stores queue entries with:
   - generated client UUID.
   - school id.
@@ -58,11 +61,10 @@ The current queue implementation:
 
 ## Queue Hardening For Next Slice
 
-- Move the queue from localStorage to IndexedDB before large multi-form offline capture is enabled.
-- Add server lookup endpoints for richer local-vs-server comparison views for attendance and marks conflicts.
+- Add dedicated server lookup endpoints for richer local-vs-server comparison views instead of relying on list queries.
 - Add a sync review drawer before deleting local failed/conflicted records.
 - Add unit coverage around queue helper classification when the Nuxt test harness is in place.
-- Extend browser queue QA to Marks once seeded exam/class-subject combinations are stable across environments.
+- Add broader offline capture beyond Attendance and Marks only after field-level conflict policies are defined.
 
 ## Service Worker Deployment Notes
 
@@ -88,6 +90,6 @@ The current queue implementation:
 - Offline attendance and marks submissions enter a visible queue. Implemented.
 - Queue survives reload and browser restart. Implemented through durable browser storage.
 - Queue replays when the connection returns. Implemented for non-conflicting records.
-- Conflicts are visible with local payload review and retry/discard controls. Server comparison remains planned.
+- Conflicts are visible with local payload review, server snapshot comparison where available, and retry/discard controls. Implemented for Attendance and Marks.
 - Failed sync records are never silently discarded. Implemented.
 - Service worker update flow is documented for self-hosted deployments.

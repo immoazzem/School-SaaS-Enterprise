@@ -65,6 +65,13 @@ const attendanceDraft = useOfflineDraft<AttendanceDraft>(
 const attendanceQueueEntries = computed(() =>
   offlineQueue.entries.value.filter((entry) => entry.schoolId === schoolId.value),
 )
+const attendanceConflictSnapshots = ref<Record<string, Record<string, unknown> | null>>({})
+const attendanceQueuePanelEntries = computed(() =>
+  attendanceQueueEntries.value.map((entry) => ({
+    ...entry,
+    serverSnapshot: attendanceConflictSnapshots.value[entry.id] ?? null,
+  })),
+)
 
 const attendanceSummary = computed(() => {
   const counts = {
@@ -181,6 +188,49 @@ function attendanceQueueLabel(payload: { student_enrollment_id: number, attendan
   return `Attendance / ${enrollment?.student?.full_name || `Enrollment ${payload.student_enrollment_id}`} / ${payload.attendance_date}`
 }
 
+function attendanceSnapshot(record: StudentAttendanceRecord) {
+  return {
+    id: record.id,
+    student_enrollment_id: record.student_enrollment_id,
+    student: record.student_enrollment?.student?.full_name ?? null,
+    attendance_date: record.attendance_date,
+    status: record.status,
+    remarks: record.remarks,
+  }
+}
+
+async function loadAttendanceConflictSnapshots() {
+  const targets = attendanceQueueEntries.value.filter((entry) => entry.status === 'conflict')
+  const next: Record<string, Record<string, unknown> | null> = {}
+
+  for (const entry of targets) {
+    const payload = entry.payload as { student_enrollment_id?: number, attendance_date?: string }
+
+    if (!payload.student_enrollment_id || !payload.attendance_date) {
+      next[entry.id] = null
+      continue
+    }
+
+    try {
+      const query = new URLSearchParams()
+      query.set('attendance_date', String(payload.attendance_date))
+      query.set('per_page', '100')
+
+      const response = await api.request<ListResponse<StudentAttendanceRecord>>(
+        `/schools/${schoolId.value}/student-attendance-records?${query.toString()}`,
+      )
+      const match = response.data.find((record) =>
+        record.student_enrollment_id === Number(payload.student_enrollment_id),
+      )
+      next[entry.id] = match ? attendanceSnapshot(match) : null
+    } catch {
+      next[entry.id] = null
+    }
+  }
+
+  attendanceConflictSnapshots.value = next
+}
+
 async function queueAttendance(payload: { student_enrollment_id: number, attendance_date: string, status: StudentAttendanceRecord['status'], remarks: string | null }) {
   await offlineQueue.enqueue({
     schoolId: schoolId.value,
@@ -230,10 +280,13 @@ async function syncAttendanceQueue() {
   }
 
   await loadRecords()
+  await loadAttendanceConflictSnapshots()
 }
 
-function retryQueuedAttendance(id: string) {
-  offlineQueue.markPending(id)
+async function retryQueuedAttendance(id: string) {
+  await offlineQueue.markPending(id)
+  const { [id]: _removed, ...rest } = attendanceConflictSnapshots.value
+  attendanceConflictSnapshots.value = rest
   success.value = 'Attendance queue item is ready to retry.'
 }
 
@@ -319,10 +372,11 @@ watch(selectedDate, (value) => {
   }
 })
 
-onMounted(() => {
+onMounted(async () => {
   restoreDraft()
-  offlineQueue.refresh()
-  loadWorkspace()
+  await offlineQueue.refresh()
+  await loadWorkspace()
+  await loadAttendanceConflictSnapshots()
 })
 </script>
 
@@ -372,7 +426,7 @@ onMounted(() => {
       </OfflineNotice>
 
       <OfflineQueuePanel
-        :entries="attendanceQueueEntries"
+        :entries="attendanceQueuePanelEntries"
         :syncing="offlineQueue.syncing.value"
         @discard="offlineQueue.remove"
         @retry="retryQueuedAttendance"

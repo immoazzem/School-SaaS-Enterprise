@@ -8,6 +8,7 @@ type QueueEntry = {
   updatedAt: string
   lastAttemptAt: string | null
   payload: Record<string, unknown>
+  serverSnapshot?: Record<string, unknown> | null
 }
 
 const props = defineProps<{
@@ -94,6 +95,10 @@ function payloadPreview(payload: Record<string, unknown>) {
               <details v-if="entry.status === 'conflict' || entry.status === 'failed' || entry.status === 'auth_required'" class="queue-review">
                 <summary>Review local payload</summary>
                 <pre>{{ payloadPreview(entry.payload) }}</pre>
+              </details>
+              <details v-if="entry.serverSnapshot" class="queue-review">
+                <summary>Compare server record</summary>
+                <pre>{{ payloadPreview(entry.serverSnapshot) }}</pre>
               </details>
             </td>
             <td>

@@ -1355,6 +1355,28 @@ Phase 7E status: offline queue recovery UX is now implemented and browser-tested
 
 Current page after finishing this phase: Phase 7E offline queue recovery.
 
+### Phase 7E IndexedDB Queue And Conflict Comparison
+
+Current page/module complete: Phase 7E offline queue storage and conflict comparison, routes `/schools/{schoolId}/attendance` and `/schools/{schoolId}/marks`.
+
+Scope:
+- Migrated `useOfflineQueue()` to IndexedDB-first durable storage with automatic legacy localStorage migration and localStorage fallback.
+- Extended the offline browser QA script to cover Attendance and Marks queue recovery.
+- Added queue storage assertions so browser QA verifies legacy localStorage records are moved into IndexedDB.
+- Added server snapshot comparison to the shared queue panel.
+- Attendance conflicts now fetch the matching server attendance record by enrollment/date for review.
+- Marks conflicts now fetch the matching server marks entry by exam/class subject/enrollment for review.
+
+Verification:
+- `npm run build`: passed with the existing classified Nuxt/Nitro/Node warnings.
+- Restarted the local Nuxt dev server; `/login` is reachable at `http://localhost:3000/login`.
+- `npm run qa:offline-queue`: passed for Attendance and Marks.
+- Browser QA screenshots saved at `docs/browser-checks/offline-queue-recovery-20260428010653.png` and `docs/browser-checks/offline-queue-recovery-20260428011644.png`.
+
+Phase 7E status: the v3 Phase 7E offline/PWA scope is complete for the current Attendance and Marks surfaces. Future hardening should add dedicated conflict lookup endpoints and field-level merge decisions before expanding offline capture to more modules.
+
+Current page after finishing this phase: Phase 7E IndexedDB offline queue.
+
 ```text
 Read D:\Development\School-SaaS-Enterprise-CONTEXT.md and D:\Development\School-SaaS-Enterprise\docs\current-status.md.
 Continue from the current status.

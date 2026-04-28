@@ -42,6 +42,13 @@ const marksDraft = useOfflineDraft<MarksDraft>(
 const marksQueueEntries = computed(() =>
   offlineQueue.entries.value.filter((entry) => entry.schoolId === schoolId.value),
 )
+const marksConflictSnapshots = ref<Record<string, Record<string, unknown> | null>>({})
+const marksQueuePanelEntries = computed(() =>
+  marksQueueEntries.value.map((entry) => ({
+    ...entry,
+    serverSnapshot: marksConflictSnapshots.value[entry.id] ?? null,
+  })),
+)
 
 const markForm = reactive({
   exam_id: '',
@@ -163,6 +170,56 @@ function markQueueLabel(payload: { exam_id: number, class_subject_id: number, st
   return `Marks / ${enrollment?.student?.full_name || `Enrollment ${payload.student_enrollment_id}`} / ${exam?.name || `Exam ${payload.exam_id}`} / ${subjectName}`
 }
 
+function marksSnapshot(entry: MarksEntry) {
+  return {
+    id: entry.id,
+    exam_id: entry.exam_id,
+    exam: entry.exam?.name ?? null,
+    class_subject_id: entry.class_subject_id,
+    subject: entry.class_subject?.subject?.name ?? null,
+    student_enrollment_id: entry.student_enrollment_id,
+    student: entry.student_enrollment?.student?.full_name ?? null,
+    marks_obtained: entry.marks_obtained,
+    full_marks: entry.full_marks,
+    is_absent: entry.is_absent,
+    verification_status: entry.verification_status,
+  }
+}
+
+async function loadMarksConflictSnapshots() {
+  const targets = marksQueueEntries.value.filter((entry) => entry.status === 'conflict')
+  const next: Record<string, Record<string, unknown> | null> = {}
+
+  if (!targets.length) {
+    marksConflictSnapshots.value = next
+    return
+  }
+
+  try {
+    const response = await api.request<ListResponse<MarksEntry>>(`/schools/${schoolId.value}/marks-entries?per_page=100`)
+
+    for (const entry of targets) {
+      const payload = entry.payload as {
+        exam_id?: number
+        class_subject_id?: number
+        student_enrollment_id?: number
+      }
+      const match = response.data.find((record) =>
+        record.exam_id === Number(payload.exam_id)
+        && record.class_subject_id === Number(payload.class_subject_id)
+        && record.student_enrollment_id === Number(payload.student_enrollment_id),
+      )
+      next[entry.id] = match ? marksSnapshot(match) : null
+    }
+  } catch {
+    for (const entry of targets) {
+      next[entry.id] = null
+    }
+  }
+
+  marksConflictSnapshots.value = next
+}
+
 async function queueMark(payload: {
   exam_id: number
   class_subject_id: number
@@ -220,10 +277,13 @@ async function syncMarksQueue() {
   }
 
   await loadWorkspace()
+  await loadMarksConflictSnapshots()
 }
 
-function retryQueuedMark(id: string) {
-  offlineQueue.markPending(id)
+async function retryQueuedMark(id: string) {
+  await offlineQueue.markPending(id)
+  const { [id]: _removed, ...rest } = marksConflictSnapshots.value
+  marksConflictSnapshots.value = rest
   success.value = 'Marks queue item is ready to retry.'
 }
 
@@ -325,10 +385,11 @@ watch(isOnline, (online) => {
   }
 })
 
-onMounted(() => {
+onMounted(async () => {
   restoreMarksDraft()
-  offlineQueue.refresh()
-  loadWorkspace()
+  await offlineQueue.refresh()
+  await loadWorkspace()
+  await loadMarksConflictSnapshots()
 })
 </script>
 
@@ -373,7 +434,7 @@ onMounted(() => {
       </OfflineNotice>
 
       <OfflineQueuePanel
-        :entries="marksQueueEntries"
+        :entries="marksQueuePanelEntries"
         :syncing="offlineQueue.syncing.value"
         @discard="offlineQueue.remove"
         @retry="retryQueuedMark"

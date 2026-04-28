@@ -1881,3 +1881,17 @@ Scope: completed the next offline queue hardening slice for Attendance and Marks
 Verification: `npm run build` passed with the existing classified Nuxt/Nitro/Node warnings. The local Nuxt dev server on port 3000 was restarted after build cache churn. `npm run qa:offline-queue` passed; the browser suite injected auth-required and conflict queue records, verified local payload review, retried the conflict, followed sign-in-again to `/login?redirect=/schools/1/attendance`, and saved `docs/browser-checks/offline-queue-recovery-20260427111712.png`.
 
 Phase 7E status: recovery UX and browser QA are complete for Attendance. Remaining hardening is IndexedDB migration for larger queues, server-backed local-vs-server conflict comparison, and Marks-specific queue browser QA once seeded marks choices are stable.
+
+### Phase 7E IndexedDB Queue And Conflict Comparison
+
+Scope: completed the remaining Phase 7E offline queue hardening slice for the current Attendance and Marks workspaces:
+- migrated `apps/web/composables/useOfflineQueue.ts` to IndexedDB-first storage.
+- retained automatic migration for old `school-saas:offline-queue:*` localStorage records and a localStorage fallback when IndexedDB is unavailable.
+- extended `apps/web/scripts/browser-offline-queue-recovery.mjs` so the real-browser suite covers both Attendance and Marks, including legacy storage migration into IndexedDB.
+- added server snapshot comparison rendering to `apps/web/components/OfflineQueuePanel.vue`.
+- enriched Attendance conflicts with the matching server attendance record.
+- enriched Marks conflicts with the matching server marks entry.
+
+Verification: `npm run build` passed with the existing classified Nuxt/Nitro/Node warnings. The local Nuxt dev server was restarted on `http://localhost:3000`, `/login` returned 200, and `npm run qa:offline-queue` passed for Attendance and Marks. Screenshots saved at `docs/browser-checks/offline-queue-recovery-20260428010653.png` and `docs/browser-checks/offline-queue-recovery-20260428011644.png`.
+
+Phase 7E status: complete for the current v3 Attendance/Marks offline scope. Remaining ideas are future hardening, not current blockers: dedicated comparison endpoints, field-level merge choices, and more offline-enabled modules.
