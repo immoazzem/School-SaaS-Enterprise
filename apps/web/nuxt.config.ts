@@ -8,6 +8,7 @@ const enablePwa = process.env.NUXT_ENABLE_PWA === 'true'
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   ssr: false,
+  spaLoadingTemplate: './spa-loading-template.html',
   ...(process.env.NUXT_BUILD_DIR ? { buildDir: process.env.NUXT_BUILD_DIR } : {}),
 
   app: {
@@ -24,7 +25,7 @@ export default defineNuxtConfig({
   },
 
   devtools: {
-    enabled: true,
+    enabled: process.env.NUXT_DEVTOOLS === 'true',
   },
 
   css: [
@@ -56,6 +57,7 @@ export default defineNuxtConfig({
 
   experimental: {
     typedPages: true,
+    browserDevtoolsTiming: false,
   },
 
   typescript: {

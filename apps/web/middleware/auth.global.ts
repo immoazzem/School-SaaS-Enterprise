@@ -1,3 +1,5 @@
+import { dashboardPathForSchool } from '~/lib/accessControl'
+
 export default defineNuxtRouteMiddleware(async to => {
   const session = useSession()
 
@@ -31,6 +33,6 @@ export default defineNuxtRouteMiddleware(async to => {
     }
   }
 
-  if (to.path === '/')
-    return navigateTo('/dashboard')
+  if (to.path === '/' || to.path === '/dashboard')
+    return navigateTo(dashboardPathForSchool(session.selectedSchool.value), { replace: true })
 })

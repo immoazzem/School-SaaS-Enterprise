@@ -17,7 +17,25 @@ const viewports = [
 ]
 
 const routes = [
+  { name: 'root', path: '/' },
   { name: 'dashboard', path: '/dashboard' },
+  { name: 'dashboard-admin', path: '/dashboard/admin' },
+  { name: 'dashboard-principal', path: '/dashboard/principal' },
+  { name: 'dashboard-teacher', path: '/dashboard/teacher' },
+  { name: 'dashboard-accountant', path: '/dashboard/accountant' },
+  { name: 'dashboard-student', path: '/dashboard/student' },
+  { name: 'dashboard-parent', path: '/dashboard/parent' },
+  { name: 'dashboard-auditor', path: '/dashboard/auditor' },
+  { name: 'analytics', path: '/analytics' },
+  { name: 'students-root', path: '/students' },
+  { name: 'classes-root', path: '/classes' },
+  { name: 'attendance-root', path: '/attendance' },
+  { name: 'marks-root', path: '/marks' },
+  { name: 'reports-root', path: '/reports' },
+  { name: 'finance-fees-root', path: '/finance/fees' },
+  { name: 'notices-root', path: '/notices' },
+  { name: 'settings-root', path: '/settings' },
+  { name: 'second-page', path: '/second-page' },
   { name: 'schools', path: '/schools' },
   { name: 'admin-index', path: '/admin' },
   { name: 'admin-schools', path: '/admin/schools' },
@@ -59,7 +77,7 @@ const routes = [
 
 async function login(page) {
   await page.goto(`${baseURL}/login`, { waitUntil: 'domcontentloaded' })
-  await page.waitForLoadState('networkidle', { timeout: 60000 }).catch(() => page.waitForLoadState('load'))
+  await waitForUsablePage(page)
 
   const emailField = page.locator('input[type="email"]').first()
   const passwordField = page.locator('input[type="password"]').first()
@@ -70,6 +88,17 @@ async function login(page) {
   await passwordField.fill(qaPassword)
   await submitButton.click()
   await page.waitForFunction(() => !window.location.pathname.startsWith('/login'), { timeout: 60000 })
+  await waitForUsablePage(page)
+}
+
+async function waitForUsablePage(page) {
+  await page.waitForLoadState('load', { timeout: 60000 }).catch(() => {})
+  await page.waitForFunction(() => {
+    const loader = document.querySelector('.school-spa-loader')
+    const text = document.body?.innerText?.trim() || ''
+
+    return !loader && text.length > 20
+  }, { timeout: 90000 })
 }
 
 async function collectLayoutIssues(page) {
@@ -199,9 +228,10 @@ try {
     await login(page)
 
     for (const route of routes) {
+      console.log(`[visual-layout] ${viewport.name} ${route.path}`)
       await page.goto(`${baseURL}${route.path}`, { waitUntil: 'domcontentloaded' })
-      await page.waitForLoadState('networkidle', { timeout: 60000 }).catch(() => page.waitForLoadState('load'))
-      await page.waitForTimeout(900)
+      await waitForUsablePage(page)
+      await page.waitForTimeout(300)
 
       const result = {
         route: route.name,

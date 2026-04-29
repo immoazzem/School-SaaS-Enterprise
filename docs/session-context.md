@@ -2,6 +2,36 @@
 
 ## Latest Resume Point
 
+- Senior QA login, routing, and full-stack verification completed on 2026-04-29.
+- Important fixes:
+  - cold Nuxt starts now show a branded SPA loader instead of an empty white page.
+  - `/`, `/dashboard`, and `/second-page` now redirect through middleware/client-mounted logic instead of top-level await navigation that could leave the loader stuck.
+  - missing `Admin` i18n key was added for role-dashboard labels.
+  - attendance records now sort newest same-day records first, so browser QA can edit the row it just created under seeded production-like data.
+  - visual layout audit now covers 56 frontend routes across 4 viewport sizes and waits for usable rendered content.
+- Verified this pass:
+  - `cd apps/web && npm.cmd run qa:visual-layout`
+  - `cd apps/web && npm.cmd run qa:browser`
+  - `cd apps/web && npm.cmd run qa:extended-ops`
+  - `cd apps/web && npm.cmd run qa:admin-ops`
+  - `cd apps/web && npm.cmd run qa:ops-mutation`
+  - `cd apps/web && npm.cmd run qa:phase-ops`
+  - `cd apps/web && npm.cmd run qa:offline-queue`
+  - `cd apps/web && npm.cmd run qa:roles`
+  - `cd apps/web && npm.cmd run build`
+  - `cd apps/api && vendor\bin\pint --test`
+  - `cd apps/api && php artisan route:list --path=api/v1`
+  - `cd apps/api && php artisan test`
+- Final database state was reset and reseeded with deterministic demo data:
+  - 1 school, 13 users, 10 academic years, 48 students, 480 enrollments, 8640 student attendance rows, 9600 marks, 3360 invoices, 3278 payments, 0 failed jobs, 0 orphan enrollments, 0 orphan invoices.
+- Useful artifacts:
+  - `docs/browser-checks/login-fixed-final.png`
+  - `docs/browser-checks/root-after-auth-fixed.png`
+  - `docs/browser-checks/visual-layout-20260429T032651/report.json`
+  - `docs/browser-checks/workflow-smoke-20260429034226.png`
+- Environment note:
+  - current verified URLs are `http://localhost:3000/login` for Nuxt and `http://127.0.0.1:8010/up` for Laravel.
+
 - Ops mutation and full browser QA recovery completed on 2026-04-25.
 - Added:
   - `apps/web/scripts/browser-ops-mutation.mjs`

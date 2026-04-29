@@ -14,6 +14,56 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 
 ## 2026-04-25
 
+### Senior QA Login, Routing, And Full-Stack Verification
+
+Current page/module complete: login recovery, root/dashboard routing hardening, expanded visual QA, operational browser QA, backend tests, and clean ten-year simulation.
+
+Scope:
+- reproduced the reported login/white-page symptom in a real browser.
+- added a Nuxt SPA loading template so slow cold-start hydration no longer presents as a blank white page.
+- fixed root and dashboard redirects so `/`, `/dashboard`, and `/second-page` do not leave suspense unresolved or keep the SPA loader mounted.
+- added missing `Admin` i18n strings.
+- made Nuxt devtools opt-in with `NUXT_DEVTOOLS=true`.
+- expanded `apps/web/scripts/browser-visual-layout-audit.mjs` to 56 routes, added route progress output, and replaced fragile `networkidle` waits with usable-page waits.
+- fixed `StudentAttendanceRecordController` sorting so newly created same-day attendance records appear first and remain editable in the UI.
+
+Verification:
+- `cd apps/web && npm run qa:roles`: passed for 7 role accounts.
+- `cd apps/web && npm run qa:visual-layout`: passed, 56 routes x 4 viewports.
+- `cd apps/web && npm run qa:browser`: passed with 12 workflow checks after the attendance sort fix.
+- `cd apps/web && npm run qa:extended-ops`: passed.
+- `cd apps/web && npm run qa:admin-ops`: passed.
+- `cd apps/web && npm run qa:ops-mutation`: passed.
+- `cd apps/web && npm run qa:phase-ops`: passed.
+- `cd apps/web && npm run qa:offline-queue`: passed.
+- `cd apps/api && vendor\bin\pint --test`: passed.
+- `cd apps/api && php artisan route:list --path=api/v1`: passed, 251 versioned API routes.
+- `cd apps/api && php artisan test`: passed, 118 tests / 710 assertions.
+- `cd apps/web && npm run build`: passed with the existing documented Nuxt/Nitro/Node dependency warnings.
+- `cd apps/api && php artisan migrate:fresh --seed --force && php artisan db:seed --class=DemoDataSeeder --force`: passed after mutation QA.
+- final clean `npm run qa:roles`: passed.
+
+Final clean database counts:
+- 1 school, 13 users, 10 academic years, 5 classes, 48 students, 48 guardians, 8 employees.
+- 480 enrollments, 8,640 student attendance records, 1,920 employee attendance records.
+- 100 assignments, 20 exams, 9,600 marks, 3,360 invoices, 3,278 payments.
+- 896 salary records, 96 promotion records, 40 calendar events, 10 documents.
+- 0 failed jobs, 0 orphan enrollments, 0 orphan invoices.
+
+Browser evidence:
+- `docs/browser-checks/login-fixed-final.png`
+- `docs/browser-checks/root-after-auth-fixed.png`
+- `docs/browser-checks/visual-layout-20260429T032651/report.json`
+- latest `docs/browser-checks/role-dashboard-*.png`
+
+Notes:
+- Current local Node remains `v25.0.0`; no Node version was installed or switched.
+- The remaining `npm run build` warnings are framework/dependency-level Nuxt/Nitro/Node warnings, not application test failures.
+
+Next:
+- checkpoint and push this QA hardening slice.
+- continue with the next v3 feature/hardening item after the user reviews the current QA state.
+
 ### Pending Checkpoint - Ops Mutation And Full Browser QA Recovery
 
 Current page/module complete: staff operations, finance mutation paths, enterprise onboarding, phase ops, and the full browser smoke workflow are green again on the rebuilt frontend.

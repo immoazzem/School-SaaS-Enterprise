@@ -6,6 +6,7 @@ export default defineI18nConfig(() => ({
     en: {
       Overview: 'Overview',
       Dashboard: 'Dashboard',
+      Admin: 'Admin',
       Analytics: 'Analytics',
       Reports: 'Reports',
       Academics: 'Academics',
@@ -29,6 +30,7 @@ export default defineI18nConfig(() => ({
       },
       common: {
         active: 'Active',
+        admin: 'Admin',
         analytics: 'Analytics',
         attendance: 'Attendance',
         classes: 'Classes',
@@ -74,6 +76,7 @@ export default defineI18nConfig(() => ({
     bn: {
       Overview: 'ওভারভিউ',
       Dashboard: 'ড্যাশবোর্ড',
+      Admin: 'অ্যাডমিন',
       Analytics: 'অ্যানালিটিক্স',
       Reports: 'রিপোর্ট',
       Academics: 'একাডেমিকস',
@@ -97,6 +100,7 @@ export default defineI18nConfig(() => ({
       },
       common: {
         active: 'সক্রিয়',
+        admin: 'অ্যাডমিন',
         analytics: 'অ্যানালিটিক্স',
         attendance: 'উপস্থিতি',
         classes: 'ক্লাস',

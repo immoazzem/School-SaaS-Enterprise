@@ -4,6 +4,49 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Frontend Checkpoint
 
+Current page/module complete: senior QA pass for login, root/dashboard routing, visual layout, browser workflows, backend tests, and clean ten-year demo data.
+
+- Fixed the local login white-page symptom with a visible Nuxt SPA loading shell in `apps/web/spa-loading-template.html`.
+- Fixed root/dashboard redirect traps that could leave the SPA loader mounted:
+  - `/` and `/dashboard` now resolve directly to the user's role dashboard in global auth middleware.
+  - `/dashboard/index.vue` and the legacy `/second-page` redirect no longer use top-level `await navigateTo`.
+- Fixed a missing `Admin` i18n key that produced browser warnings.
+- Disabled normal Nuxt devtools UI unless `NUXT_DEVTOOLS=true`.
+- Expanded `npm run qa:visual-layout` from 38 to 56 routes and added progress logging plus better usable-page waits.
+- Fixed a real attendance listing defect: newly created attendance records now sort newest-first within a date, so saved records remain visible/editable when the day has many records.
+- Cleaned and rebuilt the database after mutation QA:
+  - `php artisan migrate:fresh --seed --force`
+  - `php artisan db:seed --class=DemoDataSeeder --force`
+- Final clean database state:
+  - 1 school, 13 users, 10 academic years, 5 classes, 48 students, 48 guardians, 8 employees
+  - 480 enrollments, 8,640 student attendance records, 1,920 staff attendance records
+  - 100 assignments, 20 exams, 9,600 marks, 3,360 invoices, 3,278 payments
+  - 896 salary records, 96 promotion records, 40 calendar events, 10 documents
+  - 0 failed jobs, 0 orphan enrollments, 0 orphan invoices
+- Verification after this pass:
+  - `cd apps/api && vendor\bin\pint --test` passed
+  - `cd apps/api && php artisan route:list --path=api/v1` passed, 251 versioned API routes
+  - `cd apps/api && php artisan test` passed, 118 tests / 710 assertions
+  - `cd apps/web && npm run build` passed with existing documented Nuxt/Nitro/Node dependency warnings
+  - `cd apps/web && npm run qa:roles` passed for all 7 role accounts
+  - `cd apps/web && npm run qa:visual-layout` passed, 56 routes x 4 viewports
+  - `cd apps/web && npm run qa:browser` passed with 12 workflow checks
+  - `cd apps/web && npm run qa:extended-ops` passed
+  - `cd apps/web && npm run qa:admin-ops` passed
+  - `cd apps/web && npm run qa:ops-mutation` passed
+  - `cd apps/web && npm run qa:phase-ops` passed
+  - `cd apps/web && npm run qa:offline-queue` passed
+  - clean reseed plus final `npm run qa:roles` passed
+- Browser evidence:
+  - `docs/browser-checks/login-fixed-final.png`
+  - `docs/browser-checks/root-after-auth-fixed.png`
+  - `docs/browser-checks/visual-layout-20260429T032651/report.json`
+  - latest `role-dashboard-*.png` screenshots
+
+Known note: `npm run build` still exits 0 but prints framework/dependency-level Nuxt/Nitro/Node warnings already tracked as known warnings. Current local Node remains `v25.0.0`; no other Node version was installed or switched.
+
+## Latest Frontend Checkpoint
+
 Current page/module complete: role-aware dashboards, permission-filtered navigation, full-stack QA, and final clean ten-year simulation.
 
 - Added role dashboard routing so each seeded user lands on the correct workspace:

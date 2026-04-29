@@ -40,7 +40,7 @@ class StudentAttendanceRecordController extends Controller
                 });
             })
             ->orderByDesc('attendance_date')
-            ->orderBy('id')
+            ->orderByDesc('id')
             ->paginate($this->perPage($request));
 
         return response()->json($this->paginated($records));

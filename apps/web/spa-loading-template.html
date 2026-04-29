@@ -1,0 +1,77 @@
+<div class="school-spa-loader" role="status" aria-live="polite">
+  <style>
+    .school-spa-loader {
+      align-items: center;
+      background: #f6f7fb;
+      color: #121826;
+      display: flex;
+      font-family: Inter, Roboto, Arial, sans-serif;
+      inset: 0;
+      justify-content: center;
+      min-height: 100vh;
+      position: fixed;
+      z-index: 9999;
+    }
+
+    .school-spa-loader__panel {
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      text-align: center;
+    }
+
+    .school-spa-loader__mark {
+      align-items: center;
+      background: #22c55e;
+      border-radius: 8px;
+      color: #ffffff;
+      display: flex;
+      font-size: 15px;
+      font-weight: 800;
+      height: 44px;
+      justify-content: center;
+      letter-spacing: 0;
+      width: 44px;
+    }
+
+    .school-spa-loader__title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .school-spa-loader__text {
+      color: #5f6b7a;
+      font-size: 13px;
+    }
+
+    .school-spa-loader__bar {
+      background: #d8dee8;
+      border-radius: 999px;
+      height: 4px;
+      overflow: hidden;
+      width: 180px;
+    }
+
+    .school-spa-loader__bar::before {
+      animation: school-spa-loader 1.2s ease-in-out infinite;
+      background: #121826;
+      border-radius: inherit;
+      content: "";
+      display: block;
+      height: 100%;
+      width: 45%;
+    }
+
+    @keyframes school-spa-loader {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(240%); }
+    }
+  </style>
+  <div class="school-spa-loader__panel">
+    <div class="school-spa-loader__mark">SS</div>
+    <div class="school-spa-loader__title">Opening workspace</div>
+    <div class="school-spa-loader__text">Preparing dashboards, permissions, and school data.</div>
+    <div class="school-spa-loader__bar"></div>
+  </div>
+</div>
