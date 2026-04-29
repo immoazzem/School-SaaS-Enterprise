@@ -5,6 +5,7 @@ import Footer from '@/layouts/components/Footer.vue'
 import UserProfile from '@/layouts/components/UserProfile.vue'
 import NavBarI18n from '@core/components/I18n.vue'
 import { VerticalNavLayout } from '@layouts'
+import { filterGuardedNavItems } from '~/lib/accessControl'
 
 const session = useSession()
 
@@ -27,10 +28,12 @@ const workspaceSummary = computed(() => {
 
   return `${activeName} · ${campusCount} ${campusCount === 1 ? 'campus' : 'campuses'} in portfolio`
 })
+
+const filteredNavItems = computed(() => filterGuardedNavItems(navItems, session.selectedSchool.value))
 </script>
 
 <template>
-  <VerticalNavLayout :nav-items="navItems">
+  <VerticalNavLayout :nav-items="filteredNavItems">
     <!-- 👉 navbar -->
     <template #navbar="{ toggleVerticalOverlayNavActive }">
       <div class="signal-navbar">

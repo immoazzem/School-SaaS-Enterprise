@@ -1833,6 +1833,47 @@ Latest verification inherited by this handoff:
 - `npm audit --audit-level=high` returned `found 0 vulnerabilities`.
 - Browser queue conflict smoke passed on Attendance.
 
+### Role-Aware Dashboard And Full-Stack QA Checkpoint
+
+Date: 2026-04-29
+
+Scope: completed the role-specific dashboard and permission-filtered navigation pass, then ran a full-stack QA cycle against the local Laravel API, Nuxt frontend, and a clean deterministic ten-year school dataset.
+
+Changes:
+- Added `apps/web/lib/accessControl.ts` for dashboard profile resolution, permission guard helpers, and nav filtering.
+- Added `apps/web/pages/dashboard/[role].vue` with role-tailored dashboard content and authorized shortcuts.
+- Replaced the old `/dashboard` parent route with `apps/web/pages/dashboard/index.vue` so `/dashboard/:role` renders as a real standalone route.
+- Updated the login flow to navigate directly to the resolved role dashboard after authentication.
+- Filtered global vertical and horizontal navigation items by selected-school permissions.
+- Hardened `SchoolMetricCard` so missing delta text cannot crash a dashboard render.
+- Added `apps/web/scripts/browser-role-dashboard-access.mjs` and the `npm run qa:roles` script.
+
+QA findings fixed:
+- A stale Nuxt dev-server chunk produced a white-page state after production build; restarting the dev server restored the app.
+- `/dashboard.vue` as a parent route prevented `/dashboard/:role` from rendering; moving it to `/dashboard/index.vue` fixed the route table.
+- Role dashboard metric cards crashed when `delta` was absent; the shared card now defaults the badge to `Live`.
+- Login via `/dashboard` redirect could leave the blank login layout mounted; login now targets the role dashboard directly.
+- The role QA script was made resilient for Nuxt dev-server readiness without relying on `networkidle`, which can hang on HMR/devtools sockets.
+
+Verification:
+- `vendor\bin\pint --test`: passed.
+- `php artisan route:list --path=api/v1`: passed, 251 versioned API routes.
+- `php artisan test`: passed, 118 tests / 710 assertions.
+- `php artisan migrate:fresh --seed --force` plus `php artisan db:seed --class=DemoDataSeeder --force`: passed before QA and again after mutation QA to leave a clean local demo state.
+- `npm run build`: passed with existing classified Nuxt/Nitro/Node dependency warnings.
+- `npm run qa:visual-layout`: passed, 38 routes across 4 viewports.
+- `npm run qa:browser`: passed, 12 workflow checks.
+- `npm run qa:extended-ops`: passed.
+- `npm run qa:admin-ops`: passed.
+- `npm run qa:ops-mutation`: passed.
+- `npm run qa:phase-ops`: passed.
+- `npm run qa:offline-queue`: passed.
+- `npm run qa:roles`: passed for super admin, principal, teacher, accountant, student, parent, and auditor against the final clean dataset.
+
+Final clean database counts: 1 school, 13 users, 10 academic years, 5 classes, 48 students, 48 guardians, 8 employees, 480 enrollments, 8,640 student attendance records, 1,920 staff attendance records, 100 assignments, 20 exams, 9,600 marks, 3,360 invoices, 3,278 payments, 896 salary records, 96 promotion records, 40 calendar events, 10 documents, 0 failed jobs, 0 orphan enrollments, and 0 orphan invoices.
+
+Browser evidence: `docs/browser-checks/visual-layout-20260429T005927/report.json`, `workflow-smoke-20260429011013.png`, `extended-ops-suite-20260429011656.png`, `admin-ops-suite-20260429011745.png`, `ops-mutation-suite-20260429011826.png`, `phase-ops-suite-20260429011937.png`, `offline-queue-recovery-20260429012245.png`, and final `role-dashboard-*.png` screenshots.
+
 ### Demo Data Verification Checkpoint
 
 Scope: added `apps/api/database/seeders/DemoDataSeeder.php` so full local browser checks can run from repeatable data instead of hand-created fragments. The seeder creates or updates the demo school, owner membership, academic year/class/section/group/shift/subject/class-subject, employee/teacher, student/enrollment, attendance, timetable, assignment/submission, exam type/exam/schedule, verified marks, grade scale/result summary, fee category/structure, paid invoice/payment, payment gateway config, salary, employee attendance, leave setup/application, calendar event, and public demo document.

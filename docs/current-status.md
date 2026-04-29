@@ -4,6 +4,58 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Frontend Checkpoint
 
+Current page/module complete: role-aware dashboards, permission-filtered navigation, full-stack QA, and final clean ten-year simulation.
+
+- Added role dashboard routing so each seeded user lands on the correct workspace:
+  - super admin: `/dashboard/admin`
+  - principal: `/dashboard/principal`
+  - teacher: `/dashboard/teacher`
+  - accountant: `/dashboard/accountant`
+  - student: `/dashboard/student`
+  - parent: `/dashboard/parent`
+  - auditor: `/dashboard/auditor`
+- Added permission-aware global navigation filtering for vertical and horizontal menus.
+- Fixed two dashboard runtime defects found by browser QA:
+  - changed `/dashboard` from a parent route into a proper index redirect so `/dashboard/:role` renders its page.
+  - made the shared metric card tolerate missing delta text instead of crashing role dashboard renders.
+- Fixed login routing so successful login goes directly to the resolved role dashboard instead of a `/dashboard` redirect chain that could leave the blank login layout mounted.
+- Added `apps/web/scripts/browser-role-dashboard-access.mjs` and `npm run qa:roles` to verify role dashboards and authorized menu visibility.
+- Final clean local database state after QA:
+  - 1 school, 13 users, 10 academic years, 5 classes, 48 students, 48 guardians, 8 employees
+  - 480 enrollments, 8,640 student attendance records, 1,920 staff attendance records
+  - 100 assignments, 20 exams, 9,600 marks, 3,360 invoices, 3,278 payments
+  - 896 salary records, 96 promotion records, 40 calendar events, 10 documents
+  - 0 failed jobs, 0 orphan enrollments, 0 orphan invoices
+- Verification after this pass:
+  - `cd apps/api && vendor\bin\pint --test` passed
+  - `cd apps/api && php artisan route:list --path=api/v1` showed 251 versioned API routes
+  - `cd apps/api && php artisan test` passed with 118 tests / 710 assertions
+  - `cd apps/api && php artisan migrate:fresh --seed --force && php artisan db:seed --class=DemoDataSeeder --force` passed
+  - `cd apps/web && npm run build` passed with the existing classified Nuxt/Nitro/Node dependency warnings
+  - `cd apps/web && npm run qa:visual-layout` passed, 38 routes across 4 viewports
+  - `cd apps/web && npm run qa:browser` passed with 12 workflow checks
+  - `cd apps/web && npm run qa:extended-ops` passed
+  - `cd apps/web && npm run qa:admin-ops` passed
+  - `cd apps/web && npm run qa:ops-mutation` passed
+  - `cd apps/web && npm run qa:phase-ops` passed
+  - `cd apps/web && npm run qa:offline-queue` passed
+  - `cd apps/web && npm run qa:roles` passed for 7 role accounts after the final clean reseed
+- Browser evidence:
+  - `docs/browser-checks/visual-layout-20260429T005927/report.json`
+  - `docs/browser-checks/workflow-smoke-20260429011013.png`
+  - `docs/browser-checks/extended-ops-suite-20260429011656.png`
+  - `docs/browser-checks/admin-ops-suite-20260429011745.png`
+  - `docs/browser-checks/ops-mutation-suite-20260429011826.png`
+  - `docs/browser-checks/phase-ops-suite-20260429011937.png`
+  - `docs/browser-checks/offline-queue-recovery-20260429012245.png`
+  - final role screenshots in `docs/browser-checks/role-dashboard-*.png`
+
+Answer to the role/dashboard question: yes, the app now routes different users to different dashboards, and the global menu is filtered by the selected school user's permissions. Finance invoice/payment APIs were exercised by backend tests and browser mutation suites and passed.
+
+Known note: `npm run build` still prints the already classified dependency-level Nuxt/Nitro warnings from `docs/KNOWN-BUILD-WARNINGS.md`; no new application warning was introduced by the role dashboard work.
+
+## Latest Frontend Checkpoint
+
 Current page/module complete: staff, finance, admin onboarding, phase-ops, and full school-workflow browser QA recovery.
 
 - Added `apps/web/scripts/browser-ops-mutation.mjs` for repeatable super-admin mutation QA across:

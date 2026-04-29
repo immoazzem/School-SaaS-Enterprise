@@ -2,13 +2,15 @@
 const props = defineProps<{
   title: string
   value: string
-  delta: string
+  delta?: string
   tone?: string
   icon: string
   note: string
 }>()
 
 const tone = computed(() => props.tone ?? 'primary')
+const deltaLabel = computed(() => props.delta || 'Live')
+const deltaTone = computed(() => deltaLabel.value.startsWith('-') ? 'error' : 'success')
 </script>
 
 <template>
@@ -36,11 +38,11 @@ const tone = computed(() => props.tone ?? 'primary')
 
       <div class="d-flex align-center justify-space-between gap-3">
         <VChip
-          :color="delta.startsWith('-') ? 'error' : 'success'"
+          :color="deltaTone"
           variant="tonal"
           size="small"
         >
-          {{ delta }}
+          {{ deltaLabel }}
         </VChip>
         <span class="text-body-2 text-medium-emphasis">{{ note }}</span>
       </div>

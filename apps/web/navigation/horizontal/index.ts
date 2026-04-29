@@ -1,12 +1,14 @@
 export default [
   {
-    title: 'Home',
-    to: { name: 'index' },
+    title: 'Dashboard',
+    to: { name: 'dashboard' },
     icon: { icon: 'tabler-smart-home' },
+    all: true,
   },
   {
-    title: 'Second page',
-    to: { name: 'second-page' },
-    icon: { icon: 'tabler-file' },
+    title: 'Reports',
+    to: { name: 'reports' },
+    icon: { icon: 'tabler-file-analytics' },
+    permissions: ['reports.view'],
   },
 ]

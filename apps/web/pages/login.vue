@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { dashboardPathForSchool } from '~/lib/accessControl'
+
 definePageMeta({
   layout: 'blank',
   public: true,
@@ -19,7 +21,7 @@ const redirectPath = computed(() => {
   const redirect = Array.isArray(route.query.redirect) ? route.query.redirect[0] : route.query.redirect
 
   if (!redirect || !redirect.startsWith('/') || redirect.startsWith('//'))
-    return '/'
+    return '/dashboard'
 
   return redirect
 })
@@ -29,7 +31,12 @@ async function handleLogin() {
 
   try {
     await session.login(form.value.email, form.value.password)
-    await navigateTo(redirectPath.value)
+
+    const targetPath = redirectPath.value === '/dashboard'
+      ? dashboardPathForSchool(session.selectedSchool.value)
+      : redirectPath.value
+
+    await navigateTo(targetPath)
   }
   catch (error: any) {
     errorMessage.value = error?.data?.message || error?.data?.errors?.email?.[0] || 'We could not sign you in with those credentials.'

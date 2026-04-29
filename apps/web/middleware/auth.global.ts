@@ -13,7 +13,7 @@ export default defineNuxtRouteMiddleware(async to => {
       }
 
       if (session.user.value)
-        return navigateTo('/')
+        return navigateTo('/dashboard')
     }
 
     return
@@ -30,4 +30,7 @@ export default defineNuxtRouteMiddleware(async to => {
       return navigateTo({ path: '/login', query: { redirect: to.fullPath } })
     }
   }
+
+  if (to.path === '/')
+    return navigateTo('/dashboard')
 })

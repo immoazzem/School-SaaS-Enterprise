@@ -10,10 +10,14 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
 import NavBarI18n from '@core/components/I18n.vue'
 import { HorizontalNavLayout } from '@layouts'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
+import { filterGuardedNavItems } from '~/lib/accessControl'
+
+const session = useSession()
+const filteredNavItems = computed(() => filterGuardedNavItems(navItems, session.selectedSchool.value))
 </script>
 
 <template>
-  <HorizontalNavLayout :nav-items="navItems">
+  <HorizontalNavLayout :nav-items="filteredNavItems">
     <!-- 👉 navbar -->
     <template #navbar>
       <NuxtLink
