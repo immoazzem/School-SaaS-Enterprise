@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'blank',
+})
+
 import type { AcademicClass, AcademicSection } from '~/composables/useApi'
 
 interface ClassesResponse {

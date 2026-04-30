@@ -16,13 +16,15 @@ const activeSchool = computed(() =>
 )
 
 const activeModule = computed(() => {
-  if (route.path === '/dashboard')
+  if (route.path === '/dashboard' || /^\/schools\/[^/]+\/?$/.test(route.path))
     return {
       label: 'Dashboard',
       description: 'School-wide command center and launchpad',
     }
 
-  const match = schoolWorkspaceModules.find(module => route.path.includes(`/${module.route}`))
+  const match = schoolWorkspaceModules
+    .filter(module => module.route)
+    .find(module => route.path.includes(`/${module.route}`))
 
   return match
     ? { label: match.label, description: match.description }

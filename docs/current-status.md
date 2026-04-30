@@ -4,6 +4,52 @@ Planning rule: `docs/enterprise-plan-v3.md` is the active plan. Whenever v3 ment
 
 ## Latest Frontend Checkpoint
 
+Current page/module complete: school dashboard route, school workspace shell correction, role-filtered school menus, full browser QA, backend QA, and clean ten-year demo data.
+
+- Answer to the dashboard question: before this pass there were separate role dashboards at `/dashboard/{role}`, but there was no dedicated school dashboard at `/schools/{schoolId}`. Opening a school jumped into `/schools/{schoolId}/students`.
+- Added a real school dashboard route: `/schools/{schoolId}`.
+- Fixed the deep school layout defect:
+  - every `/schools/{schoolId}/...` page now uses the blank layout and renders only the school workspace shell.
+  - the school workspace no longer nests inside the global dashboard sidebar/topbar.
+- Fixed school workspace menu authorization:
+  - unauthorized school modules are filtered out entirely instead of being shown as disabled menu items.
+  - `npm run qa:roles` now checks both role dashboards and school workspace menus for all 7 seeded roles.
+- Strengthened `npm run qa:visual-layout`:
+  - now covers 57 routes x 4 viewports.
+  - explicitly fails if a school workspace page is rendered inside the global dashboard shell.
+- Fixed brittle browser QA wait in `qa:ops-mutation` after the discount policy workflow proved slower under dev-server load.
+- Cleaned and rebuilt the database after mutation QA:
+  - `php artisan migrate:fresh --seed --force`
+  - `php artisan db:seed --class=DemoDataSeeder --force`
+- Final clean database state:
+  - 1 school, 13 users, 10 academic years, 5 classes, 48 students, 48 guardians, 8 employees
+  - 480 enrollments, 8,640 student attendance records, 1,920 staff attendance records
+  - 100 assignments, 20 exams, 9,600 marks, 3,360 invoices, 3,278 payments
+  - 896 salary records, 96 promotion records, 40 calendar events, 10 documents
+  - 0 failed jobs, 0 orphan enrollments, 0 orphan invoices
+- Verification after this pass:
+  - `cd apps/web && npm run qa:visual-layout` passed, 57 routes x 4 viewports
+  - `cd apps/web && npm run qa:roles` passed for all 7 role accounts and their school workspace menus
+  - `cd apps/web && npm run qa:browser` passed with 12 workflow checks
+  - `cd apps/web && npm run qa:extended-ops` passed
+  - `cd apps/web && npm run qa:admin-ops` passed
+  - `cd apps/web && npm run qa:ops-mutation` passed
+  - `cd apps/web && npm run qa:phase-ops` passed
+  - `cd apps/web && npm run qa:offline-queue` passed
+  - `cd apps/api && vendor\bin\pint --test` passed
+  - `cd apps/api && php artisan route:list --path=api/v1` passed, 251 versioned API routes
+  - `cd apps/api && php artisan test` passed, 118 tests / 710 assertions
+  - `cd apps/web && npm run build` passed with existing documented Nuxt/Nitro/Node dependency warnings
+  - final clean reseed plus `npm run qa:roles` passed
+- Browser evidence:
+  - `docs/browser-checks/visual-layout-20260430T045114/report.json`
+  - latest `docs/browser-checks/role-dashboard-*.png`
+  - latest `docs/browser-checks/role-school-workspace-*.png`
+
+Known note: `npm run build` still exits 0 but prints framework/dependency-level Nuxt/Nitro/Node warnings already tracked as known warnings. Current local Node remains `v25.0.0`; no other Node version was installed or switched.
+
+## Previous Frontend Checkpoint
+
 Current page/module complete: senior QA pass for login, root/dashboard routing, visual layout, browser workflows, backend tests, and clean ten-year demo data.
 
 - Fixed the local login white-page symptom with a visible Nuxt SPA loading shell in `apps/web/spa-loading-template.html`.

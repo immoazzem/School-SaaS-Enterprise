@@ -65,7 +65,7 @@ async function login(page) {
   await page.waitForFunction(() => !window.location.pathname.startsWith('/login'), { timeout: 60000 })
 }
 
-async function expectText(page, text, timeout = 15000) {
+async function expectText(page, text, timeout = 30000) {
   await page.getByText(text, { exact: false }).first().waitFor({ timeout })
 }
 

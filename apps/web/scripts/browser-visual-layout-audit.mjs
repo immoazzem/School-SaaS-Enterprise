@@ -42,6 +42,7 @@ const routes = [
   { name: 'admin-users', path: '/admin/users' },
   { name: 'admin-jobs', path: '/admin/jobs' },
   { name: 'admin-audit-logs', path: '/admin/audit-logs' },
+  { name: 'school-dashboard', path: `/schools/${schoolId}` },
   { name: 'academic-years', path: `/schools/${schoolId}/academic-years` },
   { name: 'academic-classes', path: `/schools/${schoolId}/academic-classes` },
   { name: 'academic-sections', path: `/schools/${schoolId}/academic-sections` },
@@ -171,6 +172,7 @@ async function collectLayoutIssues(page) {
 
     const desktopDrawer = document.querySelector('.workspace-admin-drawer')
     const stage = document.querySelector('.workspace-stage')
+    const isSchoolWorkspace = window.location.pathname.startsWith('/schools/') && window.location.pathname !== '/schools'
 
     if (desktopDrawer instanceof HTMLElement && stage instanceof HTMLElement && viewportWidth >= 960) {
       const drawerRect = desktopDrawer.getBoundingClientRect()
@@ -182,6 +184,18 @@ async function collectLayoutIssues(page) {
           message: 'Workspace content starts underneath the left navigation drawer',
           drawerRight: Math.round(drawerRect.right),
           stageLeft: Math.round(stageRect.left),
+        })
+      }
+    }
+
+    if (isSchoolWorkspace) {
+      const globalShell = document.querySelector('.layout-vertical-nav, .signal-navbar, .layout-navbar, .layout-footer')
+
+      if (globalShell) {
+        issues.push({
+          type: 'nested-global-shell',
+          message: 'School workspace is rendered inside the global dashboard layout',
+          selector: globalShell.className || globalShell.tagName.toLowerCase(),
         })
       }
     }

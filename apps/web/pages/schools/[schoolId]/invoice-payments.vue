@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'blank',
+})
+
 import type { StudentInvoice } from '~/composables/useApi'
 
 interface InvoicePaymentItem {

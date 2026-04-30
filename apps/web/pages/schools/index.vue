@@ -103,7 +103,7 @@ function switchSchool(id: number) {
 
 function openSchool(id: number) {
   auth.selectSchool(id)
-  router.push(`/schools/${id}/students`)
+  router.push(`/schools/${id}`)
 }
 
 onMounted(loadPortfolio)
@@ -130,7 +130,7 @@ onMounted(loadPortfolio)
           v-if="selectedSchool"
           color="primary"
           prepend-icon="tabler-arrow-right"
-          :to="`/schools/${selectedSchool.id}/students`"
+          :to="`/schools/${selectedSchool.id}`"
         >
           Open school workspace
         </VBtn>

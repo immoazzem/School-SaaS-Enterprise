@@ -2,6 +2,7 @@ import { chromium } from 'playwright'
 
 const baseURL = process.env.QA_BASE_URL || 'http://localhost:3000'
 const password = process.env.QA_PASSWORD || 'password'
+const schoolId = process.env.QA_SCHOOL_ID || '1'
 
 const roles = [
   {
@@ -9,6 +10,7 @@ const roles = [
     dashboard: '/dashboard/admin',
     title: 'Admin command center',
     visible: ['Dashboard', 'Finance', 'Admin', 'Schools'],
+    schoolVisible: ['Dashboard', 'Students', 'Finance', 'Reports', 'School Settings'],
   },
   {
     email: 'farhana.kabir@example.com',
@@ -16,6 +18,8 @@ const roles = [
     title: 'Principal dashboard',
     visible: ['Dashboard', 'Attendance', 'Marks', 'Classes', 'Reports'],
     hidden: ['Finance'],
+    schoolVisible: ['Dashboard', 'Classes', 'Students', 'Attendance', 'Marks', 'Reports'],
+    schoolHidden: ['Finance', 'Payment Gateways', 'School Settings', 'Invitations'],
   },
   {
     email: 'amina.rahman@example.com',
@@ -23,6 +27,8 @@ const roles = [
     title: 'Teacher dashboard',
     visible: ['Dashboard', 'Attendance', 'Marks', 'Reports'],
     hidden: ['Finance', 'Admin', 'Settings'],
+    schoolVisible: ['Dashboard', 'Students', 'Attendance', 'Marks', 'Assignments', 'Reports'],
+    schoolHidden: ['Finance', 'Employees', 'School Settings', 'Invitations'],
   },
   {
     email: 'mahmud.alam@example.com',
@@ -30,6 +36,8 @@ const roles = [
     title: 'Finance dashboard',
     visible: ['Dashboard', 'Finance', 'Reports', 'Students'],
     hidden: ['Admin', 'Classes', 'Attendance'],
+    schoolVisible: ['Dashboard', 'Students', 'Finance', 'Invoice Payments', 'Payment Gateways', 'Staff Ops', 'Reports'],
+    schoolHidden: ['Attendance', 'Marks', 'School Settings', 'Invitations'],
   },
   {
     email: 'student001@example.com',
@@ -37,6 +45,8 @@ const roles = [
     title: 'Student dashboard',
     visible: ['Dashboard', 'Reports'],
     hidden: ['Finance', 'Admin', 'Settings', 'Schools'],
+    schoolVisible: ['Dashboard', 'Reports', 'Notifications', 'Student Portal'],
+    schoolHidden: ['Finance', 'Students', 'Attendance', 'School Settings', 'Parent Portal'],
   },
   {
     email: 'guardian001@example.com',
@@ -44,6 +54,8 @@ const roles = [
     title: 'Parent dashboard',
     visible: ['Dashboard', 'Reports'],
     hidden: ['Finance', 'Admin', 'Settings', 'Schools'],
+    schoolVisible: ['Dashboard', 'Reports', 'Notifications', 'Parent Portal'],
+    schoolHidden: ['Finance', 'Students', 'Attendance', 'School Settings', 'Student Portal'],
   },
   {
     email: 'auditor@example.com',
@@ -51,6 +63,8 @@ const roles = [
     title: 'Audit dashboard',
     visible: ['Dashboard', 'Reports', 'Admin'],
     hidden: ['Finance', 'Students', 'Attendance', 'Marks'],
+    schoolVisible: ['Dashboard', 'Reports', 'Notifications'],
+    schoolHidden: ['Finance', 'Students', 'Attendance', 'Marks', 'School Settings'],
   },
 ]
 
@@ -81,6 +95,20 @@ async function navText(page) {
   return (await nav.innerText()).replace(/\s+/g, ' ')
 }
 
+async function assertTextIncludes(text, items, message) {
+  for (const item of items || []) {
+    if (!text.includes(item))
+      throw new Error(`${message} should include "${item}", nav was: ${text}`)
+  }
+}
+
+async function assertTextExcludes(text, items, message) {
+  for (const item of items || []) {
+    if (text.includes(item))
+      throw new Error(`${message} should not include "${item}", nav was: ${text}`)
+  }
+}
+
 async function assertRole(page, role) {
   await login(page, role.email)
   await page.waitForURL(url => url.pathname === role.dashboard, { timeout: 60000 })
@@ -88,18 +116,29 @@ async function assertRole(page, role) {
 
   const text = await navText(page)
 
-  for (const item of role.visible) {
-    if (!text.includes(item))
-      throw new Error(`${role.email} should see nav item "${item}", nav was: ${text}`)
-  }
-
-  for (const item of role.hidden || []) {
-    if (text.includes(item))
-      throw new Error(`${role.email} should not see nav item "${item}", nav was: ${text}`)
-  }
+  await assertTextIncludes(text, role.visible, `${role.email} global dashboard nav`)
+  await assertTextExcludes(text, role.hidden, `${role.email} global dashboard nav`)
 
   await page.screenshot({
     path: `../../docs/browser-checks/role-dashboard-${role.dashboard.split('/').pop()}-${Date.now()}.png`,
+    fullPage: true,
+  })
+
+  await page.goto(`${baseURL}/schools/${schoolId}`, { waitUntil: 'domcontentloaded', timeout: 90000 })
+  await page.getByText(/Role-aware launchpad/i).waitFor({ state: 'visible', timeout: 60000 })
+
+  const nestedGlobalShell = await page.locator('.layout-vertical-nav, .signal-navbar, .layout-navbar, .layout-footer').count()
+
+  if (nestedGlobalShell > 0)
+    throw new Error(`${role.email} school workspace is still nested inside the global dashboard shell.`)
+
+  const schoolNavText = await navText(page)
+
+  await assertTextIncludes(schoolNavText, role.schoolVisible, `${role.email} school workspace nav`)
+  await assertTextExcludes(schoolNavText, role.schoolHidden, `${role.email} school workspace nav`)
+
+  await page.screenshot({
+    path: `../../docs/browser-checks/role-school-workspace-${role.dashboard.split('/').pop()}-${Date.now()}.png`,
     fullPage: true,
   })
 
@@ -107,13 +146,21 @@ async function assertRole(page, role) {
 }
 
 const browser = await chromium.launch({ headless: true })
-const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } })
 
 try {
-  for (const role of roles)
-    await assertRole(page, role)
+  for (const role of roles) {
+    const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } })
+    const page = await context.newPage()
 
-  console.log(`Role dashboard access completed with ${roles.length} passed checks.`)
+    try {
+      await assertRole(page, role)
+    }
+    finally {
+      await context.close()
+    }
+  }
+
+  console.log(`Role dashboard and school workspace access completed with ${roles.length} passed checks.`)
 }
 finally {
   await browser.close()

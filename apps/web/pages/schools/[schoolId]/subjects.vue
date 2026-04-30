@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'blank',
+})
+
 import type { Subject } from '~/composables/useApi'
 
 interface SubjectsResponse {

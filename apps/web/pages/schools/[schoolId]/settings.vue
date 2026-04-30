@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'blank',
+})
+
 interface SchoolSettingsPayload {
   timezone: string
   locale: string

@@ -12,6 +12,60 @@ Durable build log for the School SaaS Enterprise rebuild. Update this after each
 - Mention the current page/module in progress and phase completion notes.
 - Use visible agent-browser checks during UI phases when the dev server is available.
 
+## 2026-04-30
+
+### School Workspace Dashboard And Senior QA Correction
+
+Current page/module complete: dedicated school dashboard, corrected school workspace shell, role-filtered school workspace menus, browser QA, backend QA, and clean ten-year simulation.
+
+Scope:
+- confirmed there was no separate school dashboard route before this pass; school opening went directly to `/schools/{schoolId}/students`.
+- added `/schools/{schoolId}` as the school command-center dashboard.
+- moved all deep school workspace pages to the blank layout so they no longer nest inside the global dashboard sidebar/topbar.
+- changed the school workspace rail to hide unauthorized modules entirely instead of rendering disabled menu rows.
+- updated the school portfolio "Open school workspace" action to open `/schools/{schoolId}`.
+- expanded the visual layout audit to include the school dashboard and to fail on nested global layout shell leakage.
+- expanded role QA so all 7 seeded accounts verify both role dashboard routing and authorized school workspace menus.
+- increased the browser mutation harness wait around success messages after the discount policy workflow exposed a dev-load timing issue.
+
+Verification:
+- `cd apps/web && npm run qa:visual-layout`: passed, 57 routes x 4 viewports.
+- `cd apps/web && npm run qa:roles`: passed for 7 role accounts and school workspace menus.
+- `cd apps/web && npm run qa:browser`: passed with 12 workflow checks.
+- `cd apps/web && npm run qa:extended-ops`: passed.
+- `cd apps/web && npm run qa:admin-ops`: passed.
+- `cd apps/web && npm run qa:ops-mutation`: passed.
+- `cd apps/web && npm run qa:phase-ops`: passed.
+- `cd apps/web && npm run qa:offline-queue`: passed.
+- `cd apps/api && vendor\bin\pint --test`: passed.
+- `cd apps/api && php artisan route:list --path=api/v1`: passed, 251 versioned API routes.
+- `cd apps/api && php artisan test`: passed, 118 tests / 710 assertions.
+- `cd apps/web && npm run build`: passed with existing documented Nuxt/Nitro/Node dependency warnings.
+- `cd apps/api && php artisan migrate:fresh --seed --force && php artisan db:seed --class=DemoDataSeeder --force`: passed after mutation QA.
+- final clean `cd apps/web && npm run qa:roles`: passed.
+
+Final clean database counts:
+- 1 school, 13 users, 10 academic years, 5 classes, 48 students, 48 guardians, 8 employees.
+- 480 enrollments, 8,640 student attendance records, 1,920 employee attendance records.
+- 100 assignments, 20 exams, 9,600 marks, 3,360 invoices, 3,278 payments.
+- 896 salary records, 96 promotion records, 40 calendar events, 10 documents.
+- 0 failed jobs, 0 orphan enrollments, 0 orphan invoices.
+
+Browser evidence:
+- `docs/browser-checks/visual-layout-20260430T045114/report.json`
+- latest `docs/browser-checks/role-dashboard-*.png`
+- latest `docs/browser-checks/role-school-workspace-*.png`
+- latest workflow suite screenshots from 2026-04-30.
+
+Notes:
+- Current local verified URLs are `http://localhost:3000/login` and `http://127.0.0.1:8010/up`.
+- Current local Node remains `v25.0.0`; no Node version was installed or switched.
+- Remaining `npm run build` warnings are framework/dependency-level Nuxt/Nitro/Node warnings, not application test failures.
+
+Next:
+- checkpoint and push this correction.
+- continue with deeper page-level UX cleanup only after this restored baseline is reviewed.
+
 ## 2026-04-25
 
 ### Senior QA Login, Routing, And Full-Stack Verification

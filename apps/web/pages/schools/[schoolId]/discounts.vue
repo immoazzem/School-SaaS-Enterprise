@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'blank',
+})
+
 import type { AcademicYear, DiscountPolicy, FeeCategory, StudentEnrollment } from '~/composables/useApi'
 
 interface StudentDiscountItem {

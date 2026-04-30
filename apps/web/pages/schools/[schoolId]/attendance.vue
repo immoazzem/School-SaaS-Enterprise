@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'blank',
+})
+
 import type { StudentAttendanceRecord, StudentEnrollment } from '~/composables/useApi'
 
 interface ListResponse<T> {

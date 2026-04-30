@@ -43,23 +43,26 @@ const schoolOptions = computed(() =>
 )
 
 const groupedModules = computed(() =>
-  schoolWorkspaceGroups.map((group) => ({
-    title: group.title,
-    icon: group.icon,
-    items: schoolWorkspaceModules
-      .filter((item) => item.tone === group.tone)
-      .map((item) => {
-        const enabled = canOpen(item)
-        const to = activeSchoolId.value && enabled ? `/schools/${activeSchoolId.value}/${item.route}` : null
+  schoolWorkspaceGroups
+    .map((group) => ({
+      title: group.title,
+      icon: group.icon,
+      items: schoolWorkspaceModules
+        .filter((item) => item.tone === group.tone)
+        .filter(canOpen)
+        .map((item) => {
+          const to = item.route
+            ? `/schools/${activeSchoolId.value}/${item.route}`
+            : `/schools/${activeSchoolId.value}`
 
-        return {
-          ...item,
-          enabled,
-          to,
-          active: to ? route.path === to : false,
-        }
-      }),
-  })),
+          return {
+            ...item,
+            to,
+            active: route.path === to,
+          }
+        }),
+    }))
+    .filter(group => group.items.length),
 )
 
 const drawerModel = computed({
@@ -71,6 +74,9 @@ const drawerModel = computed({
 })
 
 function canOpen(module: { permissions: string[] }) {
+  if (!module.permissions.length)
+    return Boolean(activeSchoolId.value)
+
   const permissions = selectedSchool.value?.permissions ?? []
 
   return module.permissions.some(permission => permissions.includes(permission))
@@ -84,7 +90,7 @@ async function selectSchool(value: number | null) {
 
   if (route.path.startsWith('/schools/')) {
     const [, , , ...rest] = route.path.split('/')
-    await router.push(`/schools/${value}/${rest.join('/')}`)
+    await router.push(`/schools/${value}${rest.length ? `/${rest.join('/')}` : ''}`)
   }
 }
 
@@ -200,8 +206,7 @@ function iconPath(icon: string) {
                 v-for="item in group.items"
                 :key="item.label"
                 :active="item.active"
-                :disabled="!item.to"
-                :to="item.to || undefined"
+                :to="item.to"
                 rounded="lg"
                 class="workspace-nav-item"
               >

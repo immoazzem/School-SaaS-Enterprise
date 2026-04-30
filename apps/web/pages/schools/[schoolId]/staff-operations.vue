@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'blank',
+})
+
 import type { AcademicYear, Employee, EmployeeAttendanceRecord, LeaveApplication, LeaveBalance, LeaveType, SalaryRecord } from '~/composables/useApi'
 
 interface ListResponse<T> {

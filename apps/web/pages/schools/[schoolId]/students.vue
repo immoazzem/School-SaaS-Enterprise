@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'blank',
+})
+
 import type { Guardian, Student } from '~/composables/useApi'
 
 interface GuardiansResponse {

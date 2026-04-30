@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'blank',
+})
+
 import type { AcademicClass, AcademicYear, CalendarEvent } from '~/composables/useApi'
 
 interface ListResponse<T> {

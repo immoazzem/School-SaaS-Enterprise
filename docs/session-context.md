@@ -2,6 +2,36 @@
 
 ## Latest Resume Point
 
+- Senior QA correction completed on 2026-04-30.
+- Important fixes:
+  - added a dedicated school dashboard at `/schools/{schoolId}`; before this pass, opening a school jumped to `/schools/{schoolId}/students`.
+  - all deep school workspace pages now use `layout: 'blank'`, so the school shell is no longer nested inside the global dashboard shell.
+  - school workspace rail now hides unauthorized modules entirely instead of showing disabled menu items.
+  - role QA now checks both `/dashboard/{role}` routing and `/schools/{schoolId}` workspace menus for all 7 seeded roles.
+  - visual layout QA now covers 57 routes x 4 viewports and fails on nested global shell leakage.
+- Verified this pass:
+  - `cd apps/web && npm.cmd run qa:visual-layout`
+  - `cd apps/web && npm.cmd run qa:roles`
+  - `cd apps/web && npm.cmd run qa:browser`
+  - `cd apps/web && npm.cmd run qa:extended-ops`
+  - `cd apps/web && npm.cmd run qa:admin-ops`
+  - `cd apps/web && npm.cmd run qa:ops-mutation`
+  - `cd apps/web && npm.cmd run qa:phase-ops`
+  - `cd apps/web && npm.cmd run qa:offline-queue`
+  - `cd apps/web && npm.cmd run build`
+  - `cd apps/api && vendor\bin\pint --test`
+  - `cd apps/api && php artisan route:list --path=api/v1`
+  - `cd apps/api && php artisan test`
+  - clean reseed plus final `npm.cmd run qa:roles`
+- Final database state was reset and reseeded with deterministic demo data:
+  - 1 school, 13 users, 10 academic years, 48 students, 480 enrollments, 8640 student attendance rows, 9600 marks, 3360 invoices, 3278 payments, 0 failed jobs, 0 orphan enrollments, 0 orphan invoices.
+- Useful artifacts:
+  - `docs/browser-checks/visual-layout-20260430T045114/report.json`
+  - latest `docs/browser-checks/role-dashboard-*.png`
+  - latest `docs/browser-checks/role-school-workspace-*.png`
+- Environment note:
+  - current verified URLs are `http://localhost:3000/login` for Nuxt and `http://127.0.0.1:8010/up` for Laravel.
+
 - Senior QA login, routing, and full-stack verification completed on 2026-04-29.
 - Important fixes:
   - cold Nuxt starts now show a branded SPA loader instead of an empty white page.

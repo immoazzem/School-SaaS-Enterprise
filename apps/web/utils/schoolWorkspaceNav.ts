@@ -10,6 +10,7 @@ export type SchoolWorkspaceModule = {
 }
 
 export const schoolWorkspaceModules: SchoolWorkspaceModule[] = [
+  { label: 'Dashboard', description: 'School command center', route: '', permissions: [], tone: 'operations', icon: 'chart' },
   { label: 'Academic Years', description: 'Sessions and current year', route: 'academic-years', permissions: ['academic_years.manage'], tone: 'academic', icon: 'calendar' },
   { label: 'Classes', description: 'Class levels and order', route: 'academic-classes', permissions: ['academic_classes.manage'], tone: 'academic', icon: 'stack' },
   { label: 'Sections', description: 'Rooms, capacity, class mapping', route: 'academic-sections', permissions: ['sections.manage'], tone: 'academic', icon: 'grid' },

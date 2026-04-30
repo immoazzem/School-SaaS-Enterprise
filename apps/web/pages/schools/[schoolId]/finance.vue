@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'blank',
+})
+
 import type { AcademicClass, AcademicYear, FeeCategory, FeeStructure, StudentEnrollment, StudentInvoice } from '~/composables/useApi'
 
 interface ListResponse<T> {

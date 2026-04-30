@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: 'blank',
+})
+
 interface StudentProfile {
   full_name?: string
   admission_no?: string
